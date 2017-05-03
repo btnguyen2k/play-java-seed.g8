@@ -23,6 +23,21 @@ sbt new btnguyen2k/play-java-seed.g8
   - Form controller
   - API controller
 
+### Start/Stop Scripts
+
+Commands:
+
+- start
+- stop
+
+Command line arguments
+
+- TODO
+
+Environment properties:
+
+- TODO
+
 
 ## Scaffolding 
 
