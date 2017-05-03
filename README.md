@@ -10,6 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
+
 ## Features
 
 - Intended for Linux-based applications.
@@ -17,11 +18,23 @@ sbt new btnguyen2k/play-java-seed.g8
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
   - For non-production: `conf/application.conf` and `conf/logback.xml`
 - Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server.sh` for non-production.
+- Samples:
+  - Module
+  - Form controller
+  - API controller
 
 
 ## Scaffolding 
 
 Type `g8Scaffold form` from sbt to create the scaffold controller, template and tests needed to process a form.
+
+
+## LICENSE & COPYRIGHT
+
+This template is distributed under the same license as the original [`playframework/play-java-seed.g8`](https://github.com/playframework/play-java-seed.g8) template.
+
+You are free to clone the repository, use, modify and redistribute the template.
+
 
 ## Giter8 template. 
 
