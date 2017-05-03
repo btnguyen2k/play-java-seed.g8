@@ -8,7 +8,6 @@ addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.1.0")
 addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.0") // https://github.com/sbt/sbt-coffeescript
 addSbtPlugin("com.typesafe.sbt" % "sbt-less" % "1.1.0")         // https://github.com/sbt/sbt-less
 addSbtPlugin("com.typesafe.sbt" % "sbt-jshint" % "1.0.4")       // https://github.com/sbt/sbt-jshint
-addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.8")          // https://github.com/sbt/sbt-rjs
 addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.1")       // https://github.com/sbt/sbt-digest
 addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.0")        // https://github.com/sbt/sbt-mocha
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")         // https://github.com/sbt/sbt-gzip

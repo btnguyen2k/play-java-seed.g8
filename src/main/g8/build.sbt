@@ -17,7 +17,7 @@ javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 routesGenerator := InjectedRoutesGenerator
 
-pipelineStages := Seq(rjs, digest, gzip)
+pipelineStages := Seq(digest, gzip)
 
 lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, SbtWeb).settings(
     name         := appName,

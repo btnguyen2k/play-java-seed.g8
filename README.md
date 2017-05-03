@@ -2,20 +2,27 @@
 
 Giter8 template for generating a Play project in Java.
 
-This project is intended for people who know how to use Play and want to get started right away.
+This project is the base template for my own Play projects in Java.
 
-You should only need to clone this project if you are modifying the giter8 template.  For information on giter8 templates, please see http://www.foundweekends.org/giter8/
-
-## Running
-
-If you want to create a project:
+To create a project:
 
 ```
-sbt new playframework/play-java-seed.g8
+sbt new btnguyen2k/play-java-seed.g8
 ```
+
+## Features
+
+- Intended for Linux-based applications.
+- Separated configurations for production and non-production environments.
+  - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
+  - For non-production: `conf/application.conf` and `conf/logback.xml`
+- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server.sh` for non-production.
+
 
 ## Scaffolding 
 
 Type `g8Scaffold form` from sbt to create the scaffold controller, template and tests needed to process a form.
 
-You can also create your own giter8 seeds and scaffolds based off this one by forking from the https://github.com/playframework/play-java-seed.g8 or https://github.com/playframework/play-scala-seed.g8 github projects.
+## Giter8 template. 
+
+For information on giter8 templates, please see http://www.foundweekends.org/giter8/
