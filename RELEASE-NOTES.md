@@ -1,6 +1,13 @@
-Release Notes
+../../../README.mdRelease Notes
 =============
 
-## 2017-05-03: version 1.0.0
+## 2017-05-07: version 0.1.0
 
-- First release
+First release:
+ 
+- Base application template with examples:
+  - Module
+  - Form controller
+  - API controller
+- Start/Stop scripts on *NIX.
+- Separated configurations for production and non-production environments.

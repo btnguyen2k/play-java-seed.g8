@@ -139,7 +139,7 @@ doStart() {
     	RUN_CMD+=(-Dhttp.nonProxyHosts=\$APP_NOPROXY_HOST)
     fi
     RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
-    RUN_CMD+=(-Dspring.profiles.active=development -Dconfig.file=\$FINAL_APP_CONF -Dlogback.configurationFile=\$FINAL_APP_LOGBACK)
+    RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogback.configurationFile=\$FINAL_APP_LOGBACK)
     RUN_CMD+=(\$JVM_EXTRA_OPS)
     
     "\${RUN_CMD[@]}" &

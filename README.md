@@ -27,21 +27,27 @@ sbt new btnguyen2k/play-java-seed.g8
 
 Commands:
 
-- start
-- stop
+- start: `sh conf/server.sh start` or `sh conf/server-prod.sh start`
+- stop : `sh conf/server.sh stop` or `sh conf/server-prod.sh stop`
 
 Command line arguments
 
-- TODO
+- `-h`: display help and exist
+- `-a <listen-address>`: address to bind to, default `0.0.0.0`
+- `-p <http-port>`: port to bind to, default `9090`
+- `-m <max-memory-in-mb>`: example `-m 64` will limit the JVM's memory to 64Mb
+- `-c <config-file.conf>`: specify application's configuration file, default:
+  - Production: `conf/application-prod.conf`
+  - Non-production: `conf/application.conf`
+- `-l <logback-file.xml>`: logback configuration file, default:
+  - Production: `conf/logback-prod.conf`
+  - Non-production: `conf/logback-dev.conf`
+- `-j "extra-jvm-options"`: example `-j "-Djava.rmi.server.hostname=localhost)"`
 
 Environment properties:
 
-- TODO
-
-
-## Scaffolding 
-
-Type `g8Scaffold form` from sbt to create the scaffold controller, template and tests needed to process a form.
+- `app.home`: point to application's home directory
+- `spring.profiles.active`: set to `production` for production environment and set to `development` otherwise
 
 
 ## LICENSE & COPYRIGHT
