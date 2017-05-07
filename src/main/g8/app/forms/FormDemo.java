@@ -77,7 +77,7 @@ public class FormDemo {
              */
             errors.add(new ValidationError("email", "error.empty_email||"));
         }
-        if (!email.matches("^\\s*[0-9a-zA-Z_\\-\\.]+\\@[0-9a-zA-Z_\\-\\.]+\\s*$")) {
+        if (!email.matches("^\\s*[0-9a-zA-Z_\\-\\.]+\\@[0-9a-zA-Z_\\-\\.]+\\s*\$")) {
             /*
              * Error for field "email" and the error message is custom text
              */
