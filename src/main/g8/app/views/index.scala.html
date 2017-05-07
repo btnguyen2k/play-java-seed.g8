@@ -1,5 +1,20 @@
-@()
+@(languages: Array[play.i18n.Lang])(implicit messages: play.i18n.Messages)
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Play Java Template</title>
+</head>
+<body>
+    <h1>@messages.at("msg.welcome")</h1>
 
-@main("Welcome to Play") {
-  <h1>Welcome to Play!</h1>
-}
+    [@messages.at("msg.home")]
+    [<a href="@routes.SamplePageController.formDemo">@messages.at("msg.form_demo")</a>]
+    |
+    @messages.at("msg.languages"):
+    @for( (lang,i) <- languages.zipWithIndex ) {
+        <a href="@routes.SamplePageController.switchLang(lang.code())">@messages.at("lang."+lang.code())</a>
+        @if(i<languages.size-1){ | }
+    }
+
+</body>
+</html>

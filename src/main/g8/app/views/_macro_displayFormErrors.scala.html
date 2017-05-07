@@ -1,0 +1,11 @@
+@(form: play.data.Form[_], fields: Array[String])(implicit messages: play.i18n.Messages)
+@import utils._
+@if(form.hasErrors){
+    <div class="alert alert-danger">
+        @for(field <- fields){
+            @for(error <- form(field).errors) {
+                <p>@I18NUtils.renderMessage(messages, error.message)</p>
+            }
+        }
+    </div>
+}
