@@ -28,7 +28,7 @@ public class I18NUtils {
      */
     public static String renderMessage(Messages messages, String msgKey) {
         if (msgKey.contains("||")) {
-            String[] tokens = msgKey.split("\\|\\|");
+            String[] tokens = msgKey.split("\\\\|\\\\|");
             return messages.at(tokens[0], (Object[]) Arrays.copyOfRange(tokens, 1, tokens.length));
         }
         return msgKey;
