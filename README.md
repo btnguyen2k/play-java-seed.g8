@@ -16,8 +16,8 @@ sbt new btnguyen2k/play-java-seed.g8
 - Intended for Linux-based applications.
 - Separated configurations for production and non-production environments.
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
-  - For non-production: `conf/application.conf` and `conf/logback.xml`
-- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server.sh` for non-production.
+  - For non-production: `conf/application.conf` and `conf/logback-dev.xml`
+- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server-dev.sh` for non-production.
 - Samples:
   - Module
   - Form controller
@@ -27,8 +27,8 @@ sbt new btnguyen2k/play-java-seed.g8
 
 Commands:
 
-- start: `sh conf/server.sh start` or `sh conf/server-prod.sh start`
-- stop : `sh conf/server.sh stop` or `sh conf/server-prod.sh stop`
+- start: `sh conf/server-dev.sh start` or `sh conf/server-prod.sh start`
+- stop : `sh conf/server-dev.sh stop` or `sh conf/server-prod.sh stop`
 
 Command line arguments
 
