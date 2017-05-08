@@ -83,10 +83,10 @@
                 value="jdbc:mysql://localhost:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
         </bean>
         <bean id="_db_user" class="java.lang.String">
-            <constructor-arg value="mysql_user" />
+            <constructor-arg value="test" />
         </bean>
         <bean id="_db_password" class="java.lang.String">
-            <constructor-arg value="mysql_password" />
+            <constructor-arg value="test" />
         </bean>
 
         <bean id="_redis_hostAndPort" class="java.lang.String">
@@ -108,10 +108,10 @@
                 value="jdbc:mysql://localhost:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
         </bean>
         <bean id="_db_user" class="java.lang.String">
-            <constructor-arg value="mysql_user" />
+            <constructor-arg value="test" />
         </bean>
         <bean id="_db_password" class="java.lang.String">
-            <constructor-arg value="mysql_password" />
+            <constructor-arg value="test" />
         </bean>
 
         <bean id="_redis_hostAndPort" class="java.lang.String">

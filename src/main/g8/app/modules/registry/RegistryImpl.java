@@ -1,13 +1,20 @@
 package modules.registry;
 
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+
 import akka.actor.ActorSystem;
 import play.Application;
 import play.Configuration;
+import play.Logger;
 import play.i18n.Lang;
 import play.i18n.MessagesApi;
 import play.inject.ApplicationLifecycle;
