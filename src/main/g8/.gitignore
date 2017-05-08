@@ -10,4 +10,5 @@
 /.cache-main
 /.cache-tests
 .DS_Store
+/.g8
 
