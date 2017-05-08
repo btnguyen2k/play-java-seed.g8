@@ -27,6 +27,7 @@ public class RegistryImpl implements IRegistry {
     private MessagesApi messagesApi;
     private WSClient wsClient;
     private Lang[] availableLanguages;
+    private AbstractApplicationContext appContext;
 
     /**
      * {@inheritDoc}
@@ -54,7 +55,16 @@ public class RegistryImpl implements IRegistry {
     }
 
     /*----------------------------------------------------------------------*/
-    protected void initAvailableLanguages() {
+    private void init() throws Exception {
+        RegistryGlobal.registry = this;
+        initAvailableLanguages();
+        initApplicationContext();
+    }
+
+    private void destroy() {
+    }
+    
+    private void initAvailableLanguages() {
         List<String> langCodes = appConfig.getStringList("play.i18n.langs");
         availableLanguages = new Lang[langCodes != null ? langCodes.size() : 0];
         if (langCodes != null) {
@@ -63,13 +73,44 @@ public class RegistryImpl implements IRegistry {
             }
         }
     }
-
-    private void init() throws Exception {
-        initAvailableLanguages();
-        RegistryGlobal.registry = this;
+    
+    private void initApplicationContext() {
+        String configFile = playApp.configuration().getString("spring.conf");
+        if (!StringUtils.isBlank(configFile)) {
+            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
+                    : new File(playApp.path(), configFile);
+            if (springConfigFile.exists() && springConfigFile.isFile()
+                    && springConfigFile.canRead()) {
+                AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
+                        "file:" + springConfigFile.getAbsolutePath());
+                applicationContext.start();
+                appContext = applicationContext;
+            } else {
+                Logger.warn(
+                        "Spring config file [" + springConfigFile + "] not found or not readable!");
+            }
+        }
     }
 
-    private void destroy() {
+    private void destroyApplicationContext() {
+        if (appContext != null) {
+            try {
+                appContext.destroy();
+            } catch (Exception e) {
+                Logger.warn(e.getMessage(), e);
+            } finally {
+                appContext = null;
+            }
+        }
+    }
+    
+    /*----------------------------------------------------------------------*/
+    private <T> T getBean(Class<T> clazz) {
+        try {
+            return appContext != null ? appContext.getBean(clazz) : null;
+        } catch (NoSuchBeanDefinitionException e) {
+            return null;
+        }
     }
 
     /**
@@ -118,5 +159,7 @@ public class RegistryImpl implements IRegistry {
     public WSClient getWsClient() {
         return wsClient;
     }
+    
+    /*----------------------------------------------------------------------*/
 
 }

@@ -1,6 +1,11 @@
 ../../../README.mdRelease Notes
 =============
 
+## 2017-05-09: version 0.1.1
+
+- Spring's bean configuration file with sample cache factory and datasource beans.
+
+
 ## 2017-05-07: version 0.1.0
 
 First release:
@@ -11,3 +16,4 @@ First release:
   - API controller
 - Start/Stop scripts on *NIX.
 - Separated configurations for production and non-production environments.
+
