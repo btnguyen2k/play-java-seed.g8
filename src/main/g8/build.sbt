@@ -13,6 +13,10 @@ EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE1
 EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources, EclipseCreateSrc.ManagedSrc, EclipseCreateSrc.ManagedResources, EclipseCreateSrc.ManagedClasses)
 EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
 
+// Exclude the Play's the API documentation
+sources in (Compile, doc) := Seq.empty
+publishArtifact in (Compile, packageDoc) := false
+
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 
 routesGenerator := InjectedRoutesGenerator
@@ -50,8 +54,8 @@ libraryDependencies ++= Seq(
 
     // Cache library
     ,"com.github.ddth"           % "ddth-cache-adapter-core"      % _ddthCacheAdapterVersion
-    //,"com.github.ddth"           % "ddth-cache-adapter-redis"     % _ddthCacheAdapterVersion
-    //,"com.github.ddth"           % "ddth-cache-adapter-memcached" % _ddthCacheAdapterVersion
+    ,"com.github.ddth"           % "ddth-cache-adapter-redis"     % _ddthCacheAdapterVersion
+    ,"com.github.ddth"           % "ddth-cache-adapter-memcached" % _ddthCacheAdapterVersion
 
     ,filters
     ,javaWs

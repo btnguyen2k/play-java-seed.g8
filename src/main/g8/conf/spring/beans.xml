@@ -24,7 +24,7 @@
         <property name="defaultExpireAfterWrite" value="5" />
         <property name="redisHostAndPort" ref="_redis_hostAndPort" />
         <!-- <property name="redisPassword" ref="_redis_password" /> -->
-        <!-- <property name="keyMode" value="NAMESPACE" /> -->
+        <property name="keyMode" value="NAMESPACE" />
         <property name="cacheEntrySerializer">
             <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
                     init-method="init" destroy-method="destroy">
@@ -44,7 +44,7 @@
         <property name="defaultExpireAfterAccess" value="-1" />
         <property name="defaultExpireAfterWrite" value="5" />
         <property name="memcachedHostsAndPorts" ref="_memcached_hostsAndPorts" />
-        <!-- <property name="keyMode" value="NAMESPACE" /> -->
+        <property name="keyMode" value="NAMESPACE" />
         <property name="cacheEntrySerializer">
             <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
                     init-method="init" destroy-method="destroy">
@@ -71,7 +71,7 @@
         <property name="connectionTestQuery" value="SELECT 1" />
         <property name="validationTimeout" value="1500" />
         <property name="maximumPoolSize" value="4" />
-        <property name="initializationFailFast" value="false" />
+        <property name="initializationFailTimeout" value="-1" />
         <property name="connectionInitSql" value="SET NAMES 'utf8'" />
         <property name="leakDetectionThreshold" value="300000" />
     </bean>

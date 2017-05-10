@@ -57,4 +57,14 @@ public interface IRegistry {
      */
     public WSClient getWsClient();
 
+    /**
+     * Get a Spring bean by clazz.
+     */
+    public <T> T getBean(Class<T> clazz);
+
+    /**
+     * Get a Spring bean by name and clazz.
+     */
+    public <T> T getBean(String name, Class<T> clazz);
 }
+

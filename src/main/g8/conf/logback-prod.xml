@@ -36,7 +36,7 @@
 	</root>
 
 	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
-	<appender name="FILE_ACTION" class="ch.qos.logback.core.FileAppender">
+	<appender name="FILE_ACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file><![CDATA[${app.home:-.}/logs/action.log]]></file>
 		<append>true</append>
 		<encoder>

@@ -69,6 +69,7 @@ public class RegistryImpl implements IRegistry {
     }
 
     private void destroy() {
+        destroyApplicationContext();
     }
     
     private void initAvailableLanguages() {
@@ -112,9 +113,25 @@ public class RegistryImpl implements IRegistry {
     }
     
     /*----------------------------------------------------------------------*/
-    private <T> T getBean(Class<T> clazz) {
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getBean(Class<T> clazz) {
         try {
             return appContext != null ? appContext.getBean(clazz) : null;
+        } catch (NoSuchBeanDefinitionException e) {
+            return null;
+        }
+    }
+    
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public <T> T getBean(String name, Class<T> clazz) {
+        try {
+            return appContext != null ? appContext.getBean(name, clazz) : null;
         } catch (NoSuchBeanDefinitionException e) {
             return null;
         }

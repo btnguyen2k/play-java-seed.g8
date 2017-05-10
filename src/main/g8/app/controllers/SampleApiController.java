@@ -6,6 +6,8 @@ import java.util.Map.Entry;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import play.Logger;
+import play.Logger.ALogger;
 import play.mvc.Result;
 
 /**
@@ -15,6 +17,8 @@ import play.mvc.Result;
  * @since 0.1.0
  */
 public class SampleApiController extends BaseJsonWsController {
+
+    private final ALogger LOGGER_ACTION = Logger.of("action");
 
     /*
      * Handle request GET:/api/echo
@@ -31,6 +35,7 @@ public class SampleApiController extends BaseJsonWsController {
     }
 
     private Result echo() throws Exception {
+        LOGGER_ACTION.info(request().method() + "\techo\t" + System.currentTimeMillis());
         Map<String, Object> data = new HashMap<>();
         {
             Map<String, Object> queryParams = new HashMap<>();
@@ -61,6 +66,7 @@ public class SampleApiController extends BaseJsonWsController {
     }
 
     private Result info() throws Exception {
+        LOGGER_ACTION.info(request().method() + "\techo\t" + System.currentTimeMillis());
         Map<String, Object> data = new HashMap<>();
         data.put("method", request().method());
 
