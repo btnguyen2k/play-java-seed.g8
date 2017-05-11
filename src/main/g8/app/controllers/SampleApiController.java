@@ -11,10 +11,10 @@ import play.Logger.ALogger;
 import play.mvc.Result;
 
 /**
- * Sample API controller.
+ * Sample API/Web-service controller.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class SampleApiController extends BaseJsonWsController {
 
@@ -66,10 +66,10 @@ public class SampleApiController extends BaseJsonWsController {
     }
 
     private Result info() throws Exception {
+        long t1 = System.currentTimeMillis();
         LOGGER_ACTION.info(request().method() + "\techo\t" + System.currentTimeMillis());
         Map<String, Object> data = new HashMap<>();
         data.put("method", request().method());
-
         {
             Map<String, String> headerMap = new HashMap<>();
             data.put("headers", headerMap);
@@ -78,9 +78,14 @@ public class SampleApiController extends BaseJsonWsController {
                 headerMap.put(header.getKey(), header.getValue()[0]);
             }
         }
-
         data.put("system", System.getProperties());
+        long duration = System.currentTimeMillis() - t1;
 
-        return doResponse(200, "Ok", data);
+        return doResponse(200, "Ok", data, new HashMap<String, Object>() {
+            {
+                put("timestamp", t1);
+                put("duration", duration);
+            }
+        });
     }
 }

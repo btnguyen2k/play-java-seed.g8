@@ -7,10 +7,10 @@ import play.api.inject.Module;
 import scala.collection.Seq;
 
 /**
- * Registry module: register application's global items to a central registry.
+ * Registry module: register application's global items to the central registry.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class RegistryModule extends Module {
 

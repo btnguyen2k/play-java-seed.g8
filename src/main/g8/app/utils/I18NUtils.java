@@ -12,7 +12,7 @@ import play.mvc.Http.RequestHeader;
  * I18N utility class.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class I18NUtils {
     /**

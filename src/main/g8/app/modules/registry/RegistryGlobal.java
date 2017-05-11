@@ -9,11 +9,11 @@ import com.github.ddth.commons.utils.DPathUtils;
  * Global static repository where DI is not visible.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class RegistryGlobal {
     /**
-     * Will be populated during initialization of registry module
+     * Will be populated during initialization of registry module.
      */
     public static IRegistry registry;
 

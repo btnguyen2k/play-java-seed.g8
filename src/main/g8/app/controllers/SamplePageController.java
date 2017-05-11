@@ -9,7 +9,7 @@ import play.mvc.Result;
  * Sample API controller.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class SamplePageController extends BasePageController {
 

@@ -1,6 +1,7 @@
 package modules.registry;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -11,7 +12,10 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Props;
+import akka.workers.TickFanoutActor;
 import play.Application;
 import play.Configuration;
 import play.Logger;
@@ -21,10 +25,10 @@ import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
 
 /**
- * Application's central registry.
+ * Application's central registry implementation.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class RegistryImpl implements IRegistry {
 
@@ -66,12 +70,14 @@ public class RegistryImpl implements IRegistry {
         RegistryGlobal.registry = this;
         initAvailableLanguages();
         initApplicationContext();
+        initWorkers();
     }
 
     private void destroy() {
+        destroyWorkers();
         destroyApplicationContext();
     }
-    
+
     private void initAvailableLanguages() {
         List<String> langCodes = appConfig.getStringList("play.i18n.langs");
         availableLanguages = new Lang[langCodes != null ? langCodes.size() : 0];
@@ -81,7 +87,43 @@ public class RegistryImpl implements IRegistry {
             }
         }
     }
-    
+
+    private ActorRef actorTickFanout;
+    private List<ActorRef> actorList = new ArrayList<>();
+
+    private void initWorkers() throws ClassNotFoundException {
+        // create "tick" fanout actor
+        actorTickFanout = getActorSystem().actorOf(TickFanoutActor.PROPS,
+                TickFanoutActor.ACTOR_NAME);
+
+        List<String> workerClazzs = appConfig.getStringList("workers");
+        if (workerClazzs != null) {
+            for (String clazz : workerClazzs) {
+                actorList.add(getActorSystem().actorOf(Props.create(Class.forName(clazz))));
+            }
+        }
+    }
+
+    private void destroyWorkers() {
+        for (ActorRef actorRef : actorList) {
+            if (actorRef != null) {
+                try {
+                    actorSystem.stop(actorRef);
+                } catch (Exception e) {
+                    Logger.warn(e.getMessage(), e);
+                }
+            }
+        }
+
+        if (actorTickFanout != null) {
+            try {
+                actorSystem.stop(actorTickFanout);
+            } catch (Exception e) {
+                Logger.warn(e.getMessage(), e);
+            }
+        }
+    }
+
     private void initApplicationContext() {
         String configFile = playApp.configuration().getString("spring.conf");
         if (!StringUtils.isBlank(configFile)) {
@@ -111,7 +153,7 @@ public class RegistryImpl implements IRegistry {
             }
         }
     }
-    
+
     /*----------------------------------------------------------------------*/
     /**
      * {@inheritDoc}
@@ -124,7 +166,7 @@ public class RegistryImpl implements IRegistry {
             return null;
         }
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -183,7 +225,7 @@ public class RegistryImpl implements IRegistry {
     public WSClient getWsClient() {
         return wsClient;
     }
-    
+
     /*----------------------------------------------------------------------*/
 
 }

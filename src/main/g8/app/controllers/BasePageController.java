@@ -15,7 +15,7 @@ import play.twirl.api.Html;
  * Base class for controllers that handle form submissions & page renderings.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class BasePageController extends BaseController {
 

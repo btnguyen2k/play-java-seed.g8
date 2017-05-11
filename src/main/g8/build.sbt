@@ -60,3 +60,4 @@ libraryDependencies ++= Seq(
     ,filters
     ,javaWs
 )
+

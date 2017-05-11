@@ -8,10 +8,10 @@ import play.i18n.MessagesApi;
 import play.libs.ws.WSClient;
 
 /**
- * Application's central registry.
+ * Application's central registry interface.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public interface IRegistry {
 
@@ -67,4 +67,3 @@ public interface IRegistry {
      */
     public <T> T getBean(String name, Class<T> clazz);
 }
-

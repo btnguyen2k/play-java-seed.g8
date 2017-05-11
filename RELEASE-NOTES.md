@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2017-05-11: version 0.1.2
+
+- Sample workers.
+- GC logging
+- JVM tuning
+
+
 ## 2017-05-10: version 0.1.1
 
 - Spring's bean configuration file with sample cache factory and datasource beans.

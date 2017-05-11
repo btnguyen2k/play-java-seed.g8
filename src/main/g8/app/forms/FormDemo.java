@@ -11,7 +11,7 @@ import play.data.validation.ValidationError;
  * Form example.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since
+ * @since template-v0.1.0
  */
 public class FormDemo {
     private String email;

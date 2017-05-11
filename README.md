@@ -13,15 +13,17 @@ sbt new btnguyen2k/play-java-seed.g8
 
 ## Features
 
-- Intended for Linux-based applications.
-- Separated configurations for production and non-production environments.
+- Intended for Linux-based applications
+- Separated configurations for production and non-production environments:
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
   - For non-production: `conf/application.conf` and `conf/logback-dev.xml`
-- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server-dev.sh` for non-production.
+- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server-dev.sh` for non-production
 - Samples:
   - Module
-  - Form controller
+  - Form & Form controller
   - API controller
+  - Workers & Scheduling
+- JVM tuning & GC logging
 
 ### Start/Stop Scripts
 

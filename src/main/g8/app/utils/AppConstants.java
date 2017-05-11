@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
  * Application's common constants.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class AppConstants {
     public final static Charset UTF8 = Charset.forName("UTF-8");

@@ -25,7 +25,7 @@ import utils.I18NUtils;
  * Base class for all controllers. Base stuff should go here.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class BaseController extends Controller {
 

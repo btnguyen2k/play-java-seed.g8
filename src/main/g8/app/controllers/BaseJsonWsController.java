@@ -15,13 +15,27 @@ import play.mvc.Http.RawBuffer;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
 import utils.AppConstants;
-import utils.RequestEntiryTooLarge;
+import utils.RequestEntiryTooLargeException;
 
 /**
- * Base class for Json-based webservice controllers.
+ * Base class for Json-based web-service controllers.
+ * 
+ * <p>
+ * This controller accepts request data in JSON format, and response to client also in JSON. All
+ * responses have the following format:
+ * </p>
+ * 
+ * <pre>
+ * {
+ *     "status" : "(int) status code",
+ *     "message": "(string) status message",
+ *     "data"   : "(mixed/optional) API's output data, each API/service defines its own output",
+ *     "dedug"  : "(mixed/optional) debug information"
+ * }
+ * </pre>
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since 0.1.0
+ * @since template-v0.1.0
  */
 public class BaseJsonWsController extends BaseController {
 
@@ -36,7 +50,7 @@ public class BaseJsonWsController extends BaseController {
      * @return
      * @throws IOException
      */
-    protected JsonNode parseRequestContent() throws IOException, RequestEntiryTooLarge {
+    protected JsonNode parseRequestContent() throws IOException, RequestEntiryTooLargeException {
         return parseRequestContent(Integer.MAX_VALUE);
     }
 
@@ -53,13 +67,13 @@ public class BaseJsonWsController extends BaseController {
      * @throws IOException
      */
     protected JsonNode parseRequestContent(long maxPostSize)
-            throws IOException, RequestEntiryTooLarge {
+            throws IOException, RequestEntiryTooLargeException {
         RequestBody requestBody = request().body();
         JsonNode jsonNode = requestBody.asJson();
         if (jsonNode != null) {
             long postSize = jsonNode.toString().getBytes(AppConstants.UTF8).length;
             if (postSize > maxPostSize) {
-                throw new RequestEntiryTooLarge(postSize);
+                throw new RequestEntiryTooLargeException(postSize);
             }
             return jsonNode;
         }
@@ -71,14 +85,14 @@ public class BaseJsonWsController extends BaseController {
             if (buffer != null) {
                 long postSize = buffer.size();
                 if (postSize > maxPostSize) {
-                    throw new RequestEntiryTooLarge(postSize);
+                    throw new RequestEntiryTooLargeException(postSize);
                 }
                 requestContent = buffer.decodeString(AppConstants.UTF8);
             } else {
                 File bufferFile = rawBuffer.asFile();
                 long postSize = bufferFile.length();
                 if (postSize > maxPostSize) {
-                    throw new RequestEntiryTooLarge(postSize);
+                    throw new RequestEntiryTooLargeException(postSize);
                 }
                 byte[] buff = FileUtils.readFileToByteArray(bufferFile);
                 requestContent = buff != null ? new String(buff, AppConstants.UTF8) : null;
@@ -87,15 +101,25 @@ public class BaseJsonWsController extends BaseController {
             requestContent = requestBody.asText();
             long postSize = requestContent.getBytes(AppConstants.UTF8).length;
             if (postSize > maxPostSize) {
-                throw new RequestEntiryTooLarge(postSize);
+                throw new RequestEntiryTooLargeException(postSize);
             }
         }
 
         return requestContent != null ? Json.parse(requestContent) : null;
     }
 
+    /**
+     * Response to client in JSON format.
+     * 
+     * @param status
+     * @param message
+     * @param data
+     * @param debugData
+     * @return
+     * @since template-v0.1.2
+     */
     @SuppressWarnings("serial")
-    public Result doResponse(int status, String message, Object data) {
+    public Result doResponse(int status, String message, Object data, Object debugData) {
         Map<String, Object> result = new HashMap<String, Object>() {
             {
                 put("status", status);
@@ -105,13 +129,35 @@ public class BaseJsonWsController extends BaseController {
                 if (data != null) {
                     put("data", data);
                 }
+                if (debugData != null) {
+                    put("debug", debugData);
+                }
             }
         };
-        return ok(Json.toJson(result)).as("application/json; charset=UTF-8");
+        return ok(Json.toJson(result)).as(AppConstants.CONTENT_TYPE_JSON);
     }
 
+    /**
+     * Response to client in JSON format.
+     * 
+     * @param status
+     * @param message
+     * @param data
+     * @return
+     */
+    public Result doResponse(int status, String message, Object data) {
+        return doResponse(status, message, data, null);
+    }
+
+    /**
+     * Resposne to client in JSON format.
+     * 
+     * @param status
+     * @param message
+     * @return
+     */
     public Result doResponse(int status, String message) {
-        return doResponse(status, message, null);
+        return doResponse(status, message, null, null);
     }
 
 }
