@@ -2,6 +2,7 @@ package akka.workers;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import akka.messages.TickMessage;
 import play.Logger;
@@ -28,6 +29,25 @@ import play.Logger;
 public abstract class BaseWorkerActor extends UntypedActor {
 
     /**
+     * Special "tick" message to be sent only once when actor starts.
+     *
+     * @author Thanh Nguyen <btnguyen2k@gmail.com>
+     * @since template-v0.1.2.1
+     */
+    public static class FirstTimeTickMessage extends TickMessage {
+    }
+
+    /**
+     * If {@code true}, the first run will start as soon as the actor starts, ignoring tick-match check.
+     * 
+     * @return
+     * @since template-v0.1.2.1
+     */
+    protected boolean runFirstTimeRegardlessScheduling() {
+        return false;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -36,6 +56,10 @@ public abstract class BaseWorkerActor extends UntypedActor {
 
         // subscribe to "TicketMessage" channel
         getContext().system().eventStream().subscribe(self(), TickMessage.class);
+
+        if (runFirstTimeRegardlessScheduling()) {
+            self().tell(new FirstTimeTickMessage(), ActorRef.noSender());
+        }
     }
 
     /**
@@ -85,7 +109,7 @@ public abstract class BaseWorkerActor extends UntypedActor {
     private AtomicBoolean LOCK = new AtomicBoolean(false);
 
     protected void onTick(TickMessage tick) {
-        if (isTickMatched(tick)) {
+        if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
             if (LOCK.compareAndSet(false, true)) {
                 try {
                     lastTick = tick;

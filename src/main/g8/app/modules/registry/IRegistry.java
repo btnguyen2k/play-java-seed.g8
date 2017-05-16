@@ -1,5 +1,7 @@
 package modules.registry;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 import akka.actor.ActorSystem;
 import play.Application;
 import play.Configuration;
@@ -56,6 +58,14 @@ public interface IRegistry {
      * @return
      */
     public WSClient getWsClient();
+
+    /**
+     * Get the global {@link ScheduledExecutorService} instance.
+     * 
+     * @return
+     * @since template-v0.1.2.1
+     */
+    public ScheduledExecutorService getScheduledExecutorService();
 
     /**
      * Get a Spring bean by clazz.

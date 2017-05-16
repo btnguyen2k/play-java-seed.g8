@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 
@@ -39,6 +41,7 @@ public class RegistryImpl implements IRegistry {
     private WSClient wsClient;
     private Lang[] availableLanguages;
     private AbstractApplicationContext appContext;
+    private ScheduledExecutorService scheduledExecutorService;
 
     /**
      * {@inheritDoc}
@@ -69,6 +72,7 @@ public class RegistryImpl implements IRegistry {
     private void init() throws Exception {
         RegistryGlobal.registry = this;
         initAvailableLanguages();
+        initScheduledExecutorService();
         initApplicationContext();
         initWorkers();
     }
@@ -76,6 +80,7 @@ public class RegistryImpl implements IRegistry {
     private void destroy() {
         destroyWorkers();
         destroyApplicationContext();
+        destroyScheduledExecutorService();
     }
 
     private void initAvailableLanguages() {
@@ -84,6 +89,30 @@ public class RegistryImpl implements IRegistry {
         if (langCodes != null) {
             for (int i = 0, n = langCodes.size(); i < n; i++) {
                 availableLanguages[i] = Lang.forCode(langCodes.get(i));
+            }
+        }
+    }
+
+    /**
+     * @since template-v0.1.2.1
+     */
+    private void initScheduledExecutorService() {
+        int numThreads = appConfig.getInt("globalScheduledExecutorServiceThreads", 4);
+        if (numThreads < 1) {
+            numThreads = 1;
+        }
+        scheduledExecutorService = Executors.newScheduledThreadPool(numThreads);
+    }
+
+    /**
+     * @since template-v0.1.2.1
+     */
+    private void destroyScheduledExecutorService() {
+        if (scheduledExecutorService != null) {
+            try {
+                scheduledExecutorService.shutdown();
+            } catch (Exception e) {
+                Logger.warn(e.getMessage(), e);
             }
         }
     }
@@ -224,6 +253,14 @@ public class RegistryImpl implements IRegistry {
     @Override
     public WSClient getWsClient() {
         return wsClient;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ScheduledExecutorService getScheduledExecutorService() {
+        return scheduledExecutorService;
     }
 
     /*----------------------------------------------------------------------*/

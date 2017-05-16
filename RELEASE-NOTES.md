@@ -1,5 +1,11 @@
 # Release Notes
 
+## 2017-05-16: version 0.1.2.1
+
+- `BaseWorkerActor` enhancement: allow worker to trigger work when it start regardless scheduling option.
+- `IRegistry`: add global `ScheduledExecutorService` instance.
+
+
 ## 2017-05-11: version 0.1.2
 
 - Sample workers.
