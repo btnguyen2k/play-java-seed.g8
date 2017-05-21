@@ -8,9 +8,7 @@ EclipseKeys.preTasks                 := Seq(compile in Compile)                 
 EclipseKeys.skipParents in ThisBuild := false
 EclipseKeys.projectFlavor            := EclipseProjectFlavor.Java                   // Java project. Don't expect Scala IDE
 EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE18)  // expect Java 1.8
-//EclipseKeys.eclipseOutput            := Some(".target")
 // Use .class files instead of generated .scala files for views and routes
-EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources, EclipseCreateSrc.ManagedSrc, EclipseCreateSrc.ManagedResources, EclipseCreateSrc.ManagedClasses)
 EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
 
 // Exclude the Play's the API documentation
