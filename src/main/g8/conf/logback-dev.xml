@@ -6,7 +6,7 @@
 
 	<!-- Log messages to file -->
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file><![CDATA[${app.home:-.}/logs/application.log]]></file>
+		<file><![CDATA[${app.logdir:-.}/application.log]]></file>
 		<encoder>
 			<pattern><![CDATA[%date [%level] from %logger in %thread - %message%n%xException]]></pattern>
 		</encoder>
@@ -45,7 +45,7 @@
 
 	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
 	<appender name="FILE_ACTION" class="ch.qos.logback.core.FileAppender">
-		<file><![CDATA[${app.home:-.}/logs/action.log]]></file>
+		<file><![CDATA[${app.logdir:-.}/action.log]]></file>
 		<encoder>
 			<pattern><![CDATA[%message%n]]></pattern>
 		</encoder>

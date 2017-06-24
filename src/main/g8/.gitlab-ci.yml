@@ -1,0 +1,131 @@
+# GitLab CI Runner configuration file for Play! Framework application
+# By Thanh Nguyen <btnguyen2k@gmail.com>
+
+cache:
+  paths:
+    - target/
+
+variables:
+  # IP addresses of servers
+  SERVER_PRODUCTION_01: 10.100.1.1
+  SERVER_PRODUCTION_02: 10.100.10.1
+  SERVER_STAGING: 192.168.0.1
+  DIR_DEPLOY: /home/<user>/gitlabci/deploys/$CI_PROJECT_NAME
+
+before_script:
+  # Setup http proxy if needed
+  #- "export http_proxy=http://10.100.100.1:8888"
+  #- "export https_proxy=http://10.100.100.1:8888"
+  # So that current directory and datetime occur in log
+  - pwd && date
+  - "export CI_PROJECT_VERSION=`echo $CI_COMMIT_REF_NAME | cut -d'-' -f 2`"
+  - "echo CI_PROJECT_VERSION: $CI_COMMIT_REF_NAME --\\> $CI_PROJECT_VERSION"
+  - "export CI_PROJECT_DEPLOY_DIR=$DIR_DEPLOY/$CI_PROJECT_NAME-$CI_PROJECT_VERSION"
+  - "echo CI_PROJECT_DEPLOY_DIR: $CI_PROJECT_DEPLOY_DIR"
+
+after_script:
+
+stages:
+  - build
+  - test
+  - deploy
+  - deploy-to-server
+  - start-on-server
+
+build:
+  stage: build
+  script:
+    - sbt -Djline.terminal=jline.UnsupportedTerminal clean compile
+
+test:
+  stage: test
+  only:
+    # Run ony if commit has tag release-x.y.z.t or staging-x.y.z.t
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    #- sbt -Djline.terminal=jline.UnsupportedTerminal test
+    - "test"
+
+deploy on build server:
+  stage: deploy
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    # So that current directory and datetie occur in log
+    - pwd && date
+    - mkdir -p $DIR_DEPLOY
+    - sbt -Djline.terminal=jline.UnsupportedTerminal dist
+    # Copy package .zip file to deploy directory
+    - cp ./target/universal/$CI_PROJECT_NAME-$CI_PROJECT_VERSION.zip $DIR_DEPLOY
+    # Safeguard check
+    - "if [ -d $CI_PROJECT_DEPLOY_DIR ]; then echo 'Directory $CI_PROJECT_DEPLOY_DIR already existed!'; false; else true; fi"
+    - unzip $DIR_DEPLOY/$CI_PROJECT_NAME-$CI_PROJECT_VERSION.zip -d $DIR_DEPLOY
+    # Recreate soft link to newly unzipped package directory
+    - rm -f $DIR_DEPLOY/$CI_PROJECT_NAME
+    - ln -sf $CI_PROJECT_DEPLOY_DIR $DIR_DEPLOY/$CI_PROJECT_NAME
+  tags:
+    # Only run this task on GitLab CI Runner with tag "gitlabci-build"
+    - gitlabci-build
+
+deploy to staging server:
+  stage: deploy-to-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "rsync -v -rlkHpEXtz --delete $CI_PROJECT_DEPLOY_DIR/* rsync://$SERVER_STAGING/$CI_PROJECT_NAME/apps"
+  tags:
+    - gitlabci-build
+
+start service on staging server:
+  stage: start-on-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "ssh -f -i <private-key-file.pem> <user>@$SERVER_STAGING \"cd scripts && ./$CI_PROJECT_NAME restart > /dev/null 2>&1\"" 
+
+deploy to production server 01:
+  stage: deploy-to-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "rsync -v -rlkHpEXtz --delete $CI_PROJECT_DEPLOY_DIR/* rsync://$SERVER_PRODUCTION_01/$CI_PROJECT_NAME/apps"
+  tags:
+    - gitlabci-build
+  # Manually deploy to production server!
+  when: manual
+
+deploy on production server 02:
+  stage: deploy-to-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "rsync -v -rlkHpEXtz --delete $CI_PROJECT_DEPLOY_DIR/* rsync://$SERVER_PRODUCTION_02/$CI_PROJECT_NAME/apps"
+  # Manually deploy to production server!
+  when: manual
+
+start service on production server 01:
+  stage: start-on-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "ssh -f -i <private-key-file.pem> <user>@$SERVER_PRODUCTION_01 \"cd scripts && ./$CI_PROJECT_NAME restart > /dev/null 2>&1\""
+  # Manually start service on production server!
+  when: manual
+
+start service on production server 02:
+  stage: start-on-server
+  only:
+    - /^release-.*$/
+    - /^staging-.*$/
+  script:
+    - "ssh -f -i <private-key-file.pem> <user>@$SERVER_PRODUCTION_02 \"cd scripts && ./$CI_PROJECT_NAME restart > /dev/null 2>&1\""
+  # Manually start service on production server!
+  when: manual
+

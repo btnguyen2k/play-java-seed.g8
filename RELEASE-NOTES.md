@@ -1,5 +1,17 @@
 # Release Notes
 
+## 2017-06-24: version 0.1.3
+
+- Sample GitLab CI Runner config file `.gitlab-ci.yml`
+- Rename `server-dev.sh` to `server.sh`
+- New commandline arguments:
+  - `--pid`: specify application's .pid file
+  - `--logdir`: specify application's log directory, also set env variable `-Dapp.logdir`
+- Update `conf/logback-dev.xml` and `conf/logback-prod.xml` to reflect new env variable `app.logdir`
+- Change commandline argument `--log` to `--logconf`
+- Update dependency libs.
+
+
 ## 2017-05-16: version 0.1.2.1
 
 - `BaseWorkerActor` enhancement: allow worker to trigger work when it start regardless scheduling option.
@@ -30,4 +42,3 @@ First release:
   - API controller
 - Start/Stop scripts on *NIX.
 - Separated configurations for production and non-production environments.
-

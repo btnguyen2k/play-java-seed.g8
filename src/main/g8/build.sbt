@@ -4,7 +4,7 @@ val conf       = ConfigFactory.parseFile(new File("conf/application.conf")).reso
 val appName    = conf.getString("app.name").toLowerCase().replaceAll("\\\\W+", "-")
 val appVersion = conf.getString("app.version")
 
-EclipseKeys.preTasks                 := Seq(compile in Compile)                     // You must compile your project before running the eclipse command
+EclipseKeys.preTasks                 := Seq(compile in Compile)                     // Force compile project before running the eclipse command
 EclipseKeys.skipParents in ThisBuild := false
 EclipseKeys.projectFlavor            := EclipseProjectFlavor.Java                   // Java project. Don't expect Scala IDE
 EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE18)  // expect Java 1.8
@@ -32,8 +32,8 @@ scalaVersion := "$scala_version$"
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-val _springVersion           = "4.3.8.RELEASE"
-val _ddthCacheAdapterVersion = "0.6.0.2"
+val _springVersion           = "4.3.9.RELEASE"
+val _ddthCacheAdapterVersion = "0.6.1"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
@@ -41,13 +41,14 @@ libraryDependencies ++= Seq(
     
     // MySQL is our default database
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
-    ,"com.zaxxer"                % "HikariCP"                     % "2.6.1"
+    ,"com.zaxxer"                % "HikariCP"                     % "2.6.3"
 
     ,"org.springframework"       % "spring-beans"                 % _springVersion
     ,"org.springframework"       % "spring-expression"            % _springVersion
     ,"org.springframework"       % "spring-jdbc"                  % _springVersion
 
-    ,"com.github.ddth"           % "ddth-commons-serialization"   % "0.6.1.1"
+    ,"com.github.ddth"           % "ddth-commons-core"            % "0.6.3.2"
+    ,"com.github.ddth"           % "ddth-commons-serialization"   % "0.6.3.2"
     ,"com.github.ddth"           % "ddth-dao-jdbc"                % "0.7.1"
 
     // Cache library
@@ -58,4 +59,3 @@ libraryDependencies ++= Seq(
     ,filters
     ,javaWs
 )
-
