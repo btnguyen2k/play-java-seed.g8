@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2017-06-24: version 0.1.4
+
+- New package `api`
+  - Centralize API handlers.
+  - WebService/HTTP is now one of many gateways call APIs.
+
+
 ## 2017-06-24: version 0.1.3
 
 - Sample GitLab CI Runner config file `.gitlab-ci.yml`
@@ -9,7 +16,7 @@
   - `--logdir`: specify application's log directory, also set env variable `-Dapp.logdir`
 - Update `conf/logback-dev.xml` and `conf/logback-prod.xml` to reflect new env variable `app.logdir`
 - Change commandline argument `--log` to `--logconf`
-- Update dependency libs.
+- Update dependency libs & Play! version to `2.5.15`
 
 
 ## 2017-05-16: version 0.1.2.1

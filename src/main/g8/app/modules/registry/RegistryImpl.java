@@ -18,6 +18,7 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.workers.TickFanoutActor;
+import api.ApiDispatcher;
 import play.Application;
 import play.Configuration;
 import play.Logger;
@@ -261,6 +262,14 @@ public class RegistryImpl implements IRegistry {
     @Override
     public ScheduledExecutorService getScheduledExecutorService() {
         return scheduledExecutorService;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ApiDispatcher getApiDispatcher() {
+        return getBean(ApiDispatcher.class);
     }
 
     /*----------------------------------------------------------------------*/

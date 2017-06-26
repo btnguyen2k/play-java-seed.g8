@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v0.1.3](RELEASE-NOTES.md).
+Latest release: [template-v0.1.4](RELEASE-NOTES.md).
 
 
 ## Features

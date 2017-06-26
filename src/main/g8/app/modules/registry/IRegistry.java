@@ -3,6 +3,7 @@ package modules.registry;
 import java.util.concurrent.ScheduledExecutorService;
 
 import akka.actor.ActorSystem;
+import api.ApiDispatcher;
 import play.Application;
 import play.Configuration;
 import play.i18n.Lang;
@@ -32,7 +33,8 @@ public interface IRegistry {
     public Configuration getAppConfiguration();
 
     /**
-     * Get application's available languages defined in {@code application.conf}.
+     * Get application's available languages defined in
+     * {@code application.conf}.
      * 
      * @return
      */
@@ -76,4 +78,12 @@ public interface IRegistry {
      * Get a Spring bean by name and clazz.
      */
     public <T> T getBean(String name, Class<T> clazz);
+
+    /**
+     * Get {@link ApiDispatcher} instance.
+     * 
+     * @return
+     * @since template-v0.1.4
+     */
+    public ApiDispatcher getApiDispatcher();
 }

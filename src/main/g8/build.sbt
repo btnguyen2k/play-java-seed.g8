@@ -34,6 +34,7 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 
 val _springVersion           = "4.3.9.RELEASE"
 val _ddthCacheAdapterVersion = "0.6.1"
+val _ddthCommonsVersion      = "0.6.3.2"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
@@ -43,12 +44,14 @@ libraryDependencies ++= Seq(
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
     ,"com.zaxxer"                % "HikariCP"                     % "2.6.3"
 
+    ,"org.apache.thrift"         % "libthrift"                    % "0.10.0"
+
     ,"org.springframework"       % "spring-beans"                 % _springVersion
     ,"org.springframework"       % "spring-expression"            % _springVersion
     ,"org.springframework"       % "spring-jdbc"                  % _springVersion
 
-    ,"com.github.ddth"           % "ddth-commons-core"            % "0.6.3.2"
-    ,"com.github.ddth"           % "ddth-commons-serialization"   % "0.6.3.2"
+    ,"com.github.ddth"           % "ddth-commons-core"            % _ddthCommonsVersion
+    ,"com.github.ddth"           % "ddth-commons-serialization"   % _ddthCommonsVersion
     ,"com.github.ddth"           % "ddth-dao-jdbc"                % "0.7.1"
 
     // Cache library
