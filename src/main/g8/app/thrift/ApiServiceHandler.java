@@ -28,11 +28,11 @@ import utils.AppConstants;
  */
 public class ApiServiceHandler implements TApiService.Iface {
 
+    private Provider<IRegistry> registry;
+
     public ApiServiceHandler(Provider<IRegistry> registry) {
         this.registry = registry;
     }
-
-    private Provider<IRegistry> registry;
 
     private static ApiParams parseParams(TApiParams _apiParams) {
         JsonNode paramNode = ThriftApiUtils.decodeToJson(

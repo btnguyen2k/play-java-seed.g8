@@ -1,10 +1,11 @@
 # Release Notes
 
-## 2017-06-24: version 0.1.4
+## 2017-06-26: version 0.1.4
 
 - New package `api`
   - Centralize API handlers.
   - WebService/HTTP is now one of many gateways call APIs.
+- Thrift & Thrift SSL API Gateway: allow APIs to be called via Apache's Thrift/SSL
 
 
 ## 2017-06-24: version 0.1.3

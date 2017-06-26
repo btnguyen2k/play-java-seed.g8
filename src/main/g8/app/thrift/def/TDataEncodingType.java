@@ -12,8 +12,8 @@ import java.util.HashMap;
 import org.apache.thrift.TEnum;
 
 public enum TDataEncodingType implements org.apache.thrift.TEnum {
-  JSON_STRING(1),
-  JSON_GZIP(2);
+  JSON_STRING(0),
+  JSON_GZIP(1);
 
   private final int value;
 
@@ -34,9 +34,9 @@ public enum TDataEncodingType implements org.apache.thrift.TEnum {
    */
   public static TDataEncodingType findByValue(int value) { 
     switch (value) {
-      case 1:
+      case 0:
         return JSON_STRING;
-      case 2:
+      case 1:
         return JSON_GZIP;
       default:
         return null;

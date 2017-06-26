@@ -8,27 +8,27 @@
 namespace java thrift.def
 
 enum TDataEncodingType {
-    JSON_STRING = 1,  // Data is encoded as JSON string
-    JSON_GZIP   = 2   // Data is encoded as gzipped JSON string
+    JSON_STRING = 0,  // Data is encoded as JSON string
+    JSON_GZIP   = 1   // Data is encoded as gzipped JSON string
 }
 
 struct TApiAuth {
-    1: optional string apiKey,
-    2: optional string accessToken
+    1: optional string apiKey      = "",
+    2: optional string accessToken = ""
 }
 
 struct TApiParams {
-    1: optional TDataEncodingType dataType,
+    1: optional TDataEncodingType dataType = TDataEncodingType.JSON_STRING,
     2: optional binary paramsData,
-    3: optional TDataEncodingType expectedReturnDataType, // 0 or null, use parameter's data type
+    3: optional TDataEncodingType expectedReturnDataType = TDataEncodingType.JSON_STRING, // if null, use parameter's data type
     4: optional i32 version = 1
 }
 
 struct TApiResult {
     1: i32 status,
     2: optional string message,
-    3: optional TDataEncodingType dataType,
-    4: optional binary resultData
+    3: optional TDataEncodingType dataType = TDataEncodingType.JSON_STRING,
+    4: optional binary resultData,
     5: optional binary debugData
 }
 
@@ -37,7 +37,7 @@ service TApiService {
       * This method is to test if server is online.
       */
     void ping(),
-    
+
     /**
       * This method is to test if server is online.
       */
