@@ -35,10 +35,16 @@ resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/reposi
 val _springVersion           = "4.3.9.RELEASE"
 val _ddthCacheAdapterVersion = "0.6.1"
 val _ddthCommonsVersion      = "0.6.3.2"
+val _akkaVersion             = "2.5.3"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
     "org.slf4j"                  % "log4j-over-slf4j"             % "1.7.25"
+    
+    ,"com.typesafe.akka"         %% "akka-cluster"                % _akkaVersion
+    ,"com.typesafe.akka"         %% "akka-distributed-data"       % _akkaVersion
+    ,"com.typesafe.akka"         %% "akka-cluster-metrics"        % _akkaVersion
+    ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaVersion
     
     // MySQL is our default database
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
@@ -62,3 +68,4 @@ libraryDependencies ++= Seq(
     ,filters
     ,javaWs
 )
+

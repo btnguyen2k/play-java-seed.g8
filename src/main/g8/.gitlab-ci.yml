@@ -16,8 +16,8 @@ before_script:
   # Setup http proxy if needed
   #- "export http_proxy=http://10.100.100.1:8888"
   #- "export https_proxy=http://10.100.100.1:8888"
-  # So that current directory and datetime occur in log
-  - pwd && date
+  # So that current user, directory and datetime occur in log
+  - whoami && pwd && date
   - "export CI_PROJECT_VERSION=`echo $CI_COMMIT_REF_NAME | cut -d'-' -f 2`"
   - "echo CI_PROJECT_VERSION: $CI_COMMIT_REF_NAME --\\> $CI_PROJECT_VERSION"
   - "export CI_PROJECT_DEPLOY_DIR=$DIR_DEPLOY/$CI_PROJECT_NAME-$CI_PROJECT_VERSION"

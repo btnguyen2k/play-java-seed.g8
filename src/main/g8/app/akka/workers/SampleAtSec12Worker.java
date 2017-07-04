@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.github.ddth.commons.utils.DateFormatUtils;
 
-import akka.messages.TickMessage;
+import akka.TickMessage;
 import play.Logger;
 
 /**
@@ -13,7 +13,7 @@ import play.Logger;
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.2
  */
-public class SampleAtSec12Worker extends BaseWorkerActor {
+public class SampleAtSec12Worker extends BaseWorker {
 
     private CronFormat scheduling = CronFormat.parse("12 * *");
 
@@ -28,7 +28,7 @@ public class SampleAtSec12Worker extends BaseWorkerActor {
     @Override
     protected void doJob(TickMessage tick) {
         Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + self()
+        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + getActorPath()
                 + " do job " + tick);
     }
 

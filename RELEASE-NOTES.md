@@ -1,10 +1,15 @@
 # Release Notes
 
+## 2017-07-04: version 0.1.5
+
+- Cluster support: configurations & scripts.
+
+
 ## 2017-06-26: version 0.1.4
 
 - New package `api`
   - Centralize API handlers.
-  - WebService/HTTP is now one of many gateways call APIs.
+  - WebService/HTTP is now one of many gateways to call APIs.
 - Thrift & Thrift SSL API Gateway: allow APIs to be called via Apache's Thrift/SSL
 
 

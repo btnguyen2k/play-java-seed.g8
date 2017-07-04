@@ -123,13 +123,13 @@ public class RegistryImpl implements IRegistry {
 
     private void initWorkers() throws ClassNotFoundException {
         // create "tick" fanout actor
-        actorTickFanout = getActorSystem().actorOf(TickFanoutActor.PROPS,
-                TickFanoutActor.ACTOR_NAME);
+        actorTickFanout = actorSystem.actorOf(TickFanoutActor.PROPS, TickFanoutActor.ACTOR_NAME);
 
         List<String> workerClazzs = appConfig.getStringList("workers");
         if (workerClazzs != null) {
-            for (String clazz : workerClazzs) {
-                actorList.add(getActorSystem().actorOf(Props.create(Class.forName(clazz))));
+            for (String clazzName : workerClazzs) {
+		Class<?> clazz = Class.forName(clazzName);
+                actorList.add(actorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
             }
         }
     }
@@ -275,3 +275,4 @@ public class RegistryImpl implements IRegistry {
     /*----------------------------------------------------------------------*/
 
 }
+

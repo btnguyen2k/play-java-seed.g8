@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v0.1.4](RELEASE-NOTES.md).
+Latest release: [template-v0.1.5](RELEASE-NOTES.md).
 
 
 ## Features
@@ -20,12 +20,15 @@ Latest release: [template-v0.1.4](RELEASE-NOTES.md).
 - Separated configurations for production and non-production environments:
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
   - For non-production: `conf/application.conf` and `conf/logback-dev.xml`
+  - For cluster: `conf/application-cluster.conf`
 - Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server.sh` for non-production
+- Cluster support
 - Samples:
   - Module
   - Form & Form controller
   - API controller
   - Workers & Scheduling
+  - Cluster workers
 - JVM tuning & GC logging
 
 ### Start/Stop Scripts
@@ -56,6 +59,20 @@ Environment properties:
 - `app.home`: point to application's home directory
 - `app.logdir`: point to application's log directory
 - `spring.profiles.active`: set to `production` for production environment and set to `development` otherwise
+
+### Cluster mode
+
+Dev env:
+
+- `sh start_node1.sh`: start first node (http port `9001`, cluster TCP/IP port `9051`)
+- `sh start_node2.sh`: start first node (http port `9002`, cluster TCP/IP port `9052`)
+- `sh start_node3.sh`: start first node (http port `9003`, cluster TCP/IP port `9053`)
+
+
+Production:
+
+- start: `sh conf/server-cluster.sh start`
+- stop : `sh conf/server-cluster.sh stop`
 
 
 ## LICENSE & COPYRIGHT

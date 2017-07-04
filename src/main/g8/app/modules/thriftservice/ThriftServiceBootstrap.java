@@ -73,22 +73,20 @@ public class ThriftServiceBootstrap {
     /*----------------------------------------------------------------------*/
     private void init() throws Exception {
         int thriftPort = 9090;
-        if (!playApp.isDev()) {
-            try {
-                thriftPort = Integer.parseInt(System.getProperty("thrift.port", "0"));
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
-                thriftPort = 0;
-            }
+        try {
+            thriftPort = Integer
+                    .parseInt(System.getProperty("thrift.port", playApp.isDev() ? "9090" : "0"));
+        } catch (Exception e) {
+            Logger.warn(e.getMessage(), e);
+            thriftPort = 0;
         }
         int thriftPortSsl = 9093;
-        if (!playApp.isDev()) {
-            try {
-                thriftPortSsl = Integer.parseInt(System.getProperty("thrift.ssl_port", "0"));
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
-                thriftPortSsl = 0;
-            }
+        try {
+            thriftPortSsl = Integer
+                    .parseInt(System.getProperty("thrift.port", playApp.isDev() ? "9093" : "0"));
+        } catch (Exception e) {
+            Logger.warn(e.getMessage(), e);
+            thriftPortSsl = 0;
         }
 
         if (thriftPort > 0 || thriftPortSsl > 0) {
@@ -246,3 +244,4 @@ public class ThriftServiceBootstrap {
     }
 
 }
+
