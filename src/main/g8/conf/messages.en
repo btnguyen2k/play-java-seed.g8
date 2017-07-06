@@ -1,0 +1,24 @@
+# Language file for English
+
+msg.welcome = Welcome to Play Application
+msg.home = Home
+msg.languages = Languages
+
+msg.form_demo = Form Demo
+msg.form.email = Email
+msg.form.fullname = Fullname
+msg.placeholder.email = Enter email address
+msg.placeholder.fullname = Enter fullname
+msg.form.dob = Day of Birth
+msg.form.mob = Month of Birth
+msg.form.yob = Year of Birth
+
+msg.form.submit = Submit
+msg.form.reset = Reset
+msg.form.submit_ok = Form has been submitted successfully.
+
+error.empty_email = Error: Email address is empty!
+error.empty_fullname = Error: Fullname is empty!
+error.invalid_dob = Error: Invalid day-of-birth (must be a number between 1 and 31)!
+error.invalid_mob = Error: Invalid month-of-birth (must be a number between 1 and 12)!
+error.invalid_yob = Error: Invalid year-of-birth (must be a number between 1970 and 2070)!

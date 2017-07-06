@@ -1,6 +1,6 @@
 sbtPlugin := true
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.11.11"
 
 scriptedSettings
 
@@ -9,3 +9,4 @@ scriptedLaunchOpts ++= sys.process.javaVmArguments.filter(
 )
 
 // giter8.ScaffoldPlugin.scaffoldSettings
+

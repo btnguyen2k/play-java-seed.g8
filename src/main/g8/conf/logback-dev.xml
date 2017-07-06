@@ -1,0 +1,73 @@
+<!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
+<!-- for Development Env -->
+<configuration>
+	<conversionRule conversionWord="coloredLevel"
+		converterClass="play.api.libs.logback.ColoredLevel" />
+
+	<!-- Log messages to file -->
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file><![CDATA[${app.logdir:-.}/application.log]]></file>
+		<encoder>
+			<pattern><![CDATA[%date [%level] from %logger in %thread - %message%n%xException]]></pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE" />
+	</appender>
+
+	<!-- Log messages to stdout -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern><![CDATA[%coloredLevel %logger{15} - %message%n%xException{10}]]></pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="STDOUT" />
+	</appender>
+
+	<!-- Off these ones as they are annoying, and anyway we manage configuration 
+		ourselves -->
+	<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader"
+		level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread"
+		level="OFF" />
+	<logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+
+	<logger name="play" level="INFO" />
+	<logger name="application" level="DEBUG" />
+	<logger name="akka.actor" level="INFO" />
+
+	<root level="INFO">
+		<appender-ref ref="ASYNC_FILE" />
+		<appender-ref ref="ASYNC_STDOUT" />
+	</root>
+
+	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
+	<appender name="FILE_ACTION" class="ch.qos.logback.core.FileAppender">
+		<file><![CDATA[${app.logdir:-.}/action.log]]></file>
+		<encoder>
+			<pattern><![CDATA[%message%n]]></pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_FILE_ACTION" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_ACTION" />
+	</appender>
+
+	<!-- Log raw messages to stdout, useful for transaction log that can be 
+		replayed -->
+	<appender name="STDOUT_ACTION" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern><![CDATA[%message%n]]></pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_STDOUT_ACTION" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="STDOUT_ACTION" />
+	</appender>
+
+	<!-- additivity=false ensures action data only goes to the action log -->
+	<logger name="action" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE_ACTION" />
+		<appender-ref ref="ASYNC_STDOUT_ACTION" />
+	</logger>
+</configuration>

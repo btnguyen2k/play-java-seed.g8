@@ -1,0 +1,24 @@
+# Language file for Vietnamese
+
+msg.welcome = Chào mừng đến với ứng dụng phát triển bởi Play Framework
+msg.home = Trang Chủ
+msg.languages = Ngôn Ngữ
+
+msg.form_demo = Form Demo
+msg.form.email = Email
+msg.form.fullname = Họ và Tên
+msg.placeholder.email = Nhập vào địa chỉ email
+msg.placeholder.fullname = Nhập vào Họ và Tên
+msg.form.dob = Ngày Sinh
+msg.form.mob = Tháng Sinh
+msg.form.yob = Năm Sinh
+
+msg.form.submit = Gởi Form
+msg.form.reset = Hoàn Tác
+msg.form.submit_ok = Gởi form thành công.
+
+error.empty_email = Lỗi: Vui lòng nhập vào địa chỉ email!
+error.empty_fullname = Lỗi: Vui lòng nhập vào họ và tên!
+error.invalid_dob = Lỗi: Ngày sinh không hợp lệ (phải nằm trong khoảng 1-31)!
+error.invalid_mob = Lỗi: Tháng sinh không hợp lệ (phải nằm trong khoảng 1-12)!
+error.invalid_yob = Lỗi: Năm sinh không hợp lệ (phải nằm trong khoảng 1970-2070)!

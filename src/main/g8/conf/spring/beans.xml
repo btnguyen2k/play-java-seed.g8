@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util 
+                           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- In-memory cache factory, no expiry -->
+    <bean id="CACHE_FACTORY_INMEM" class="com.github.ddth.cacheadapter.guava.GuavaCacheFactory" 
+            scope="singleton" init-method="init" destroy-method="destroy">
+        <property name="cloneCacheEntries" value="true" />
+        <property name="defaultExpireAfterAccess" value="-1" />
+        <property name="defaultExpireAfterWrite" value="-1" />
+    </bean>
+
+    <!-- Redis cache factory, expire after write 300s -->
+    <bean id="CACHE_FACTORY_REDIS" class="com.github.ddth.cacheadapter.redis.RedisCacheFactory"
+            scope="singleton" init-method="init" destroy-method="destroy">
+        <property name="defaultExpireAfterAccess" value="-1" />
+        <property name="defaultExpireAfterWrite" value="300" />
+        <property name="redisHostAndPort" ref="_redis_hostAndPort" />
+        <!-- <property name="redisPassword" ref="_redis_password" /> -->
+        <property name="keyMode" value="NAMESPACE" />
+        <property name="cacheEntrySerializer">
+            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
+                    init-method="init" destroy-method="destroy">
+                <property name="compressor">
+                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
+                            init-method="init" destroy-method="destroy">
+                        <property name="compressionLevel" value="1" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    
+    <!-- Memcached cache factory, expire after access 300s -->
+    <bean id="CACHE_FACTORY_MEMCACHED" class="com.github.ddth.cacheadapter.memcached.XMemcachedCacheFactory"
+            scope="singleton" init-method="init" destroy-method="destroy">
+        <property name="defaultExpireAfterAccess" value="300" />
+        <property name="defaultExpireAfterWrite" value="-1" />
+        <property name="memcachedHostsAndPorts" ref="_memcached_hostsAndPorts" />
+        <property name="keyMode" value="NAMESPACE" />
+        <property name="cacheEntrySerializer">
+            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
+                    init-method="init" destroy-method="destroy">
+                <property name="compressor">
+                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
+                            init-method="init" destroy-method="destroy">
+                        <property name="compressionLevel" value="1" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>    
+
+    <bean id="API_DISPATCHER" class="api.ApiDispatcher" init-method="init"
+        destroy-method="destroy"></bean>
+
+    <!-- MySQL/HikariCP datasource -->
+    <bean id="DATASOURCE_MYSQL" class="com.zaxxer.hikari.HikariDataSource"
+        scope="singleton">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver" />
+        <property name="jdbcUrl" ref="_db_url" />
+        <property name="username" ref="_db_user" />
+        <property name="password" ref="_db_password" />
+        <property name="connectionTimeout" value="5000" />
+        <property name="idleTimeout" value="900000" />
+        <property name="maxLifetime" value="1800000" />
+        <property name="connectionTestQuery" value="SELECT 1" />
+        <property name="validationTimeout" value="1500" />
+        <property name="maximumPoolSize" value="4" />
+        <property name="initializationFailTimeout" value="-1" />
+        <property name="connectionInitSql" value="SET NAMES 'utf8'" />
+        <property name="leakDetectionThreshold" value="300000" />
+    </bean>
+
+    <!-- beans for development env -->
+    <beans>
+        <bean id="_db_url" class="java.lang.String">
+            <constructor-arg
+                value="jdbc:mysql://127.0.0.1:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
+        </bean>
+        <bean id="_db_user" class="java.lang.String">
+            <constructor-arg value="test" />
+        </bean>
+        <bean id="_db_password" class="java.lang.String">
+            <constructor-arg value="test" />
+        </bean>
+
+        <bean id="_redis_hostAndPort" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:6379" />
+        </bean>
+        <bean id="_redis_password" class="java.lang.String">
+            <constructor-arg value="" />
+        </bean>
+
+        <bean id="_memcached_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:11211" />
+        </bean>
+    </beans>
+
+    <!-- beans for production env -->
+    <beans profile="prod,production">
+        <bean id="_db_url" class="java.lang.String">
+            <constructor-arg
+                value="jdbc:mysql://127.0.0.1:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
+        </bean>
+        <bean id="_db_user" class="java.lang.String">
+            <constructor-arg value="test" />
+        </bean>
+        <bean id="_db_password" class="java.lang.String">
+            <constructor-arg value="test" />
+        </bean>
+
+        <bean id="_redis_hostAndPort" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:6379" />
+        </bean>
+        <bean id="_redis_password" class="java.lang.String">
+            <constructor-arg value="" />
+        </bean>
+        
+        <bean id="_memcached_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:11211" />
+        </bean>
+    </beans>
+</beans>
+

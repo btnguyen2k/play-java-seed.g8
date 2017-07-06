@@ -1,0 +1,58 @@
+<!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
+<!-- for Production Env -->
+<configuration>
+	<!-- Log messages to file -->
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file><![CDATA[${app.logdir:-.}/application.log]]></file>
+		<append>true</append>
+		<encoder>
+			<pattern><![CDATA[%date [%level] from %logger in %thread - %message%n%xException]]></pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern><![CDATA[${app.logdir:-.}/application.log.%d{yyyy-MM-dd}]]></fileNamePattern>
+		</rollingPolicy>
+	</appender>
+	<appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE" />
+	</appender>
+
+	<!-- Off these ones as they are annoying, and anyway we manage configuration 
+		ourselves -->
+	<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader"
+		level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread"
+		level="OFF" />
+	<logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+
+	<logger name="play" level="INFO" />
+	<logger name="application" level="INFO" />
+	<logger name="akka.actor" level="INFO" />
+
+	<root level="INFO">
+		<appender-ref ref="ASYNC_FILE" />
+	</root>
+
+	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
+	<appender name="FILE_ACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file><![CDATA[${app.logdir:-.}/action.log]]></file>
+		<append>true</append>
+		<encoder>
+			<pattern><![CDATA[%message%n]]></pattern>
+		</encoder>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- daily rollover -->
+			<fileNamePattern><![CDATA[${app.logdir:-.}/action.log.%d{yyyy-MM-dd}]]></fileNamePattern>
+		</rollingPolicy>
+	</appender>
+	<appender name="ASYNC_FILE_ACTION" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_ACTION" />
+	</appender>
+
+	<!-- additivity=false ensures action data only goes to the action log -->
+	<logger name="action" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE_ACTION" />
+	</logger>
+</configuration>
