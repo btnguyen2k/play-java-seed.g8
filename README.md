@@ -74,6 +74,17 @@ Production:
 - start: `sh conf/server-cluster.sh start`
 - stop : `sh conf/server-cluster.sh stop`
 
+Command-line arguments for cluster mode:
+
+- `--cluster-name <cluster-name>`: name of cluster (default: `MyCluster`). Nodes in one cluster must have same cluster-name value.
+- `--cluster-addr <listen-address>`: listen address for cluster service (default: same value as application's http listen address).
+- `--cluster-port <listen-port>`: listen port for cluster service (default: application's http port `+ 7`).
+- `--cluster-seed <host:port>`: cluster seed node, must be in format `host:port`. Use multiple `--cluster-seed` to specify more than one seed nodes. If none specified, cluster mode is disabled
+
+Example:
+
+`./conf/server-cluster.sh start --cluster-name MyAwesomeCluster --cluster-port 9007 --cluster-addr 127.0.0.1 --cluster-seed 127.0.0.1:9007 --cluster-seed 127.0.0.1:9008`
+
 
 ## LICENSE & COPYRIGHT
 
