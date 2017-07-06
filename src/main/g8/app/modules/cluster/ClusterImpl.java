@@ -68,24 +68,28 @@ public class ClusterImpl implements ICluster {
     private List<ActorRef> actorList = new ArrayList<>();
 
     private void initClusterWorkers() throws ClassNotFoundException {
-        List<String> workerClazzs = appConfig.getStringList("cluster_workers");
-        if (workerClazzs != null) {
-            for (String clazzName : workerClazzs) {
-                Class<?> clazz = Class.forName(clazzName);
-                Logger.info("Creating cluster-worker " + clazz);
-                actorList.add(
-                        clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
+        if (clusterActorSystem != null) {
+            List<String> workerClazzs = appConfig.getStringList("cluster_workers");
+            if (workerClazzs != null) {
+                for (String clazzName : workerClazzs) {
+                    Class<?> clazz = Class.forName(clazzName);
+                    Logger.info("Creating cluster-worker " + clazz);
+                    actorList.add(
+                            clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
+                }
             }
         }
     }
 
     private void destroyClusterWorkers() {
-        for (ActorRef actorRef : actorList) {
-            if (actorRef != null) {
-                try {
-                    clusterActorSystem.stop(actorRef);
-                } catch (Exception e) {
-                    Logger.warn(e.getMessage(), e);
+        if (clusterActorSystem != null) {
+            for (ActorRef actorRef : actorList) {
+                if (actorRef != null) {
+                    try {
+                        clusterActorSystem.stop(actorRef);
+                    } catch (Exception e) {
+                        Logger.warn(e.getMessage(), e);
+                    }
                 }
             }
         }
@@ -97,7 +101,6 @@ public class ClusterImpl implements ICluster {
             Logger.warn("[cluster_conf] configuration not found, will not start cluster mode!");
             return;
         }
-        Logger.info("Starting cluster mode with configurations: " + clusterConfig.asMap());
 
         clusterName = clusterConfig.getString("akka.cluster.name");
         if (StringUtils.isBlank(clusterName)) {
@@ -105,6 +108,22 @@ public class ClusterImpl implements ICluster {
                     "[akka.cluster.name] configuration not found or empty, will not start cluster mode!");
             return;
         }
+
+        Integer clusterPort = clusterConfig.getInt("akka.remote.netty.tcp.port",
+                Integer.valueOf(0));
+        String clusterHost = clusterConfig.getString("akka.remote.netty.tcp.hostname");
+        if (StringUtils.isBlank(clusterHost)) {
+            Logger.warn(
+                    "[akka.remote.netty.tcp.hostname] configuration not found or empty, will not start cluster mode!");
+            return;
+        }
+        if (clusterPort == null || clusterPort.intValue() <= 0) {
+            Logger.warn(
+                    "[akka.remote.netty.tcp.port] configuration not found or invalid, will not start cluster mode!");
+            return;
+        }
+
+        Logger.info("Starting cluster mode with configurations: " + clusterConfig.asMap());
         clusterActorSystem = ActorSystem.create(clusterName, clusterConfig.underlying());
 
         // create master worker
