@@ -10,19 +10,18 @@ import akka.workers.CronFormat;
 import play.Logger;
 
 /**
- * Sample singleton cluster worker that do job every 5 seconds.
+ * Sample singleton cluster worker.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
 public class SampleSingletonClusterWorker extends BaseSingletonClusterWorker {
-
+    /**
+     * Schedule to do job every 5 seconds
+     */
     private CronFormat scheduling = CronFormat.parse("*/5 * *");
     private Random random = new Random(System.currentTimeMillis());
 
-    /**
-     * Schedule to do job every 10 seconds.
-     */
     @Override
     protected CronFormat getScheduling() {
         return scheduling;

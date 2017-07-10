@@ -1,7 +1,7 @@
 package akka.cluster.workers;
 
 import java.util.Date;
-import java.util.Random;
+import java.util.Set;
 
 import com.github.ddth.commons.utils.DateFormatUtils;
 
@@ -10,18 +10,17 @@ import akka.workers.CronFormat;
 import play.Logger;
 
 /**
- * Sample cluster worker that do job every 5 seconds.
+ * Sample cluster worker that runs on all nodes (node with any role).
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-v0.1.5
+ * @since template-v2.6.r1
  */
-public class SampleClusterWorker2 extends BaseClusterWorker {
+public class SampleAllRolesClusterWorker extends BaseClusterWorker {
 
     /**
-     * Schedule to do job every 5 seconds.
+     * Schedule to do job every 5 seconds
      */
     private CronFormat scheduling = CronFormat.parse("*/5 * *");
-    private Random random = new Random(System.currentTimeMillis());
 
     /**
      * {@inheritDoc}
@@ -36,12 +35,19 @@ public class SampleClusterWorker2 extends BaseClusterWorker {
         return scheduling;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void doJob(TickMessage tick) throws InterruptedException {
+    protected Set<String> getDeployRoles() {
+        return null;
+    }
+
+    @Override
+    protected void doJob(TickMessage tick) {
         Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + getActorPath()
-                + " do job " + tick);
-        Thread.sleep(4000 + random.nextInt(2000));
+        Logger.info("[" + DateFormatUtils.toString(d, "HH:mm:ss") + "] " + getActorPath()
+                + " do job " + tick + " from " + sender().path());
     }
 
 }

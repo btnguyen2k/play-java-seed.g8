@@ -1,6 +1,8 @@
 package akka.cluster.workers;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Set;
 
 import com.github.ddth.commons.utils.DateFormatUtils;
 
@@ -9,17 +11,17 @@ import akka.workers.CronFormat;
 import play.Logger;
 
 /**
- * Sample cluster worker that do job every minute at the 12th second.
+ * Sample cluster worker that runs only on nodes with roles contain "Role1".
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-v0.1.5
+ * @since template-v2.6.r1
  */
-public class SampleClusterWorker extends BaseClusterWorker {
+public class SampleOnlyRole1ClusterWorker extends BaseClusterWorker {
 
     /**
-     * Schedule to do job every minute at the 12th second.
+     * Schedule to do job every 7 seconds
      */
-    private CronFormat scheduling = CronFormat.parse("12 * *");
+    private CronFormat scheduling = CronFormat.parse("*/7 * *");
 
     /**
      * {@inheritDoc}
@@ -32,6 +34,14 @@ public class SampleClusterWorker extends BaseClusterWorker {
     @Override
     protected CronFormat getScheduling() {
         return scheduling;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected Set<String> getDeployRoles() {
+        return Collections.singleton("Role1");
     }
 
     @Override
