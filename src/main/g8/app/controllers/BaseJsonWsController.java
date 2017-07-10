@@ -7,6 +7,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.typesafe.config.Config;
 
 import akka.util.ByteString;
 import api.ApiAuth;
@@ -14,22 +15,22 @@ import api.ApiContext;
 import api.ApiParams;
 import api.ApiResult;
 import modules.registry.RegistryGlobal;
-import play.Configuration;
 import play.libs.Json;
 import play.mvc.Http.RawBuffer;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
+import utils.AppConfigUtils;
 import utils.AppConstants;
 import utils.RequestEntiryTooLargeException;
 
 /**
  * Base class for Json-based web-service controllers.
- * 
+ *
  * <p>
  * This controller accepts request data in JSON format, and response to client also in JSON. All
  * responses have the following format:
  * </p>
- * 
+ *
  * <pre>
  * {
  *     "status" : "(int) status code",
@@ -38,8 +39,8 @@ import utils.RequestEntiryTooLargeException;
  *     "dedug"  : "(mixed/optional) debug information"
  * }
  * </pre>
- * 
- * 
+ *
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  * @see ApiContext
@@ -50,7 +51,7 @@ public class BaseJsonWsController extends BaseController {
 
     /**
      * Parse the request's body as {@link JsonNode}.
-     * 
+     *
      * @return
      * @throws IOException
      * @throws RequestEntiryTooLargeException
@@ -61,8 +62,9 @@ public class BaseJsonWsController extends BaseController {
             return null;
         }
 
-        Configuration appConfg = RegistryGlobal.registry.getAppConfiguration();
-        int maxApiBody = appConfg.getInt("api.parser.maxBodySize", 1024 * 16);
+        Config appConfig = getAppConfig();
+        int maxApiBody = AppConfigUtils.getOrDefault(appConfig::getInt, "api.parser.maxBodySize",
+                1024 * 16);
 
         RequestBody requestBody = request().body();
         JsonNode jsonNode = requestBody.asJson();
@@ -110,7 +112,7 @@ public class BaseJsonWsController extends BaseController {
 
     /**
      * Parse the requests's body as {@link ApiParams}.
-     * 
+     *
      * @return
      * @throws IOException
      * @throws RequestEntiryTooLargeException
@@ -127,7 +129,7 @@ public class BaseJsonWsController extends BaseController {
 
     /**
      * Perform API call via web-service.
-     * 
+     *
      * @param apiName
      * @return
      * @throws Exception
@@ -148,7 +150,7 @@ public class BaseJsonWsController extends BaseController {
 
     /**
      * Return API result to client in JSON format.
-     * 
+     *
      * @param apiResult
      * @return
      * @since template-v0.1.4

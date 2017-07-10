@@ -1,8 +1,11 @@
 #!/bin/sh
 # For dev env only!
 
-sbt -Dplay.server.netty.transport=jdk -Dconfig.file=./conf/application-cluster.conf \
+unset SBT_OPTS
+sbt -Dconfig.file=conf/application-cluster.conf -Dlogger.file=conf/logback-dev.xml \
 	-Dhttp.port=9002 -Dthrift.port=0 -Dthrift.ssl_port=0 -Dgrpc.port=0\
-	-Dcluster_conf.akka.remote.netty.tcp.port=9052 \
-	-Dcluster_conf.akka.cluster.seed-nodes.0=akka.tcp://MyCluster@127.0.0.1:9051 -Dcluster_conf.akka.cluster.seed-nodes.1=akka.tcp://MyCluster@127.0.0.1:9052 \
+	-Dplay.akka.actor-system=MyCluster -Dakka.cluster.name=MyCluster -Dakka.remote.netty.tcp.hostname=127.0.0.1 -Dakka.remote.netty.tcp.port=9052 \
+	-Dakka.cluster.roles.0=Role2 \
+	-Dakka.cluster.seed-nodes.0=akka.tcp://MyCluster@127.0.0.1:9051 \
+	-Dakka.cluster.seed-nodes.1=akka.tcp://MyCluster@127.0.0.1:9052 \
 	run

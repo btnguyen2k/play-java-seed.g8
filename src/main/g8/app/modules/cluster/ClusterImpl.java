@@ -10,39 +10,39 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.inject.Provider;
+import com.typesafe.config.Config;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.cluster.Cluster;
+import akka.cluster.ClusterActorRefProvider;
 import akka.cluster.MasterActor;
 import modules.registry.IRegistry;
 import play.Application;
-import play.Configuration;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
+import utils.AppConfigUtils;
 
 @Singleton
 public class ClusterImpl implements ICluster {
 
-    private Configuration appConfig;
     private Provider<IRegistry> registry;
-
-    private ActorSystem clusterActorSystem;
+    private Config appConfig;
     private String clusterName;
+    private ActorSystem clusterActorSystem;
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @param lifecycle
      */
     @Inject
     public ClusterImpl(ApplicationLifecycle lifecycle, Application playApp,
-            Provider<IRegistry> registry) {
-        this.appConfig = playApp.configuration();
+                       Provider<IRegistry> registry) {
+        this.appConfig = playApp.config();
         this.registry = registry;
 
-        // for Java 8+
         lifecycle.addStopHook(() -> {
             destroy();
             return CompletableFuture.completedFuture(null);
@@ -69,11 +69,12 @@ public class ClusterImpl implements ICluster {
 
     private void initClusterWorkers() throws ClassNotFoundException {
         if (clusterActorSystem != null) {
-            List<String> workerClazzs = appConfig.getStringList("cluster_workers");
-            if (workerClazzs != null) {
-                for (String clazzName : workerClazzs) {
+            List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList,
+                    "akka.cluster.workers");
+            if (clazzs != null) {
+                for (String clazzName : clazzs) {
                     Class<?> clazz = Class.forName(clazzName);
-                    Logger.info("Creating cluster-worker " + clazz);
+                    Logger.info("Creating cluster-worker " + clazz + "...");
                     actorList.add(
                             clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
                 }
@@ -84,47 +85,36 @@ public class ClusterImpl implements ICluster {
     private void destroyClusterWorkers() {
         if (clusterActorSystem != null) {
             for (ActorRef actorRef : actorList) {
-                if (actorRef != null) {
-                    try {
-                        clusterActorSystem.stop(actorRef);
-                    } catch (Exception e) {
-                        Logger.warn(e.getMessage(), e);
-                    }
+                try {
+                    clusterActorSystem.stop(actorRef);
+                } catch (Exception e) {
+                    Logger.warn(e.getMessage(), e);
                 }
             }
         }
     }
 
-    private void initCluster() {
-        Configuration clusterConfig = appConfig.getConfig("cluster_conf");
-        if (clusterConfig == null) {
-            Logger.warn("[cluster_conf] configuration not found, will not start cluster mode!");
+    private void initCluster() throws ClassNotFoundException {
+        String provider = AppConfigUtils.getOrNull(appConfig::getString, "akka.actor.provider");
+        Class<?> clazz = !StringUtils.isBlank(provider) ? Class.forName(provider) : null;
+        if (clazz == null && !ClusterActorRefProvider.class.isAssignableFrom(clazz)) {
+            Logger.warn(
+                    "[akka.actor.provider] configuration not found or invalid. It must be an instance of "
+                            + ClusterActorRefProvider.class);
             return;
         }
 
-        clusterName = clusterConfig.getString("akka.cluster.name");
+        clusterName = AppConfigUtils.getOrNull(appConfig::getString, "akka.cluster.name");
         if (StringUtils.isBlank(clusterName)) {
-            Logger.warn(
-                    "[akka.cluster.name] configuration not found or empty, will not start cluster mode!");
-            return;
+            Logger.warn("[akka.cluster.name] configuration not found or empty!");
         }
 
-        Integer clusterPort = clusterConfig.getInt("akka.remote.netty.tcp.port",
-                Integer.valueOf(0));
-        String clusterHost = clusterConfig.getString("akka.remote.netty.tcp.hostname");
-        if (StringUtils.isBlank(clusterHost)) {
-            Logger.warn(
-                    "[akka.remote.netty.tcp.hostname] configuration not found or empty, will not start cluster mode!");
-            return;
+        if (Logger.isDebugEnabled()) {
+            Logger.debug(
+                    "Starting cluster mode with configurations: " + appConfig.getConfig("akka"));
         }
-        if (clusterPort == null || clusterPort.intValue() <= 0) {
-            Logger.warn(
-                    "[akka.remote.netty.tcp.port] configuration not found or invalid, will not start cluster mode!");
-            return;
-        }
-
-        Logger.info("Starting cluster mode with configurations: " + clusterConfig.asMap());
-        clusterActorSystem = ActorSystem.create(clusterName, clusterConfig.underlying());
+        // clusterActorSystem = ActorSystem.create(clusterName, clusterConfig.underlying());
+        clusterActorSystem = registry.get().getActorSystem();
 
         // create master worker
         Logger.info("Creating " + MasterActor.class);
@@ -135,8 +125,8 @@ public class ClusterImpl implements ICluster {
     private void destroyCluster() {
         if (clusterActorSystem != null) {
             try {
-                // leave the cluster
                 Cluster cluster = Cluster.get(clusterActorSystem);
+                Logger.info("Node " + cluster.selfAddress() + " is shutting down...");
                 // cluster.leave(cluster.selfAddress());
                 cluster.down(cluster.selfAddress());
                 Thread.sleep(1234);
@@ -144,12 +134,12 @@ public class ClusterImpl implements ICluster {
                 Logger.warn(e.getMessage(), e);
             }
 
-            try {
-                // and terminate the Actor System
-                clusterActorSystem.terminate();
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
-            }
+            // try {
+            // // and terminate the Actor System
+            // clusterActorSystem.terminate();
+            // } catch (Exception e) {
+            // Logger.warn(e.getMessage(), e);
+            // }
         }
     }
 

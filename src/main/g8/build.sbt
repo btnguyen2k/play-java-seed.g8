@@ -21,7 +21,8 @@ routesGenerator := InjectedRoutesGenerator
 
 pipelineStages := Seq(digest, gzip)
 
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, SbtWeb).settings(
+// See https://playframework.com/documentation/2.6.x/AkkaHttpServer
+lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttp2Support, SbtWeb).settings(
     name         := appName,
     version      := appVersion,
     organization := "$organization$"
@@ -36,6 +37,7 @@ val _springVersion           = "4.3.9.RELEASE"
 val _ddthCacheAdapterVersion = "0.6.1"
 val _ddthCommonsVersion      = "0.6.3.2"
 val _akkaVersion             = "2.5.3"
+val _playWsStandaloneVersion = "1.0.1"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
@@ -45,7 +47,12 @@ libraryDependencies ++= Seq(
     ,"com.typesafe.akka"         %% "akka-distributed-data"       % _akkaVersion
     ,"com.typesafe.akka"         %% "akka-cluster-metrics"        % _akkaVersion
     ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaVersion
-    
+
+    ,"com.typesafe.play"         %% "play-json"                   % "2.6.2"
+    ,"com.typesafe.play"         %% "play-ahc-ws-standalone"      % _playWsStandaloneVersion
+    ,"com.typesafe.play"         %% "play-ws-standalone-json"     % _playWsStandaloneVersion
+    ,"com.typesafe.play"         %% "play-ws-standalone-xml"      % _playWsStandaloneVersion
+
     // MySQL is our default database
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
     ,"com.zaxxer"                % "HikariCP"                     % "2.6.3"
@@ -67,5 +74,5 @@ libraryDependencies ++= Seq(
 
     ,filters
     ,javaWs
+    ,guice
 )
-

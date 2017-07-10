@@ -25,26 +25,28 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.TTransportFactory;
 
 import com.google.inject.Provider;
+import com.typesafe.config.Config;
 
 import modules.registry.IRegistry;
 import play.Application;
-import play.Configuration;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
 import thrift.ApiServiceHandler;
 import thrift.def.TApiService;
+import utils.AppConfigUtils;
 
 /**
  * Thrift API Gateway Bootstraper.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.4
  */
 public class ThriftServiceBootstrap {
 
-    private Application playApp;
-    private Configuration appConfig;
     private Provider<IRegistry> registry;
+    private Application playApp;
+    private Config appConfig;
+
     private TServer thriftApiGateway, thriftApiGatewaySsl;
 
     /**
@@ -52,12 +54,11 @@ public class ThriftServiceBootstrap {
      */
     @Inject
     public ThriftServiceBootstrap(ApplicationLifecycle lifecycle, Application playApp,
-            Provider<IRegistry> registry) {
+                                  Provider<IRegistry> registry) {
         this.playApp = playApp;
-        this.appConfig = playApp.configuration();
+        this.appConfig = playApp.config();
         this.registry = registry;
 
-        // for Java 8+
         lifecycle.addStopHook(() -> {
             destroy();
             return CompletableFuture.completedFuture(null);
@@ -93,12 +94,18 @@ public class ThriftServiceBootstrap {
             /* at least one of thrift of thriftSsl is enabled */
 
             // prepare configurations.
-            int clientTimeoutMillisecs = appConfig.getInt("api.thrift.clientTimeout", 0);
-            int maxFrameSize = appConfig.getInt("api.thrift.maxFrameSize", 0);
-            int maxReadBufferSize = appConfig.getInt("api.thrift.maxReadBufferSize", 0);
-            int numSelectorThreads = appConfig.getInt("api.thrift.selectorThreads", 0);
-            int numWorkerThreads = appConfig.getInt("api.thrift.workerThreads", 0);
-            int queueSizePerThread = appConfig.getInt("api.thrift.queueSizePerThread", 0);
+            int clientTimeoutMillisecs = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.clientTimeout", 0);
+            int maxFrameSize = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.maxFrameSize", 0);
+            int maxReadBufferSize = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.maxReadBufferSize", 0);
+            int numSelectorThreads = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.selectorThreads", 0);
+            int numWorkerThreads = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.workerThreads", 0);
+            int queueSizePerThread = AppConfigUtils.getOrDefault(appConfig::getInt,
+                    "api.thrift.queueSizePerThread", 0);
 
             TProcessorFactory processorFactory = new TProcessorFactory(
                     new TApiService.Processor<TApiService.Iface>(new ApiServiceHandler(registry)));
@@ -148,9 +155,9 @@ public class ThriftServiceBootstrap {
     }
 
     private TServer createThreadedPoolServerSsl(TProcessorFactory processorFactory,
-            TProtocolFactory protocolFactory, int port, int numWorkerThreads,
-            int clientTimeoutMillisecs, int maxFrameSize, long maxReadBufferSize, File keystore,
-            String keystorePass) throws TTransportException, UnknownHostException {
+                                                TProtocolFactory protocolFactory, int port, int numWorkerThreads,
+                                                int clientTimeoutMillisecs, int maxFrameSize, long maxReadBufferSize, File keystore,
+                                                String keystorePass) throws TTransportException, UnknownHostException {
         if (numWorkerThreads < 1) {
             numWorkerThreads = 8;
         }
@@ -170,9 +177,9 @@ public class ThriftServiceBootstrap {
     }
 
     private static TServer createThreadedSelectorServer(TProcessorFactory processorFactory,
-            TProtocolFactory protocolFactory, int port, int numSelectorThreads,
-            int numWorkerThreads, int queueSizePerThread, int clientTimeoutMillisecs,
-            int maxFrameSize, long maxReadBufferSize)
+                                                        TProtocolFactory protocolFactory, int port, int numSelectorThreads,
+                                                        int numWorkerThreads, int queueSizePerThread, int clientTimeoutMillisecs,
+                                                        int maxFrameSize, long maxReadBufferSize)
             throws TTransportException, UnknownHostException {
         if (numSelectorThreads < 1) {
             numSelectorThreads = 2;
@@ -244,4 +251,3 @@ public class ThriftServiceBootstrap {
     }
 
 }
-

@@ -7,10 +7,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import akka.BaseActor;
 import akka.TickMessage;
 import play.Logger;
+import scala.concurrent.ExecutionContextExecutor;
 
 /**
  * Base class to implement workers.
- * 
+ *
  * <p>
  * Worker implementation:
  * <ul>
@@ -24,7 +25,7 @@ import play.Logger;
  * implements this method to perform its own business logic.</li>
  * </ul>
  * </p>
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.2
  */
@@ -43,7 +44,7 @@ public abstract class BaseWorker extends BaseActor {
     /**
      * If {@code true}, the first run will start as soon as the actor starts,
      * ignoring tick-match check.
-     * 
+     *
      * @return
      * @since template-v0.1.2.1
      */
@@ -56,7 +57,7 @@ public abstract class BaseWorker extends BaseActor {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @since v0.1.5
      */
     @Override
@@ -66,7 +67,7 @@ public abstract class BaseWorker extends BaseActor {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @since v0.1.5
      */
     @Override
@@ -84,7 +85,7 @@ public abstract class BaseWorker extends BaseActor {
 
     /**
      * Get worker's scheduling settings as {@link CronFormat}.
-     * 
+     *
      * @return
      */
     protected abstract CronFormat getScheduling();
@@ -92,7 +93,7 @@ public abstract class BaseWorker extends BaseActor {
     /**
      * Sub-class implements this method to actually perform worker business
      * logic.
-     * 
+     *
      * @param tick
      * @throws Exception
      */
@@ -102,7 +103,7 @@ public abstract class BaseWorker extends BaseActor {
 
     /**
      * Check if "tick" matches scheduling settings.
-     * 
+     *
      * @param tick
      * @return
      */
@@ -119,7 +120,12 @@ public abstract class BaseWorker extends BaseActor {
     private AtomicBoolean LOCK = new AtomicBoolean(false);
 
     protected void onTick(TickMessage tick) {
-        getRegistry().getScheduledExecutorService().execute(() -> {
+        ExecutionContextExecutor ecs = getRegistry()
+                .getExecutionContextExecutor("worker-dispatcher");
+        if (ecs == null) {
+            ecs = getRegistry().getDefaultExecutionContextExecutor();
+        }
+        ecs.execute(() -> {
             if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
                 if (LOCK.compareAndSet(false, true)) {
                     try {

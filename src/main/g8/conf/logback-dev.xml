@@ -18,7 +18,7 @@
 	<!-- Log messages to stdout -->
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern><![CDATA[%coloredLevel %logger{15} - %message%n%xException{10}]]></pattern>
+			<pattern><![CDATA[%date %coloredLevel %logger{15} - %message%n%xException{10}]]></pattern>
 		</encoder>
 	</appender>
 	<appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">

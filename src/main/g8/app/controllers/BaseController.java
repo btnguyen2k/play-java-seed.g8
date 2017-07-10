@@ -5,11 +5,11 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.inject.Provider;
+import com.typesafe.config.Config;
 
 import akka.actor.ActorSystem;
 import modules.registry.IRegistry;
 import play.Application;
-import play.Configuration;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.i18n.MessagesApi;
@@ -23,7 +23,7 @@ import utils.I18NUtils;
 
 /**
  * Base class for all controllers. Base stuff should go here.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  */
@@ -35,7 +35,7 @@ public class BaseController extends Controller {
 
     /**
      * Get the {@link IRegistry} instance.
-     * 
+     *
      * @return
      */
     protected IRegistry getRegistry() {
@@ -53,11 +53,11 @@ public class BaseController extends Controller {
 
     /**
      * Get the current Play application's configuration.
-     * 
+     *
      * @return
      */
-    protected Configuration getAppConfiguration() {
-        return getRegistry().getAppConfiguration();
+    protected Config getAppConfig() {
+        return getRegistry().getAppConfig();
     }
 
     /**
@@ -80,7 +80,7 @@ public class BaseController extends Controller {
 
     /**
      * Get the {@link WSClient} instance.
-     * 
+     *
      * @return
      */
     protected WSClient getWsClient() {
@@ -89,7 +89,7 @@ public class BaseController extends Controller {
 
     /**
      * Switch to the specified language.
-     * 
+     *
      * @param lang
      */
     protected void setLanguage(Lang lang) {
@@ -98,7 +98,7 @@ public class BaseController extends Controller {
 
     /**
      * Get the language for the current context.
-     * 
+     *
      * @return
      */
     protected Lang calcLang() {
@@ -109,7 +109,7 @@ public class BaseController extends Controller {
 
     /**
      * Get the {@link Messages} instance for the current context.
-     * 
+     *
      * @return
      */
     protected Messages calcMessages() {
@@ -119,7 +119,7 @@ public class BaseController extends Controller {
 
     /**
      * Get all available languages.
-     * 
+     *
      * @return
      */
     protected Lang[] availableLanguages() {
@@ -128,7 +128,7 @@ public class BaseController extends Controller {
 
     /**
      * Response to client as Json.
-     * 
+     *
      * @param data
      * @return
      */
@@ -138,7 +138,7 @@ public class BaseController extends Controller {
 
     /**
      * Redirect client to a URL.
-     * 
+     *
      * @param url
      * @param flashKey
      * @param flashMsg
@@ -153,7 +153,7 @@ public class BaseController extends Controller {
 
     /**
      * Redirect client.
-     * 
+     *
      * @param call
      * @param flashKey
      * @param flashMsg

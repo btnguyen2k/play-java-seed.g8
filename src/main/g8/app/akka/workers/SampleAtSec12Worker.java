@@ -27,9 +27,7 @@ public class SampleAtSec12Worker extends BaseWorker {
 
     @Override
     protected void doJob(TickMessage tick) {
-        Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + getActorPath()
-                + " do job " + tick);
+        Logger.info("[" + getActorPath() + "] do job " + tick);
     }
 
 }

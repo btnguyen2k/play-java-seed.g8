@@ -29,10 +29,8 @@ public class SamplePer10SecsWorker extends BaseWorker {
 
     @Override
     protected void doJob(TickMessage tick) throws InterruptedException {
-        Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + getActorPath()
-                + " do job " + tick);
-        Thread.sleep(9000 + random.nextInt(4000));
+        Logger.info("[" + getActorPath() + "] do job " + tick);
+        Thread.sleep(7500 + random.nextInt(4000));
     }
 
 }

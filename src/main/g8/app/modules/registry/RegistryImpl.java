@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import javax.inject.Inject;
 
@@ -14,49 +12,50 @@ import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
+import com.typesafe.config.Config;
+
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.workers.TickFanoutActor;
 import api.ApiDispatcher;
 import play.Application;
-import play.Configuration;
 import play.Logger;
 import play.i18n.Lang;
 import play.i18n.MessagesApi;
 import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
+import scala.concurrent.ExecutionContextExecutor;
+import utils.AppConfigUtils;
 
 /**
  * Application's central registry implementation.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  */
 public class RegistryImpl implements IRegistry {
 
     private Application playApp;
-    private Configuration appConfig;
+    private Config appConfig;
     private ActorSystem actorSystem;
     private MessagesApi messagesApi;
     private WSClient wsClient;
     private Lang[] availableLanguages;
     private AbstractApplicationContext appContext;
-    private ScheduledExecutorService scheduledExecutorService;
 
     /**
      * {@inheritDoc}
      */
     @Inject
     public RegistryImpl(ApplicationLifecycle lifecycle, Application playApp,
-            ActorSystem actorSystem, MessagesApi messagesApi, WSClient wsClient) {
+                        ActorSystem actorSystem, MessagesApi messagesApi, WSClient wsClient) {
         this.playApp = playApp;
-        this.appConfig = playApp.configuration();
+        this.appConfig = playApp.config();
         this.actorSystem = actorSystem;
         this.messagesApi = messagesApi;
         this.wsClient = wsClient;
 
-        // for Java 8+
         lifecycle.addStopHook(() -> {
             destroy();
             return CompletableFuture.completedFuture(null);
@@ -73,7 +72,6 @@ public class RegistryImpl implements IRegistry {
     private void init() throws Exception {
         RegistryGlobal.registry = this;
         initAvailableLanguages();
-        initScheduledExecutorService();
         initApplicationContext();
         initWorkers();
     }
@@ -81,39 +79,14 @@ public class RegistryImpl implements IRegistry {
     private void destroy() {
         destroyWorkers();
         destroyApplicationContext();
-        destroyScheduledExecutorService();
     }
 
     private void initAvailableLanguages() {
-        List<String> langCodes = appConfig.getStringList("play.i18n.langs");
-        availableLanguages = new Lang[langCodes != null ? langCodes.size() : 0];
-        if (langCodes != null) {
-            for (int i = 0, n = langCodes.size(); i < n; i++) {
-                availableLanguages[i] = Lang.forCode(langCodes.get(i));
-            }
-        }
-    }
-
-    /**
-     * @since template-v0.1.2.1
-     */
-    private void initScheduledExecutorService() {
-        int numThreads = appConfig.getInt("globalScheduledExecutorServiceThreads", 4);
-        if (numThreads < 1) {
-            numThreads = 1;
-        }
-        scheduledExecutorService = Executors.newScheduledThreadPool(numThreads);
-    }
-
-    /**
-     * @since template-v0.1.2.1
-     */
-    private void destroyScheduledExecutorService() {
-        if (scheduledExecutorService != null) {
-            try {
-                scheduledExecutorService.shutdown();
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
+        List<String> codes = AppConfigUtils.getOrNull(appConfig::getStringList, "play.i18n.langs");
+        availableLanguages = new Lang[codes != null ? codes.size() : 0];
+        if (codes != null) {
+            for (int i = 0, n = codes.size(); i < n; i++) {
+                availableLanguages[i] = Lang.forCode(codes.get(i));
             }
         }
     }
@@ -123,12 +96,14 @@ public class RegistryImpl implements IRegistry {
 
     private void initWorkers() throws ClassNotFoundException {
         // create "tick" fanout actor
+        Logger.info("Creating actor [" + TickFanoutActor.ACTOR_NAME + "]...");
         actorTickFanout = actorSystem.actorOf(TickFanoutActor.PROPS, TickFanoutActor.ACTOR_NAME);
 
-        List<String> workerClazzs = appConfig.getStringList("workers");
-        if (workerClazzs != null) {
-            for (String clazzName : workerClazzs) {
-		Class<?> clazz = Class.forName(clazzName);
+        List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList, "akka.workers");
+        if (clazzs != null) {
+            for (String clazzName : clazzs) {
+                Class<?> clazz = Class.forName(clazzName);
+                Logger.info("Creating worker [" + clazz + "]...");
                 actorList.add(actorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
             }
         }
@@ -155,7 +130,7 @@ public class RegistryImpl implements IRegistry {
     }
 
     private void initApplicationContext() {
-        String configFile = playApp.configuration().getString("spring.conf");
+        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
         if (!StringUtils.isBlank(configFile)) {
             File springConfigFile = configFile.startsWith("/") ? new File(configFile)
                     : new File(playApp.path(), configFile);
@@ -221,7 +196,7 @@ public class RegistryImpl implements IRegistry {
      * {@inheritDoc}
      */
     @Override
-    public Configuration getAppConfiguration() {
+    public Config getAppConfig() {
         return appConfig;
     }
 
@@ -260,19 +235,29 @@ public class RegistryImpl implements IRegistry {
      * {@inheritDoc}
      */
     @Override
-    public ScheduledExecutorService getScheduledExecutorService() {
-        return scheduledExecutorService;
+    public ApiDispatcher getApiDispatcher() {
+        return getBean(ApiDispatcher.class);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ApiDispatcher getApiDispatcher() {
-        return getBean(ApiDispatcher.class);
+    public ExecutionContextExecutor getDefaultExecutionContextExecutor() {
+        return actorSystem.dispatcher();
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ExecutionContextExecutor getExecutionContextExecutor(String id) {
+        if (StringUtils.startsWith(id, "akka.")) {
+            return actorSystem.dispatchers().lookup(id);
+        } else {
+            return actorSystem.dispatchers().lookup("akka.actor." + id);
+        }
+    }
     /*----------------------------------------------------------------------*/
 
 }
-

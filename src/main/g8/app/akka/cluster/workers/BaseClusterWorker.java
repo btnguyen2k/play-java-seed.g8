@@ -10,11 +10,12 @@ import akka.cluster.ClusterConstants;
 import akka.workers.BaseWorker;
 import akka.workers.CronFormat;
 import play.Logger;
+import scala.concurrent.ExecutionContextExecutor;
 import utils.IdUtils;
 
 /**
  * Base class to implement cluster-workers. See {@link BaseWorker}.
- * 
+ *
  * <p>
  * Note: there are 2 types of workers
  * <ul>
@@ -23,7 +24,7 @@ import utils.IdUtils;
  * <li>Normal worker: all normal workers will receive "tick" message per tick.</li>
  * </ul>
  * <p>
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
@@ -39,7 +40,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     /**
      * If {@code true}, the first run will start as soon as the actor starts,
      * ignoring tick-match check.
-     * 
+     *
      * @return
      */
     protected boolean runFirstTimeRegardlessScheduling() {
@@ -70,7 +71,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
 
     /**
      * Get worker's scheduling settings as {@link CronFormat}.
-     * 
+     *
      * @return
      */
     protected abstract CronFormat getScheduling();
@@ -78,7 +79,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     /**
      * Sub-class implements this method to actually perform worker business
      * logic.
-     * 
+     *
      * @param tick
      * @throws Exception
      */
@@ -89,7 +90,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     /**
      * Get last "tick" that the worker was fired off (i.e. ticks that didn't match scheduling and
      * ticks that came while worker was busy wouldn't count!).
-     * 
+     *
      * @return
      */
     protected TickMessage getLastTick() {
@@ -98,7 +99,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
 
     /**
      * Update last "tick" that the worker was fired off.
-     * 
+     *
      * @param tick
      */
     protected void updateLastTick(TickMessage tick) {
@@ -107,7 +108,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
 
     /**
      * Check if "tick" matches scheduling settings.
-     * 
+     *
      * @param tick
      * @return
      */
@@ -126,11 +127,11 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
 
     /**
      * Lock so that worker only do one job at a time.
-     * 
+     *
      * <p>
      * Note: lock is reentrant!
      * </p>
-     * 
+     *
      * @param lockId
      * @return
      */
@@ -140,7 +141,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
 
     /**
      * Release a previous lock.
-     * 
+     *
      * @param lockId
      * @return
      */
@@ -149,7 +150,12 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     }
 
     protected void onTick(TickMessage tick) {
-        getRegistry().getScheduledExecutorService().execute(() -> {
+        ExecutionContextExecutor ecs = getRegistry()
+                .getExecutionContextExecutor("worker-dispatcher");
+        if (ecs == null) {
+            ecs = getRegistry().getDefaultExecutionContextExecutor();
+        }
+        ecs.execute(() -> {
             if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
                 long lockId = IdUtils.nextIdAsLong();
                 if (lock(lockId)) {

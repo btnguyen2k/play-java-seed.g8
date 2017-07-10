@@ -219,7 +219,7 @@ public class BaseClusterActor extends BaseActor {
 
     private DDGetResult ddGet(DDTags tags, ReadConsistency readConsistency, long timeout,
             TimeUnit timeoutUnit) {
-        getRegistry().getScheduledExecutorService().execute(() -> replicator
+        getRegistry().getDefaultExecutionContextExecutor().execute(() -> replicator
                 .tell(new Replicator.Get<>(dataKey, readConsistency, Optional.of(tags)), self()));
         long expiry = System.currentTimeMillis() + timeoutUnit.toMillis(timeout);
         DDGetResult result = DistributedDataManager.getResponse(tags.getId());
@@ -438,7 +438,7 @@ public class BaseClusterActor extends BaseActor {
         } else {
             distributedPubSubMediator.tell(
                     new DistributedPubSubMediator.Unsubscribe(topic, groupId, self()), self());
-            Logger.info("{" + self() + "} is subscribing from topic [" + topic + "] as [" + groupId
+            Logger.info("{" + self() + "} is unsubscribing from topic [" + topic + "] as [" + groupId
                     + "].");
         }
     }

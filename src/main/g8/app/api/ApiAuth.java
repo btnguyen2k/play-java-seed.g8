@@ -4,15 +4,15 @@ import play.mvc.Http.Request;
 
 /**
  * API authentication/authorization.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.4
  */
 public class ApiAuth {
 
     public static ApiAuth buildFromHttpRequest(Request request) {
-        String apiKey = request.getHeader("X-Api-Key");
-        String apiAuth = request.getHeader("X-Api-AccessToken");
+        String apiKey = request.header("X-Api-Key").orElse(null);
+        String apiAuth = request.header("X-Api-AccessToken").orElse(null);
         return new ApiAuth(apiKey, apiAuth);
     }
 
