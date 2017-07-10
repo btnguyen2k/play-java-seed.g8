@@ -10,12 +10,13 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v0.1.5](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r1](RELEASE-NOTES.md).
 
 
 ## Features
 
-- GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md))
+- HTTPS & HTTP/2 support (since [template-v2.6.r1](RELEASE-NOTES.md)).
+- GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md)).
 - Intended for Linux-based applications
 - Separated configurations for production and non-production environments:
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
