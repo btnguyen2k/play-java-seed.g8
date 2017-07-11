@@ -74,22 +74,33 @@ doStart() {
     buildClusterSeed \${APP_CLUSTER_SEED[@]}
 
     if [ "\$APP_CLUSTER_ADDR" == "" ]; then
-        echo "WARN: Cluster listen address is not specified, cluster mode is disabled!"
+        echo "WARN: Cluster listen address is not specified, node will not start with master role!"
     fi
     if [ "\$APP_CLUSTER_PORT" == "" -o "\$APP_CLUSTER_PORT" == "0" ]; then
-        echo "WARN: Cluster port is not specified, cluster mode is disabled!"
+        echo "WARN: Cluster port is not specified, node will not start with master role!"
     fi
     if [ "\$APP_CLUSTER_NAME" == "" ]; then
-        echo "WARN: Cluster name is not specified, cluster mode is disabled!"
+        echo "WARN: Cluster name is not specified!"
     fi
     if [ "\$FINAL_CLUSTER_SEED" == "" ]; then
-        echo "WARN: No cluster seed node specified, cluster mode is disabled!"
+        echo "WARN: No cluster seed node specified!"
     fi
-    
-    RUN_CMD=(\$APP_HOME/bin/\$APP_NAME -Dapp.home=\$APP_HOME -Dapp.logdir=\$APP_LOGDIR -Dhttp.port=\$APP_PORT -Dhttp.address=\$APP_ADDR)
+
+    RUN_CMD=(\$APP_HOME/bin/\$APP_NAME -Dapp.home=\$APP_HOME -Dapp.logdir=\$APP_LOGDIR -Dhttp.address=\$APP_ADDR)
+    if [ "\$APP_PORT" != "0" ]; then
+    	RUN_CMD+=(-Dhttp.port=\$APP_PORT)
+    else
+        RUN_CMD+=(-Dhttp.port=disabled)
+    fi
+    if [ "\$APP_HTTPS_PORT" != "0" ]; then
+    	RUN_CMD+=(-Dhttps.port=\$APP_HTTPS_PORT)
+    	if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
+    		RUN_CMD+=(-Dhttps.keyStore=\$FINAL_APP_SSL_KEYSTORE -Dhttps.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
+    	fi
+    fi
     RUN_CMD+=(-Dpidfile.path=\$APP_PID)
     RUN_CMD+=(-Dakka.log-config-on-start=true)
-    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "" ]; then
+    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "0" ]; then
         RUN_CMD+=(-Dhttp.proxyHost=\$APP_PROXY_HOST -Dhttp.proxyPort=\$APP_PROXY_PORT)
         RUN_CMD+=(-Dhttps.proxyHost=\$APP_PROXY_HOST -Dhttps.proxyPort=\$APP_PROXY_PORT)
     fi
@@ -99,10 +110,16 @@ doStart() {
     if [ "\$APP_NOPROXY_HOST" != "" ]; then
         RUN_CMD+=(-Dhttp.nonProxyHosts=\$APP_NOPROXY_HOST)
     fi
-    if [ "\$APP_THRIFT_PORT" != "" -o "\$APP_THRIFT_SSL_PORT" != "" ]; then
-        RUN_CMD+=(-Dthrift.addr=\$APP_THRIFT_ADDR -Dthrift.port=\$APP_THRIFT_PORT -Dthrift.ssl_port=\$APP_THRIFT_SSL_PORT)
+    if [ "\$APP_THRIFT_PORT" != "0" -o "\$APP_THRIFT_SSL_PORT" != "0" ]; then
+        RUN_CMD+=(-Dthrift.addr=\$APP_THRIFT_ADDR)
+        if [ "\$APP_THRIFT_PORT" != "0" ]; then
+            RUN_CMD+=(-Dthrift.port=\$APP_THRIFT_PORT)
+        fi
+        if [ "\$APP_THRIFT_SSL_PORT" != "0" ]; then
+            RUN_CMD+=(-Dthrift.ssl_port=\$APP_THRIFT_SSL_PORT)
+        fi
     fi
-    if [ "\$APP_GRPC_PORT" != "" ]; then
+    if [ "\$APP_GRPC_PORT" != "0" ]; then
         RUN_CMD+=(-Dgrpc.addr=\$APP_GRPC_ADDR -Dgrpc.port=\$APP_GRPC_PORT)
     fi
     if [ "\$APP_SSL_KEYSTORE" != "" ]; then
@@ -116,10 +133,17 @@ doStart() {
     RUN_CMD+=(-J-XX:+PrintGCApplicationStoppedTime -J-XX:+PrintPromotionFailure -J-XX:PrintFLSStatistics=1)
     RUN_CMD+=(-J-Xloggc:\${APP_HOME}/logs/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
     RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
-    if [ "\$FINAL_CLUSTER_SEED" != "" -a "\$APP_CLUSTER_NAME" != "" -a "\$APP_CLUSTER_ADDR" != "" -a "\$APP_CLUSTER_PORT" != "" -a "\$APP_CLUSTER_PORT" != "0" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR -Dcluster_conf.akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT -Dcluster_conf.akka.cluster.name=\$APP_CLUSTER_NAME \${FINAL_CLUSTER_SEED[@]})
-    else
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.port=0)
+    if [ "\$APP_CLUSTER_ADDR" != "" ]; then
+        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR
+    fi
+    if [ "\$APP_CLUSTER_PORT" != "" -a "\$APP_CLUSTER_PORT" != "0" ]; then
+        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT
+    fi
+    if [ "\$APP_CLUSTER_NAME" != "" ]; then
+        RUN_CMD+=(-Dcluster_conf.akka.cluster.name=\$APP_CLUSTER_NAME
+    fi
+    if [ "\$FINAL_CLUSTER_SEED" != "" ]; then
+        RUN_CMD+=(\${FINAL_CLUSTER_SEED[@]})
     fi
     RUN_CMD+=(\$JVM_EXTRA_OPS)
     
@@ -129,6 +153,7 @@ doStart() {
     
     echo "APP_ADDR            : \$APP_ADDR"
     echo "APP_PORT            : \$APP_PORT"
+    echo "APP_HTTPS_PORT      : \$APP_HTTPS_PORT"
     echo "APP_THRIFT_ADDR     : \$APP_THRIFT_ADDR"
     echo "APP_THRIFT_PORT     : \$APP_THRIFT_PORT"
     echo "APP_THRIFT_SSL_PORT : \$APP_THRIFT_SSL_PORT"

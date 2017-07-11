@@ -43,10 +43,21 @@ APP_LOGBACK=\$DEFAULT_APP_LOGBACK
 doStart() {
     preStart
 
-    RUN_CMD=(\$APP_HOME/bin/\$APP_NAME -Dapp.home=\$APP_HOME -Dapp.logdir=\$APP_LOGDIR -Dhttp.port=\$APP_PORT -Dhttp.address=\$APP_ADDR)
+    RUN_CMD=(\$APP_HOME/bin/\$APP_NAME -Dapp.home=\$APP_HOME -Dapp.logdir=\$APP_LOGDIR -Dhttp.address=\$APP_ADDR)
+    if [ "\$APP_PORT" != "0" ]; then
+    	RUN_CMD+=(-Dhttp.port=\$APP_PORT)
+    else
+        RUN_CMD+=(-Dhttp.port=disabled)
+    fi
+    if [ "\$APP_HTTPS_PORT" != "0" ]; then
+    	RUN_CMD+=(-Dhttps.port=\$APP_HTTPS_PORT)
+    	if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
+    		RUN_CMD+=(-Dhttps.keyStore=\$FINAL_APP_SSL_KEYSTORE -Dhttps.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
+    	fi
+    fi
     RUN_CMD+=(-Dpidfile.path=\$APP_PID)
     RUN_CMD+=(-Dakka.log-config-on-start=true)
-    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "" ]; then
+    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "0" ]; then
         RUN_CMD+=(-Dhttp.proxyHost=\$APP_PROXY_HOST -Dhttp.proxyPort=\$APP_PROXY_PORT)
         RUN_CMD+=(-Dhttps.proxyHost=\$APP_PROXY_HOST -Dhttps.proxyPort=\$APP_PROXY_PORT)
     fi
@@ -56,10 +67,16 @@ doStart() {
     if [ "\$APP_NOPROXY_HOST" != "" ]; then
         RUN_CMD+=(-Dhttp.nonProxyHosts=\$APP_NOPROXY_HOST)
     fi
-    if [ "\$APP_THRIFT_PORT" != "" -o "\$APP_THRIFT_SSL_PORT" != "" ]; then
-        RUN_CMD+=(-Dthrift.addr=\$APP_THRIFT_ADDR -Dthrift.port=\$APP_THRIFT_PORT -Dthrift.ssl_port=\$APP_THRIFT_SSL_PORT)
+    if [ "\$APP_THRIFT_PORT" != "0" -o "\$APP_THRIFT_SSL_PORT" != "0" ]; then
+        RUN_CMD+=(-Dthrift.addr=\$APP_THRIFT_ADDR)
+        if [ "\$APP_THRIFT_PORT" != "0" ]; then
+            RUN_CMD+=(-Dthrift.port=\$APP_THRIFT_PORT)
+        fi
+        if [ "\$APP_THRIFT_SSL_PORT" != "0" ]; then
+            RUN_CMD+=(-Dthrift.ssl_port=\$APP_THRIFT_SSL_PORT)
+        fi
     fi
-    if [ "\$APP_GRPC_PORT" != "" ]; then
+    if [ "\$APP_GRPC_PORT" != "0" ]; then
         RUN_CMD+=(-Dgrpc.addr=\$APP_GRPC_ADDR -Dgrpc.port=\$APP_GRPC_PORT)
     fi
     if [ "\$APP_SSL_KEYSTORE" != "" ]; then
@@ -81,6 +98,7 @@ doStart() {
     
     echo "APP_ADDR            : \$APP_ADDR"
     echo "APP_PORT            : \$APP_PORT"
+    echo "APP_HTTPS_PORT      : \$APP_HTTPS_PORT"
     echo "APP_THRIFT_ADDR     : \$APP_THRIFT_ADDR"
     echo "APP_THRIFT_PORT     : \$APP_THRIFT_PORT"
     echo "APP_THRIFT_SSL_PORT : \$APP_THRIFT_SSL_PORT"

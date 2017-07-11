@@ -14,6 +14,7 @@ APP_NAME=$name;format="normalize"$
 
 DEFAULT_APP_ADDR=0.0.0.0
 DEFAULT_APP_PORT=9000
+DEFAULT_APP_HTTPS_PORT=`expr \$DEFAULT_APP_PORT + 22`
 DEFAULT_APP_MEM=64
 DEFAULT_APP_CONF=application.conf
 DEFAULT_APP_LOGBACK=logback-dev.xml
@@ -32,13 +33,14 @@ DEFAULT_GRPC_ADDR=\$DEFAULT_APP_ADDR
 # gRPC API Gateway port, default DEFAULT_APP_PORT+10
 DEFAULT_GRPC_PORT=`expr \$DEFAULT_APP_PORT + 10`
 
-# Default keystore file for SSL
-DEFAULT_SSL_KEYSTORE=\$APP_HOME/conf/keys/server.keystore
+# Default keystore file for SSL (HTTPS & Thrift SSL)
+DEFAULT_SSL_KEYSTORE=keys/server.keystore
 # Default keystore password for SSL
 DEFAULT_SSL_KEYSTORE_PASSWORD=pl2yt3mpl2t3
 
 APP_ADDR=\$DEFAULT_APP_ADDR
 APP_PORT=\$DEFAULT_APP_PORT
+APP_HTTPS_PORT=\$DEFAULT_APP_HTTPS_PORT
 APP_MEM=\$DEFAULT_APP_MEM
 APP_CONF=\$DEFAULT_APP_CONF
 APP_LOGBACK=\$DEFAULT_APP_LOGBACK
@@ -50,6 +52,7 @@ APP_THRIFT_PORT=\$DEFAULT_THRIFT_PORT
 APP_THRIFT_SSL_PORT=\$DEFAULT_THRIFT_SSL_PORT
 APP_GRPC_ADDR=\$DEFAULT_GRPC_ADDR
 APP_GRPC_PORT=\$DEFAULT_GRPC_PORT
+
 APP_SSL_KEYSTORE=\$DEFAULT_SSL_KEYSTORE
 APP_SSL_KEYSTORE_PASSWORD=\$DEFAULT_SSL_KEYSTORE_PASSWORD
 
@@ -128,6 +131,43 @@ preStart() {
             exit 1
         fi
     fi
+
+    if [ "\$APP_SSL_KEYSTORE" != "" ]; then
+        if [[ \$APP_SSL_KEYSTORE =~ \$_startsWithSlash_ ]]; then
+            FINAL_APP_SSL_KEYSTORE=\$APP_SSL_KEYSTORE
+        else
+            FINAL_APP_SSL_KEYSTORE=\$APP_HOME/conf/\$APP_SSL_KEYSTORE
+        fi
+
+        if [ ! -f "\$FINAL_APP_SSL_KEYSTORE" ]; then
+            echo "ERROR: SSL Keystore file not found: \$FINAL_APP_SSL_KEYSTORE"
+            exit 1
+        fi
+    fi
+
+    if [ "\$APP_PORT" == ""]; then
+        APP_PORT=0
+    fi
+
+    if [ "\$APP_HTTPS_PORT" == ""]; then
+        APP_HTTPS_PORT=0
+    fi
+
+    if [ "\$APP_PROXY_PORT" == ""]; then
+        APP_PROXY_PORT=0
+    fi
+
+    if [ "\$APP_THRIFT_PORT" == ""]; then
+        APP_THRIFT_PORT=0
+    fi
+
+    if [ "\$APP_THRIFT_SSL_PORT" == ""]; then
+        APP_THRIFT_SSL_PORT=0
+    fi
+
+    if [ "\$APP_GRPC_PORT" == ""]; then
+        APP_GRPC_PORT=0
+    fi
 }
 
 execStart() {
@@ -159,12 +199,13 @@ usageAndExit() {
     echo "       -j or --jvm           : Extra JVM options (example: \"-Djava.rmi.server.hostname=localhost)\""
     echo "       --pid                 : Specify application's .pid file (default \$DEFAULT_APP_PID)"
     echo "       --logdir              : Specify application's log directory (default \$DEFAULT_APP_LOGDIR)"
+    echo "       --https-port          : Specify listen port for HTTPS & HTTP/2 (default \$DEFAULT_HTTPS_PORT)"
     echo "       --thrift-addr         : Specify listen address for Thrift API Gateway (default \$DEFAULT_THRIFT_ADDR)"
     echo "       --thrift-port         : Specify listen port for Thrift API Gateway (default \$DEFAULT_THRIFT_PORT)"
     echo "       --thrift-ssl-port     : Specify listen port for Thrift API SSL Gateway (default \$DEFAULT_THRIFT_SSL_PORT)"
     echo "       --grpc-addr           : Specify listen address for gRPC API Gateway (default \$DEFAULT_GRPC_ADDR)"
     echo "       --grpc-port           : Specify listen port for gRPC API Gateway (default \$DEFAULT_GRPC_PORT)"
-    echo "       --ssl-keystore        : Specify SSL keystore file (default \$DEFAULT_SSL_KEYSTORE)"
+    echo "       --ssl-keystore        : Specify SSL keystore file, relative file is prefixed with ./conf (default \$DEFAULT_SSL_KEYSTORE)"
     echo "       --ssl-keystorePassword: Specify listen port for gRPC API Gateway (default \$DEFAULT_SSL_KEYSTORE_PASSWORD)"
     echo
     echo "Example: start server 64mb memory limit, with custom configuration file"
@@ -237,6 +278,14 @@ parseParam() {
             APP_PORT=\$VALUE
             if ! [[ \$VALUE =~ \$_number_ ]]; then
                 echo "ERROR: invalid HTTP port number \"\$VALUE\""
+                usageAndExit
+            fi
+            ;;
+
+        --https-port|--httpsPort)
+            APP_HTTPS_PORT=\$VALUE
+            if ! [[ \$VALUE =~ \$_number_ ]]; then
+                echo "ERROR: invalid HTTPS port number \"\$VALUE\""
                 usageAndExit
             fi
             ;;
