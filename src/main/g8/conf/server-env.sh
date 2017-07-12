@@ -145,27 +145,27 @@ preStart() {
         fi
     fi
 
-    if [ "\$APP_PORT" == ""]; then
+    if [ "\$APP_PORT" == "" ]; then
         APP_PORT=0
     fi
 
-    if [ "\$APP_HTTPS_PORT" == ""]; then
+    if [ "\$APP_HTTPS_PORT" == "" ]; then
         APP_HTTPS_PORT=0
     fi
 
-    if [ "\$APP_PROXY_PORT" == ""]; then
+    if [ "\$APP_PROXY_PORT" == "" ]; then
         APP_PROXY_PORT=0
     fi
 
-    if [ "\$APP_THRIFT_PORT" == ""]; then
+    if [ "\$APP_THRIFT_PORT" == "" ]; then
         APP_THRIFT_PORT=0
     fi
 
-    if [ "\$APP_THRIFT_SSL_PORT" == ""]; then
+    if [ "\$APP_THRIFT_SSL_PORT" == "" ]; then
         APP_THRIFT_SSL_PORT=0
     fi
 
-    if [ "\$APP_GRPC_PORT" == ""]; then
+    if [ "\$APP_GRPC_PORT" == "" ]; then
         APP_GRPC_PORT=0
     fi
 }

@@ -79,8 +79,8 @@ doStart() {
     if [ "\$APP_GRPC_PORT" != "0" ]; then
         RUN_CMD+=(-Dgrpc.addr=\$APP_GRPC_ADDR -Dgrpc.port=\$APP_GRPC_PORT)
     fi
-    if [ "\$APP_SSL_KEYSTORE" != "" ]; then
-        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
+    if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
+        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$FINAL_APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     fi
     RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
     RUN_CMD+=(-J-XX:+UseThreadPriorities -J-XX:ThreadPriorityPolicy=42 -J-XX:+HeapDumpOnOutOfMemoryError -J-Xss256k)

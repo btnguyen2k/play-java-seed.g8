@@ -84,7 +84,7 @@ public class ThriftServiceBootstrap {
         int thriftPortSsl = 9093;
         try {
             thriftPortSsl = Integer
-                    .parseInt(System.getProperty("thrift.port", playApp.isDev() ? "9093" : "0"));
+                    .parseInt(System.getProperty("thrift.ssl_port", playApp.isDev() ? "9093" : "0"));
         } catch (Exception e) {
             Logger.warn(e.getMessage(), e);
             thriftPortSsl = 0;

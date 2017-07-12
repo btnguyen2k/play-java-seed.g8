@@ -78,8 +78,8 @@ doStart() {
     if [ "\$APP_GRPC_PORT" != "0" ]; then
         RUN_CMD+=(-Dgrpc.addr=\$APP_GRPC_ADDR -Dgrpc.port=\$APP_GRPC_PORT)
     fi
-    if [ "\$APP_SSL_KEYSTORE" != "" ]; then
-        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
+    if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
+        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$FINAL_APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     fi
     RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
     RUN_CMD+=(-Dspring.profiles.active=development -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
@@ -97,7 +97,7 @@ doStart() {
     echo "APP_THRIFT_SSL_PORT : \$APP_THRIFT_SSL_PORT"
     echo "APP_GRPC_ADDR       : \$APP_GRPC_ADDR"
     echo "APP_GRPC_PORT       : \$APP_GRPC_PORT"
-    echo "APP_APP_SSL_KEYSTORE: \$APP_SSL_KEYSTORE"
+    echo "APP_APP_SSL_KEYSTORE: \$FINAL_APP_SSL_KEYSTORE"
     echo "APP_MEM             : \$APP_MEM"
     echo "APP_CONF            : \$FINAL_APP_CONF"
     echo "APP_LOGBACK         : \$FINAL_APP_LOGBACK"

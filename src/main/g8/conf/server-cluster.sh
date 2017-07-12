@@ -122,8 +122,8 @@ doStart() {
     if [ "\$APP_GRPC_PORT" != "0" ]; then
         RUN_CMD+=(-Dgrpc.addr=\$APP_GRPC_ADDR -Dgrpc.port=\$APP_GRPC_PORT)
     fi
-    if [ "\$APP_SSL_KEYSTORE" != "" ]; then
-        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
+    if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
+        RUN_CMD+=(-Djavax.net.ssl.keyStore=\$FINAL_APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     fi
     RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
     RUN_CMD+=(-J-XX:+UseThreadPriorities -J-XX:ThreadPriorityPolicy=42 -J-XX:+HeapDumpOnOutOfMemoryError -J-Xss256k)
@@ -134,13 +134,13 @@ doStart() {
     RUN_CMD+=(-J-Xloggc:\${APP_HOME}/logs/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
     RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
     if [ "\$APP_CLUSTER_ADDR" != "" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR
+        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR)
     fi
     if [ "\$APP_CLUSTER_PORT" != "" -a "\$APP_CLUSTER_PORT" != "0" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT
+        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT)
     fi
     if [ "\$APP_CLUSTER_NAME" != "" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.cluster.name=\$APP_CLUSTER_NAME
+        RUN_CMD+=(-Dcluster_conf.akka.cluster.name=\$APP_CLUSTER_NAME)
     fi
     if [ "\$FINAL_CLUSTER_SEED" != "" ]; then
         RUN_CMD+=(\${FINAL_CLUSTER_SEED[@]})
