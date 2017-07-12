@@ -49,7 +49,7 @@ APP_MEM=\$DEFAULT_APP_MEM
 APP_CONF=\$DEFAULT_APP_CONF
 APP_LOGBACK=\$DEFAULT_APP_LOGBACK
 
-DEFAULT_CLUSTER_ADDR=\$DEFAULT_APP_ADDR
+DEFAULT_CLUSTER_ADDR="127.0.0.1"
 DEFAULT_CLUSTER_PORT=`expr \$DEFAULT_APP_PORT + 7`
 DEFAULT_CLUSTER_NAME=MyCluster
 
@@ -58,11 +58,14 @@ APP_CLUSTER_PORT=\$DEFAULT_CLUSTER_PORT
 APP_CLUSTER_NAME=\$DEFAULT_CLUSTER_NAME
 APP_CLUSTER_SEED=()
 
+# Donot change this!
+_CLUSTER_CONF_PREFIX_=""
+
 buildClusterSeed() {
     FINAL_CLUSTER_SEED=()
     local INDEX=0
     while [ "\$1" != "" ]; do
-        FINAL_CLUSTER_SEED+=(-Dcluster_conf.akka.cluster.seed-nodes.\$INDEX=akka.tcp://\$APP_CLUSTER_NAME@\$1)
+        FINAL_CLUSTER_SEED+=(-D\${_CLUSTER_CONF_PREFIX_}akka.cluster.seed-nodes.\$INDEX=akka.tcp://\$APP_CLUSTER_NAME@\$1)
         INDEX=`expr \$INDEX + 1`
         shift
     done
@@ -134,13 +137,13 @@ doStart() {
     RUN_CMD+=(-J-Xloggc:\${APP_HOME}/logs/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
     RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
     if [ "\$APP_CLUSTER_ADDR" != "" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR)
+        RUN_CMD+=(-D\${_CLUSTER_CONF_PREFIX_}akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR)
     fi
     if [ "\$APP_CLUSTER_PORT" != "" -a "\$APP_CLUSTER_PORT" != "0" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT)
+        RUN_CMD+=(-D\${_CLUSTER_CONF_PREFIX_}akka.remote.netty.tcp.port=\$APP_CLUSTER_PORT)
     fi
     if [ "\$APP_CLUSTER_NAME" != "" ]; then
-        RUN_CMD+=(-Dcluster_conf.akka.cluster.name=\$APP_CLUSTER_NAME)
+        RUN_CMD+=(-D\${_CLUSTER_CONF_PREFIX_}akka.cluster.name=\$APP_CLUSTER_NAME)
     fi
     if [ "\$FINAL_CLUSTER_SEED" != "" ]; then
         RUN_CMD+=(\${FINAL_CLUSTER_SEED[@]})

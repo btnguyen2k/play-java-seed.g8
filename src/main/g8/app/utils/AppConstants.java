@@ -17,4 +17,6 @@ public class AppConstants {
     public final static String API_GATEWAY_THRIFT = "THRIFT";
     public final static String API_GATEWAY_THRIFT_OVER_HTTP = "THRIFT_OVER_HTTP";
     public final static String API_GATEWAY_GRPC = "GRPC";
+
+    public final static String CLUSTER_ROLE_MASTER = "master";
 }

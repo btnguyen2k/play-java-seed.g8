@@ -23,6 +23,7 @@ import play.Application;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
 import utils.AppConfigUtils;
+import utils.AppConstants;
 
 @Singleton
 public class ClusterImpl implements ICluster {
@@ -116,10 +117,13 @@ public class ClusterImpl implements ICluster {
         // clusterActorSystem = ActorSystem.create(clusterName, clusterConfig.underlying());
         clusterActorSystem = registry.get().getActorSystem();
 
-        // create master worker
-        Logger.info("Creating " + MasterActor.class);
-        Props props = Props.create(MasterActor.class, registry);
-        clusterActorSystem.actorOf(props, MasterActor.class.getSimpleName());
+        Cluster cluster = Cluster.get(clusterActorSystem);
+        if (cluster.getSelfRoles().contains(AppConstants.CLUSTER_ROLE_MASTER)) {
+            // create master worker
+            Logger.info("Creating " + MasterActor.class);
+            Props props = Props.create(MasterActor.class, registry);
+            clusterActorSystem.actorOf(props, MasterActor.class.getSimpleName());
+        }
     }
 
     private void destroyCluster() {
