@@ -38,6 +38,7 @@ val _ddthCacheAdapterVersion = "0.6.1"
 val _ddthCommonsVersion      = "0.6.3.2"
 val _akkaVersion             = "2.5.3"
 val _playWsStandaloneVersion = "1.0.1"
+val _grpcVersion             = "1.4.0"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
@@ -58,6 +59,12 @@ libraryDependencies ++= Seq(
     ,"com.zaxxer"                % "HikariCP"                     % "2.6.3"
 
     ,"org.apache.thrift"         % "libthrift"                    % "0.10.0"
+
+    ,"com.google.protobuf"       % "protobuf-java"                % "3.3.1"
+    ,"io.grpc"                   % "grpc-core"                    % _grpcVersion
+    ,"io.grpc"                   % "grpc-protobuf"                % _grpcVersion
+    ,"io.grpc"                   % "grpc-stub"                    % _grpcVersion
+    ,"io.grpc"                   % "grpc-netty"                   % _grpcVersion
 
     ,"org.springframework"       % "spring-beans"                 % _springVersion
     ,"org.springframework"       % "spring-expression"            % _springVersion

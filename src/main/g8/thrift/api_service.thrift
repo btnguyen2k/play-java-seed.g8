@@ -5,6 +5,10 @@
   * Since template-v0.1.4
   */
 
+/**
+  * $ rm -rf gen-java && thrift --gen java api_service.thrift
+  */
+
 namespace java thrift.def
 
 enum TDataEncodingType {
@@ -20,8 +24,7 @@ struct TApiAuth {
 struct TApiParams {
     1: optional TDataEncodingType dataType = TDataEncodingType.JSON_STRING,
     2: optional binary paramsData,
-    3: optional TDataEncodingType expectedReturnDataType = TDataEncodingType.JSON_STRING, // if null, use parameter's data type
-    4: optional i32 version = 1
+    3: optional TDataEncodingType expectedReturnDataType = TDataEncodingType.JSON_STRING
 }
 
 struct TApiResult {

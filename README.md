@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r1](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r2](RELEASE-NOTES.md).
 
 
 ## Features
@@ -27,9 +27,12 @@ Latest release: [template-v2.6.r1](RELEASE-NOTES.md).
 - Samples:
   - Module
   - Form & Form controller
-  - API controller
   - Workers & Scheduling
   - Cluster workers
+  - API handler: JSON-based data format. Support interface:
+    - HTTP/S
+    - Apache Thrift (since [template-v1.4.0](RELEASE-NOTES.md)).
+    - gRPC (since [template-v2.6.r2](RELEASE-NOTES.md)).
 - JVM tuning & GC logging
 
 ### Start/Stop Scripts
@@ -78,9 +81,9 @@ Production:
 Command-line arguments for cluster mode:
 
 - `--cluster-name <cluster-name>`: name of cluster (default: `MyCluster`). Nodes in one cluster must have same cluster-name value.
-- `--cluster-addr <listen-address>`: listen address for cluster service (default: same value as application's http listen address).
-- `--cluster-port <listen-port>`: listen port for cluster service (default: application's http port `+ 7`).
-- `--cluster-seed <host:port>`: cluster seed node, must be in format `host:port`. Use multiple `--cluster-seed` to specify more than one seed nodes. If none specified, cluster mode is disabled
+- `--cluster-addr <listen-address>`: listen address for cluster service (default: `127.0.0.1`).
+- `--cluster-port <listen-port>`: listen port for cluster service (default: `9007`, value 0 will start cluster node in non-master mode).
+- `--cluster-seed <host:port>`: cluster seed node, must be in format `host:port`. Use multiple `--cluster-seed` to specify more than one seed nodes. Must specify at least one seed.
 
 Example:
 

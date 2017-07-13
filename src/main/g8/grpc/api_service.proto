@@ -1,0 +1,56 @@
+/**
+  * API service definition for gRPC.
+  *
+  * By Thanh Nguyen <btnguyen2k@gmail.com>
+  * Since template-v2.6.r2
+  */
+
+/**
+  * $ rm -rf grpc && protoc --plugin=protoc-gen-grpc-java=<dir>/grpc/java_plugin/protoc-gen-grpc-java --grpc-java_out=. --java_out=. api_service.proto
+  */
+
+syntax = "proto3";
+option java_package = "grpc.def";
+option java_multiple_files = false;
+option java_outer_classname = "ApiServiceProto";
+option optimize_for = SPEED;
+
+import "google/protobuf/empty.proto";
+
+enum PDataEncodingType {
+    JSON_STRING = 0;    // Data is encoded as JSON string
+    JSON_GZIP   = 1;    // Data is encoded as gzipped JSON string
+}
+
+message PApiAuth {
+    string apiKey       = 1;
+    string accessToken  = 2;
+}
+
+message PApiParams {
+    PDataEncodingType   dataType                = 1;
+    bytes               paramsData              = 2;
+    PDataEncodingType   expectedReturnDataType  = 3;
+}
+
+message PApiResult {
+    int32               status      = 1;
+    string              message     = 2;
+    PDataEncodingType   dataType    = 3;
+    bytes               resultData  = 4;
+    bytes               debugData   = 5;
+}
+
+message PApiContext {
+    PApiAuth    apiAuth     = 1;
+    string      apiName     = 2;
+    PApiParams  apiParams   = 3;
+}
+
+service PApiService {
+    rpc ping(google.protobuf.Empty) returns (google.protobuf.Empty);
+
+    rpc check(PApiAuth) returns (PApiResult);
+
+    rpc callApi(PApiContext) returns (PApiResult);
+}

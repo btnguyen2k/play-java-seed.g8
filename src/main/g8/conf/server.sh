@@ -1,27 +1,28 @@
 #!/bin/bash
 
-# For Non-Production Env                                                       #
-# ---------------------------------------------------------------------------- #
-# Start/Stop script on *NIX                                                    #
-# ---------------------------------------------------------------------------- #
-# Command-line arguments:                                                      #
-# -h help and exist                                                            #
-#    --pid <path-to-.pid-file>                                                 #
-# -a|--addr <listen-address>                                                   #
-# -p|--port <http-port>                                                        #
-# -m|--mem <max-memory-in-mb>                                                  #
-# -c|--conf <path-to-config-file.conf>                                         #
-# -l|--logconf <path-to-logback-file.xml>                                      #
-#    --logdir <path-to-log-directory, env app.logdir will be set to this value #
-# -j|--jvm "extra-jvm-options"                                                 #
-# --thrift-addr <listen-address>                                               #
-# --thrift-port <thrift-port>                                                  #
-# --thrift-ssl-port <thrift-ssl-port>                                          #
-# --grpc-addr <listen-address>                                                 #
-# --grpc-port <thrift-port>                                                    #
-# --ssl-keystore <path-to-keystore-file>                                       #
-# --ssl-keystorePassword <keystore file's password>                            #
-# ---------------------------------------------------------------------------- #
+# For Non-Production Env                                                        #
+# ----------------------------------------------------------------------------- #
+# Start/Stop script on *NIX                                                     #
+# ----------------------------------------------------------------------------- #
+# Command-line arguments:                                                       #
+# -h help and exist                                                             #
+#    --pid <path-to-.pid-file>                                                  #
+# -a|--addr <listen-address>                                                    #
+# -p|--port <http-port>                                                         #
+#    --https-port <https-port>                                                  #
+# -m|--mem <max-memory-in-mb>                                                   #
+# -c|--conf <path-to-config-file.conf>                                          #
+# -l|--logconf <path-to-logback-file.xml>                                       #
+#    --logdir <path-to-log-directory>, env app.logdir will be set to this value #
+# -j|--jvm "extra-jvm-options"                                                  #
+# --thrift-addr <listen-address>                                                #
+# --thrift-port <thrift-port>                                                   #
+# --thrift-ssl-port <thrift-ssl-port>                                           #
+# --grpc-addr <listen-address>                                                  #
+# --grpc-port <grpc-port>                                                       #
+# --ssl-keystore <path-to-keystore-file>                                        #
+# --ssl-keystorePassword <keystore file's password>                             #
+# ----------------------------------------------------------------------------- #
 
 # from http://stackoverflow.com/questions/242538/unix-shell-script-find-out-which-directory-the-script-file-resides
 pushd \$(dirname "\${0}") > /dev/null

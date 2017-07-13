@@ -92,7 +92,8 @@ public class ApiServiceHandler implements TApiService.Iface {
             ApiAuth apiAuth = buildAuth(_apiAuth);
             ApiResult apiResult = getApiDispatcher().callApi(apiContext, apiAuth, apiParams);
             return doResponse(apiResult != null ? apiResult : ApiResult.RESULT_UNKNOWN_ERROR,
-                    _apiParams.dataType);
+                    _apiParams.expectedReturnDataType != null ? _apiParams.expectedReturnDataType
+                            : _apiParams.dataType);
         } catch (Exception e) {
             Logger.warn(e.getMessage(), e);
             return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage())

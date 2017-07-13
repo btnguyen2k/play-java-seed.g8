@@ -1,5 +1,12 @@
 # Release Notes
 
+## 2017-07-12: template-v2.6.r2
+
+- Support [gRPC](https://grpc.io) API Interface.
+- Revised [Apache Thrift](https://thrift.apache.org) API: Apache Thrift & gRPC should have same API interface.
+- Bug fixes & enhancements.
+
+
 ## 2017-07-10: template-v2.6.r1
 
 First release of Play! 2.6.x template.
