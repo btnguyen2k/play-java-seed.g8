@@ -33,34 +33,40 @@ scalaVersion := "$scala_version$"
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-val _springVersion           = "4.3.9.RELEASE"
-val _ddthCacheAdapterVersion = "0.6.1"
-val _ddthCommonsVersion      = "0.6.3.2"
-val _akkaVersion             = "2.5.3"
-val _playWsStandaloneVersion = "1.0.1"
-val _grpcVersion             = "1.4.0"
+val _akkaClusterVersion      = "2.5.6"
+val _playWsStandaloneVersion = "1.1.3"
+
+val _grpcVersion             = "1.7.0"
+
+val _springVersion           = "5.0.1.RELEASE"
+
+val _ddthCacheAdapterVersion = "0.6.2"
+val _ddthCommonsVersion      = "0.7.0.1"
+val _ddthDaoVersion          = "0.8.3"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
     "org.slf4j"                  % "log4j-over-slf4j"             % "1.7.25"
     
-    ,"com.typesafe.akka"         %% "akka-cluster"                % _akkaVersion
-    ,"com.typesafe.akka"         %% "akka-distributed-data"       % _akkaVersion
-    ,"com.typesafe.akka"         %% "akka-cluster-metrics"        % _akkaVersion
-    ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaVersion
+    ,"com.typesafe.akka"         %% "akka-cluster"                % _akkaClusterVersion
+    ,"com.typesafe.akka"         %% "akka-distributed-data"       % _akkaClusterVersion
+    ,"com.typesafe.akka"         %% "akka-cluster-metrics"        % _akkaClusterVersion
+    ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaClusterVersion
 
-    ,"com.typesafe.play"         %% "play-json"                   % "2.6.2"
+    ,"com.typesafe.play"         %% "play-json"                   % "2.6.7"
     ,"com.typesafe.play"         %% "play-ahc-ws-standalone"      % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-json"     % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-xml"      % _playWsStandaloneVersion
 
-    // MySQL is our default database
+    // RDMBS JDBC drivers & Connection Pool
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
-    ,"com.zaxxer"                % "HikariCP"                     % "2.6.3"
+    ,"org.postgresql"            % "postgresql"                   % "42.1.4"
+    ,"com.microsoft.sqlserver"   % "mssql-jdbc"                   % "6.2.2.jre8"
+    ,"com.zaxxer"                % "HikariCP"                     % "2.7.3"
 
     ,"org.apache.thrift"         % "libthrift"                    % "0.10.0"
 
-    ,"com.google.protobuf"       % "protobuf-java"                % "3.3.1"
+    ,"com.google.protobuf"       % "protobuf-java"                % "3.5.0"
     ,"io.grpc"                   % "grpc-core"                    % _grpcVersion
     ,"io.grpc"                   % "grpc-protobuf"                % _grpcVersion
     ,"io.grpc"                   % "grpc-stub"                    % _grpcVersion
@@ -70,11 +76,15 @@ libraryDependencies ++= Seq(
     ,"org.springframework"       % "spring-expression"            % _springVersion
     ,"org.springframework"       % "spring-jdbc"                  % _springVersion
 
+    // Commons
     ,"com.github.ddth"           % "ddth-commons-core"            % _ddthCommonsVersion
     ,"com.github.ddth"           % "ddth-commons-serialization"   % _ddthCommonsVersion
-    ,"com.github.ddth"           % "ddth-dao-jdbc"                % "0.7.1"
 
-    // Cache library
+    // DAO
+    ,"com.github.ddth"           % "ddth-dao-core"                % _ddthDaoVersion
+    ,"com.github.ddth"           % "ddth-dao-jdbc"                % _ddthDaoVersion
+
+    // Cache
     ,"com.github.ddth"           % "ddth-cache-adapter-core"      % _ddthCacheAdapterVersion
     ,"com.github.ddth"           % "ddth-cache-adapter-redis"     % _ddthCacheAdapterVersion
     ,"com.github.ddth"           % "ddth-cache-adapter-memcached" % _ddthCacheAdapterVersion
