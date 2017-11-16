@@ -1,4 +1,4 @@
-package akka.workers;
+package akka;
 
 import java.util.concurrent.TimeUnit;
 
@@ -24,8 +24,7 @@ public class TickFanoutActor extends AbstractActor {
     public final static Props PROPS = Props.create(TickFanoutActor.class);
 
     /*
-     * Wait for 10 seconds when application's startup before sending "tick"
-     * messages.
+     * Wait for a few seconds at application's startup before sending "tick" messages.
      */
     private final static FiniteDuration DELAY_INITIAL = Duration.create(10, TimeUnit.SECONDS);
 

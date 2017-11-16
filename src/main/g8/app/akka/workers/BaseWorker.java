@@ -42,7 +42,7 @@ public abstract class BaseWorker extends BaseActor {
     }
 
     /**
-     * If {@code true}, the first run will start as soon as the actor starts,
+     * If {@code true}, the first "tick" will fire as soon as the actor starts,
      * ignoring tick-match check.
      *
      * @return
@@ -102,14 +102,30 @@ public abstract class BaseWorker extends BaseActor {
     private TickMessage lastTick;
 
     /**
+     * 30 seconds
+     */
+    protected final static long DEFAULT_TICK_THRESHOLD_MS = 30000L;
+
+    /**
+     * Sometimes "tick" message comes late. This method returns the maximum amount of time (in
+     * milliseconds) the "tick" message can come late.
+     *
+     * @return
+     * @since templatev-2.6.r3
+     */
+    protected long getTickThresholdMs() {
+        return DEFAULT_TICK_THRESHOLD_MS;
+    }
+
+    /**
      * Check if "tick" matches scheduling settings.
      *
      * @param tick
      * @return
      */
     protected boolean isTickMatched(TickMessage tick) {
-        if (tick.timestampMs + 30000L > System.currentTimeMillis()) {
-            // only process if "tick" is not too old (within last 30 seconds)
+        if (tick.timestampMs + getTickThresholdMs() > System.currentTimeMillis()) {
+            // only process if "tick" is not too old
             if (lastTick == null || lastTick.timestampMs < tick.timestampMs) {
                 return getScheduling().matches(tick.timestampMs);
             }
@@ -120,8 +136,7 @@ public abstract class BaseWorker extends BaseActor {
     private AtomicBoolean LOCK = new AtomicBoolean(false);
 
     protected void onTick(TickMessage tick) {
-        ExecutionContextExecutor ecs = getRegistry()
-                .getExecutionContextExecutor("worker-dispatcher");
+        ExecutionContextExecutor ecs = getRegistry().getExecutionContextExecutor("worker-dispatcher");
         if (ecs == null) {
             ecs = getRegistry().getDefaultExecutionContextExecutor();
         }

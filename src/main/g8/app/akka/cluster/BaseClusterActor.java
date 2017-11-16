@@ -41,7 +41,7 @@ import utils.IdUtils;
  * <li>Management: actors are created & managed by local {@link ActorSystem}, cluster actors are
  * created and managed by cluster {@link ActorSystem}.</li>
  * <li>Deployment: actors will be deployed on all nodes, cluster actors can be deployed on a
- * selected of nodes (nodes with specified roles).</li>
+ * selected group of nodes (nodes with specified roles).</li>
  * <li>Pub-sub: actors subscribe to event channels, cluster actors subscribe to cluster topic.</li>
  * <li>Coordination: actors are independent, cluster nodes can share data via
  * {@link DistributedData}.</li>
@@ -104,7 +104,7 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Lock an object specified by {@code key}.
+     * Accquire a lock specified by {@code key}, using Akka's distributed data APIs.
      * 
      * <p>
      * Note: lock is reentrant!
@@ -137,7 +137,7 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Unlock an object specified by {@code key}.
+     * Release a lock specified by {@code key}, using Akka's distributed data APIs.
      * 
      * <p>
      * Note: This feature is experimental! The lock is considered "weak".
@@ -162,6 +162,11 @@ public class BaseClusterActor extends BaseActor {
         return result;
     }
 
+    /**
+     * Delete a distributed data record specified by {@code tags}.
+     *
+     * @param tags
+     */
     protected void ddDelete(DDTags tags) {
         replicator.tell(
                 new Replicator.Update<>(dataKey, ORMultiMap.create(), writeConsistency,
@@ -170,12 +175,20 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Delete a value from distributed-data storage by key.
+     * Delete a distributed data record specified by {@code key}.
+     *
+     * @param key
      */
     protected void ddDelete(String key) {
         ddDelete(new DDTags(IdUtils.nextIdAsLong(), key));
     }
 
+    /**
+     * Set a distributed data record.
+     *
+     * @param tags
+     * @param value
+     */
     protected void ddSet(DDTags tags, Object value) {
         replicator.tell(
                 new Replicator.Update<>(dataKey,
@@ -185,7 +198,7 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Set a value to distributed-data storage.
+     * Set a distributed data record.
      * 
      * @param key
      * @param value
@@ -195,7 +208,7 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Get a value from distributed-data storage by key.
+     * Get a distributed data record specified by {@code key}.
      * 
      * @param key
      * @return
@@ -205,7 +218,7 @@ public class BaseClusterActor extends BaseActor {
     }
 
     /**
-     * Get a value from distributed-data storage by key.
+     * Get a distributed data record specified by {@code key}.
      * 
      * @param key
      * @param timeout

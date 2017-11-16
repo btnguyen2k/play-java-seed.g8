@@ -1,28 +1,28 @@
-package akka.cluster.workers;
+package samples.akka.cluster.workers;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import com.github.ddth.commons.utils.DateFormatUtils;
 
 import akka.TickMessage;
+import akka.cluster.workers.BaseClusterWorker;
 import akka.workers.CronFormat;
 import play.Logger;
 
 /**
- * Sample cluster worker that runs only on nodes with roles contain "Role2" or "Role3".
+ * Sample cluster worker that runs only on nodes with roles contain "Role2".
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v2.6.r1
  */
-public class SampleOnlyRole3or2ClusterWorker extends BaseClusterWorker {
+public class OnlyRole2ClusterWorker extends BaseClusterWorker {
 
     /**
-     * Schedule to do job every 13 seconds
+     * Schedule to do job every 11 seconds
      */
-    private CronFormat scheduling = CronFormat.parse("*/13 * *");
+    private CronFormat scheduling = CronFormat.parse("*/11 * *");
 
     /**
      * {@inheritDoc}
@@ -42,7 +42,8 @@ public class SampleOnlyRole3or2ClusterWorker extends BaseClusterWorker {
      */
     @Override
     protected Set<String> getDeployRoles() {
-        return new HashSet<String>(Arrays.asList("Role2", "Role3"));
+        //run on nodes with role "Role2"
+        return Collections.singleton("Role2");
     }
 
     @Override

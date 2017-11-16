@@ -53,6 +53,9 @@ public class DistributedDataManager {
         ddGetResponses.put(id, ddGetResult);
     }
 
+    /**
+     * A lock implemented using distributed data.
+     */
     public static class DDLock implements Serializable {
         private static final long serialVersionUID = "template-v0.1.5".hashCode();
 
@@ -97,6 +100,9 @@ public class DistributedDataManager {
         }
     }
 
+    /**
+     * Encapsulate result from distributed data GET request.
+     */
     public static class DDGetResult implements Serializable {
         private static final long serialVersionUID = "template-v0.1.5".hashCode();
 
@@ -211,6 +217,9 @@ public class DistributedDataManager {
         }
     }
 
+    /**
+     * Encapsulate tags attached to a distributed data record.
+     */
     public static class DDTags implements Serializable {
         private static final long serialVersionUID = "template-v0.1.5".hashCode();
 

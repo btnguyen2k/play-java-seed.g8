@@ -1,21 +1,21 @@
 package akka;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-
-import com.google.inject.Provider;
-
 import akka.actor.ActorPath;
 import akka.actor.UntypedAbstractActor;
+import com.google.inject.Provider;
 import modules.registry.IRegistry;
 import modules.registry.RegistryGlobal;
 import play.Logger;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+
 /**
  * Base class to implement Akka actors.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
@@ -45,7 +45,7 @@ public class BaseActor extends UntypedAbstractActor {
 
     /**
      * Convenient method to get actor name.
-     * 
+     *
      * @return
      */
     protected String getActorName() {
@@ -54,7 +54,7 @@ public class BaseActor extends UntypedAbstractActor {
 
     /**
      * Convenient method to get actor path.
-     * 
+     *
      * @return
      */
     protected ActorPath getActorPath() {
@@ -68,7 +68,7 @@ public class BaseActor extends UntypedAbstractActor {
 
     /**
      * Message channels that the actor are subscribed to.
-     * 
+     *
      * @return
      */
     protected Collection<Class<?>> channelSubscriptions() {
@@ -76,27 +76,47 @@ public class BaseActor extends UntypedAbstractActor {
     }
 
     /**
+     * Mark if this actor has been inited.
+     *
+     * @since template-v2.6.r3
+     */
+    protected boolean actorInited = false;
+
+    /**
      * Convenient method to perform initializing work.
-     * 
+     *
      * @throws Exception
      */
     protected void initActor() throws Exception {
-        // subscribe to message channels
-        Collection<Class<?>> msgChannels = channelSubscriptions();
-        if (msgChannels != null && msgChannels.size() > 0) {
-            msgChannels.forEach(
-                    (clazz) -> getContext().system().eventStream().subscribe(self(), clazz));
+        if (!actorInited) {
+            // subscribe to message channels
+            Collection<Class<?>> msgChannels = channelSubscriptions();
+            if (msgChannels != null && msgChannels.size() > 0) {
+                msgChannels.forEach(
+                        (clazz) -> getContext().system().eventStream().subscribe(self(), clazz));
+            }
+            actorInited = true;
         }
     }
 
     /**
+     * Mark if this actor has been destroyed.
+     *
+     * @since template-v2.6.r3
+     */
+    protected boolean actorDestroyed = false;
+
+    /**
      * Convenient method to perform cleanup work.
-     * 
+     *
      * @throws Exception
      */
     protected void destroyActor() throws Exception {
-        // unsubscribe from all message channels
-        getContext().system().eventStream().unsubscribe(self());
+        if (!actorDestroyed) {
+            // unsubscribe from all message channels
+            getContext().system().eventStream().unsubscribe(self());
+            actorDestroyed = true;
+        }
     }
 
     /**
@@ -118,9 +138,9 @@ public class BaseActor extends UntypedAbstractActor {
             destroyActor();
         } catch (Exception e) {
             Logger.warn("{" + getActorPath() + "} " + e.getMessage(), e);
+        } finally {
+            super.postStop();
         }
-
-        super.postStop();
     }
 
     /**
@@ -132,27 +152,27 @@ public class BaseActor extends UntypedAbstractActor {
         if (message == null) {
             return;
         }
-        // AtomicBoolean handled = new AtomicBoolean(false);
+
+        AtomicBoolean handled = new AtomicBoolean(false);
         Class msgClazz = message.getClass();
         Consumer exactConsumer = messageHandler.get(msgClazz);
         if (exactConsumer != null) {
             // exact match
             exactConsumer.accept(message);
-            // handled.set(true);
+            handled.set(true);
         } else {
             messageHandler.forEach((Class clazz, Consumer consumer) -> {
                 // match interface/sub-class
                 if (clazz.isAssignableFrom(msgClazz)) {
                     consumer.accept(message);
-                    // handled.set(true);
+                    handled.set(true);
                 }
             });
         }
 
-        // if (!handled.get()) {
-        // Logger.warn("{" + getActorPath() + "} Unhandle message: " + message);
-        // unhandled(message);
-        // }
+        if (!handled.get()) {
+            unhandled(message);
+        }
     }
 
 }

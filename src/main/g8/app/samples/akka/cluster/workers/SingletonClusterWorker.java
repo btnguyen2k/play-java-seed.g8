@@ -1,4 +1,4 @@
-package akka.cluster.workers;
+package samples.akka.cluster.workers;
 
 import java.util.Date;
 import java.util.Random;
@@ -6,6 +6,7 @@ import java.util.Random;
 import com.github.ddth.commons.utils.DateFormatUtils;
 
 import akka.TickMessage;
+import akka.cluster.workers.BaseSingletonClusterWorker;
 import akka.workers.CronFormat;
 import play.Logger;
 
@@ -15,7 +16,7 @@ import play.Logger;
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
-public class SampleSingletonClusterWorker extends BaseSingletonClusterWorker {
+public class SingletonClusterWorker extends BaseSingletonClusterWorker {
     /**
      * Schedule to do job every 5 seconds
      */

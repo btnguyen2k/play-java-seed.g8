@@ -1,4 +1,4 @@
-package akka.cluster.workers;
+package samples.akka.cluster.workers;
 
 import java.util.Date;
 import java.util.Set;
@@ -6,6 +6,7 @@ import java.util.Set;
 import com.github.ddth.commons.utils.DateFormatUtils;
 
 import akka.TickMessage;
+import akka.cluster.workers.BaseClusterWorker;
 import akka.workers.CronFormat;
 import play.Logger;
 
@@ -15,7 +16,7 @@ import play.Logger;
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v2.6.r1
  */
-public class SampleAllRolesClusterWorker extends BaseClusterWorker {
+public class AnyRoleClusterWorker extends BaseClusterWorker {
 
     /**
      * Schedule to do job every 5 seconds
@@ -40,6 +41,7 @@ public class SampleAllRolesClusterWorker extends BaseClusterWorker {
      */
     @Override
     protected Set<String> getDeployRoles() {
+        //run on nodes with any role
         return null;
     }
 

@@ -9,54 +9,8 @@
                            http://www.springframework.org/schema/util 
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!-- In-memory cache factory, no expiry -->
-    <bean id="CACHE_FACTORY_INMEM" class="com.github.ddth.cacheadapter.guava.GuavaCacheFactory" 
-            scope="singleton" init-method="init" destroy-method="destroy">
-        <property name="cloneCacheEntries" value="true" />
-        <property name="defaultExpireAfterAccess" value="-1" />
-        <property name="defaultExpireAfterWrite" value="-1" />
-    </bean>
-
-    <!-- Redis cache factory, expire after write 300s -->
-    <bean id="CACHE_FACTORY_REDIS" class="com.github.ddth.cacheadapter.redis.RedisCacheFactory"
-            scope="singleton" init-method="init" destroy-method="destroy">
-        <property name="defaultExpireAfterAccess" value="-1" />
-        <property name="defaultExpireAfterWrite" value="300" />
-        <property name="redisHostAndPort" ref="_redis_hostAndPort" />
-        <!-- <property name="redisPassword" ref="_redis_password" /> -->
-        <property name="keyMode" value="NAMESPACE" />
-        <property name="cacheEntrySerializer">
-            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
-                    init-method="init" destroy-method="destroy">
-                <property name="compressor">
-                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
-                            init-method="init" destroy-method="destroy">
-                        <property name="compressionLevel" value="1" />
-                    </bean>
-                </property>
-            </bean>
-        </property>
-    </bean>
-    
-    <!-- Memcached cache factory, expire after access 300s -->
-    <bean id="CACHE_FACTORY_MEMCACHED" class="com.github.ddth.cacheadapter.memcached.XMemcachedCacheFactory"
-            scope="singleton" init-method="init" destroy-method="destroy">
-        <property name="defaultExpireAfterAccess" value="300" />
-        <property name="defaultExpireAfterWrite" value="-1" />
-        <property name="memcachedHostsAndPorts" ref="_memcached_hostsAndPorts" />
-        <property name="keyMode" value="NAMESPACE" />
-        <property name="cacheEntrySerializer">
-            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
-                    init-method="init" destroy-method="destroy">
-                <property name="compressor">
-                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
-                            init-method="init" destroy-method="destroy">
-                        <property name="compressionLevel" value="1" />
-                    </bean>
-                </property>
-            </bean>
-        </property>
-    </bean>    
+    <!-- import ccahe settings -->
+    <import resource="cache-beans.xml"/>
 
     <bean id="API_DISPATCHER" class="api.ApiDispatcher" init-method="init"
         destroy-method="destroy"></bean>

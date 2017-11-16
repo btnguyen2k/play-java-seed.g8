@@ -1,7 +1,8 @@
 package akka.cluster;
 
 /**
- * 
+ * Some cluster-related constants.
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */

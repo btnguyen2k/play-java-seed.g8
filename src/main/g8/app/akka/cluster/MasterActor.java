@@ -33,8 +33,7 @@ import scala.concurrent.duration.FiniteDuration;
 public class MasterActor extends BaseClusterActor {
 
     /*
-     * Wait for 10 seconds when application's startup before sending "tick"
-     * messages.
+     * Wait for a few seconds at application's startup before sending "tick" messages.
      */
     private final static FiniteDuration DELAY_INITIAL = Duration.create(10, TimeUnit.SECONDS);
 
@@ -67,8 +66,8 @@ public class MasterActor extends BaseClusterActor {
         // schedule to fire "tick" message periodically
         tick = getContext().system().scheduler().schedule(DELAY_INITIAL, DELAY_TICK, () -> {
             /*
-             * To reduce number of "tick" message flying around cluster, we first send "tick"
-             * message to current node's MasterActor first. MasterActor of the leader node will then
+             * To reduce number of "tick" messages flying around, we only send "tick" message to
+             * local (i.e. current node's) MasterActor. MasterActor of the leader node will then
              * publish tick message to relevant topics. MasterActor(s) on other nodes will just
              * simply ignore the "tick" message.
              */
@@ -119,8 +118,7 @@ public class MasterActor extends BaseClusterActor {
 
     protected void eventTick(TickMessage tick) {
         final String CLUSTER_GROUP = ClusterConstants.ROLE_ALL;
-
-        Member leader = ClusterMemberManager.getLeader(ClusterConstants.ROLE_ALL);
+        Member leader = ClusterMemberManager.getLeader(CLUSTER_GROUP);
         if (leader == null) {
             Logger.warn("Received TICK message, but cluster group [" + CLUSTER_GROUP
                     + "] is empty! " + tick);

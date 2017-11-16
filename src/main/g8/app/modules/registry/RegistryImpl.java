@@ -17,7 +17,7 @@ import com.typesafe.config.Config;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.workers.TickFanoutActor;
+import akka.TickFanoutActor;
 import api.ApiDispatcher;
 import play.Application;
 import play.Logger;
