@@ -1,6 +1,7 @@
 package api;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.github.ddth.commons.utils.MapUtils;
@@ -63,6 +64,19 @@ public class ApiContext {
      */
     public <T> T getContextField(String name, Class<T> clazz) {
         return MapUtils.getValue(context, name, clazz);
+    }
+
+    /**
+     * Get a context value.
+     *
+     * @param name
+     * @param clazz
+     * @param <T>
+     * @return
+     * @since template-v2.6.r3
+     */
+    public <T> Optional<T> getContextFieldOptional(String name, Class<T> clazz) {
+        return Optional.ofNullable(getContextField(name, clazz));
     }
 
     /**

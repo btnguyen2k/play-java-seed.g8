@@ -1,28 +1,18 @@
 package thrift;
 
-import org.apache.thrift.TException;
-
+import api.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.ddth.commons.utils.MapUtils;
 import com.google.inject.Provider;
-
-import api.ApiAuth;
-import api.ApiContext;
-import api.ApiDispatcher;
-import api.ApiParams;
-import api.ApiResult;
 import modules.registry.IRegistry;
+import org.apache.thrift.TException;
 import play.Logger;
-import thrift.def.TApiAuth;
-import thrift.def.TApiParams;
-import thrift.def.TApiResult;
-import thrift.def.TApiService;
-import thrift.def.TDataEncodingType;
+import thrift.def.*;
 import utils.AppConstants;
 
 /**
  * Handle API calls via Thrift.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.4
  */
@@ -87,17 +77,19 @@ public class ApiServiceHandler implements TApiService.Iface {
         long t = System.currentTimeMillis();
         try {
             ApiParams apiParams = parseParams(_apiParams);
-            ApiContext apiContext = ApiContext.newContext(AppConstants.API_GATEWAY_THRIFT,
-                    _apiName);
+            ApiContext apiContext = ApiContext
+                    .newContext(AppConstants.API_GATEWAY_THRIFT, _apiName);
             ApiAuth apiAuth = buildAuth(_apiAuth);
             ApiResult apiResult = getApiDispatcher().callApi(apiContext, apiAuth, apiParams);
-            return doResponse(apiResult != null ? apiResult : ApiResult.RESULT_UNKNOWN_ERROR,
-                    _apiParams.expectedReturnDataType != null ? _apiParams.expectedReturnDataType
+            return doResponse(
+                    apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR,
+                    _apiParams.expectedReturnDataType != null
+                            ? _apiParams.expectedReturnDataType
                             : _apiParams.dataType);
         } catch (Exception e) {
             Logger.warn(e.getMessage(), e);
             return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage())
-                    .setDebugData(MapUtils.createMap("t", t, "d", System.currentTimeMillis() - t)),
+                            .setDebugData(MapUtils.createMap("t", t, "d", System.currentTimeMillis() - t)),
                     null);
         }
     }

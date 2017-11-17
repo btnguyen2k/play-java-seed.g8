@@ -41,7 +41,7 @@ val _grpcVersion             = "1.7.0"
 val _springVersion           = "5.0.1.RELEASE"
 
 val _ddthCacheAdapterVersion = "0.6.2"
-val _ddthCommonsVersion      = "0.7.0.1"
+val _ddthCommonsVersion      = "0.7.1.1"
 val _ddthDaoVersion          = "0.8.3"
 
 libraryDependencies ++= Seq(
@@ -59,6 +59,7 @@ libraryDependencies ++= Seq(
     ,"com.typesafe.play"         %% "play-ws-standalone-xml"      % _playWsStandaloneVersion
 
     // RDMBS JDBC drivers & Connection Pool
+    ,"org.hsqldb"                % "hsqldb"                       % "2.4.0"
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
     ,"org.postgresql"            % "postgresql"                   % "42.1.4"
     ,"com.microsoft.sqlserver"   % "mssql-jdbc"                   % "6.2.2.jre8"

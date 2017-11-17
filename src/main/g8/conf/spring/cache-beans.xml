@@ -36,7 +36,7 @@
                     </bean>
                 </property>
             </bean>
-        </property>
+        </property>s
     </bean>
     -->
 
@@ -64,30 +64,38 @@
 
     <!-- beans for development env -->
     <beans>
+        <!--
         <bean id="_redis_hostAndPort" class="java.lang.String">
             <constructor-arg value="127.0.0.1:6379" />
         </bean>
         <bean id="_redis_password" class="java.lang.String">
             <constructor-arg value="" />
         </bean>
+        -->
 
+        <!--
         <bean id="_memcached_hostsAndPorts" class="java.lang.String">
             <constructor-arg value="127.0.0.1:11211" />
         </bean>
+        -->
     </beans>
 
     <!-- beans for production env -->
     <beans profile="prod,production">
+        <!--
         <bean id="_redis_hostAndPort" class="java.lang.String">
             <constructor-arg value="127.0.0.1:6379" />
         </bean>
         <bean id="_redis_password" class="java.lang.String">
             <constructor-arg value="" />
         </bean>
+        -->
 
+        <!--
         <bean id="_memcached_hostsAndPorts" class="java.lang.String">
             <constructor-arg value="127.0.0.1:11211" />
         </bean>
+        -->
     </beans>
 </beans>
 

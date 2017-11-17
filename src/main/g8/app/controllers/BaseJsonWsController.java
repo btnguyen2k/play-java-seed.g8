@@ -1,20 +1,15 @@
 package controllers;
 
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.typesafe.config.Config;
-
 import akka.util.ByteString;
 import api.ApiAuth;
 import api.ApiContext;
 import api.ApiParams;
 import api.ApiResult;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.typesafe.config.Config;
 import modules.registry.RegistryGlobal;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import play.libs.Json;
 import play.mvc.Http.RawBuffer;
 import play.mvc.Http.RequestBody;
@@ -23,13 +18,14 @@ import utils.AppConfigUtils;
 import utils.AppConstants;
 import utils.RequestEntiryTooLargeException;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
  * Base class for Json-based web-service controllers.
  *
- * <p>
- * This controller accepts request data in JSON format, and response to client also in JSON. All
- * responses have the following format:
- * </p>
+ * <p> This controller accepts request data in JSON format, and response to client also in JSON. All
+ * responses have the following format: </p>
  *
  * <pre>
  * {
@@ -40,12 +36,11 @@ import utils.RequestEntiryTooLargeException;
  * }
  * </pre>
  *
- *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-v0.1.0
  * @see ApiContext
  * @see ApiParams
  * @see ApiResult
+ * @since template-v0.1.0
  */
 public class BaseJsonWsController extends BaseController {
 
@@ -63,8 +58,8 @@ public class BaseJsonWsController extends BaseController {
         }
 
         Config appConfig = getAppConfig();
-        int maxApiBody = AppConfigUtils.getOrDefault(appConfig::getInt, "api.parser.maxBodySize",
-                1024 * 16);
+        int maxApiBody = AppConfigUtils
+                .getOrDefault(appConfig::getInt, "api.parser.maxBodySize", 1024 * 16);
 
         RequestBody requestBody = request().body();
         JsonNode jsonNode = requestBody.asJson();
@@ -140,9 +135,10 @@ public class BaseJsonWsController extends BaseController {
             ApiParams apiParams = parseRequest();
             ApiContext apiContext = ApiContext.newContext(AppConstants.API_GATEWAY_WEB, apiName);
             ApiAuth apiAuth = ApiAuth.buildFromHttpRequest(request());
-            ApiResult apiResult = RegistryGlobal.registry.getApiDispatcher().callApi(apiContext,
-                    apiAuth, apiParams);
-            return doResponse(apiResult != null ? apiResult : ApiResult.RESULT_UNKNOWN_ERROR);
+            ApiResult apiResult = RegistryGlobal.registry.getApiDispatcher()
+                    .callApi(apiContext, apiAuth, apiParams);
+            return doResponse(
+                    apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR);
         } catch (Exception e) {
             return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage()));
         }

@@ -1,20 +1,11 @@
 package grpc;
 
+import api.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.ddth.commons.utils.MapUtils;
 import com.google.inject.Provider;
 import com.google.protobuf.Empty;
-
-import api.ApiAuth;
-import api.ApiContext;
-import api.ApiDispatcher;
-import api.ApiParams;
-import api.ApiResult;
-import grpc.def.ApiServiceProto.PApiAuth;
-import grpc.def.ApiServiceProto.PApiContext;
-import grpc.def.ApiServiceProto.PApiParams;
-import grpc.def.ApiServiceProto.PApiResult;
-import grpc.def.ApiServiceProto.PDataEncodingType;
+import grpc.def.ApiServiceProto.*;
 import grpc.def.PApiServiceGrpc.PApiServiceImplBase;
 import io.grpc.stub.StreamObserver;
 import modules.registry.IRegistry;
@@ -31,8 +22,8 @@ public class ApiServiceHandler extends PApiServiceImplBase {
 
     private static ApiParams parseParams(PApiParams _apiParams) {
         JsonNode paramNode = GrpcApiUtils.decodeToJson(_apiParams.getDataType() != null
-                ? _apiParams.getDataType() : PDataEncodingType.JSON_STRING,
-                _apiParams.getParamsData());
+                ? _apiParams.getDataType()
+                : PDataEncodingType.JSON_STRING, _apiParams.getParamsData());
         ApiParams apiParams = new ApiParams(paramNode);
         return apiParams;
     }
@@ -88,20 +79,21 @@ public class ApiServiceHandler extends PApiServiceImplBase {
         try {
             PApiParams _apiParams = request.getApiParams();
             ApiParams apiParams = parseParams(_apiParams);
-            ApiContext apiContext = ApiContext.newContext(AppConstants.API_GATEWAY_GRPC,
-                    request.getApiName());
+            ApiContext apiContext = ApiContext
+                    .newContext(AppConstants.API_GATEWAY_GRPC, request.getApiName());
             ApiAuth apiAuth = buildAuth(request.getApiAuth());
             ApiResult apiResult = getApiDispatcher().callApi(apiContext, apiAuth, apiParams);
             PDataEncodingType dataType = _apiParams.getExpectedReturnDataType();
             if (dataType == null) {
                 dataType = _apiParams.getDataType();
             }
-            result = doResponse(apiResult != null ? apiResult : ApiResult.RESULT_UNKNOWN_ERROR,
+            result = doResponse(
+                    apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR,
                     dataType);
         } catch (Exception e) {
             Logger.warn(e.getMessage(), e);
             result = doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage())
-                    .setDebugData(MapUtils.createMap("t", t, "d", System.currentTimeMillis() - t)),
+                            .setDebugData(MapUtils.createMap("t", t, "d", System.currentTimeMillis() - t)),
                     null);
         }
         responseObserver.onNext(result);
