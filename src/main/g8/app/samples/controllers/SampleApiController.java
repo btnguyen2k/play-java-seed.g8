@@ -34,6 +34,13 @@ public class SampleApiController extends BaseJsonWsController {
     }
 
     /*
+     * Handle request PATCH:/api/echo
+     */
+    public Result echoPatch() throws Exception {
+        return doApiCall("echo");
+    }
+
+    /*
      * Handle request DELETE:/api/echo
      */
     public Result echoDelete() throws Exception {

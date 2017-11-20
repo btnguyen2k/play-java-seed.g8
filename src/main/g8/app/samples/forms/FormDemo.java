@@ -1,10 +1,10 @@
-package forms;
-
-import java.util.ArrayList;
-import java.util.List;
+package samples.forms;
 
 import org.apache.commons.lang3.StringUtils;
 
+import forms.BaseForm;
+import play.data.validation.Constraints.Validatable;
+import play.data.validation.Constraints.Validate;
 import play.data.validation.ValidationError;
 
 /**
@@ -13,7 +13,8 @@ import play.data.validation.ValidationError;
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  */
-public class FormDemo {
+@Validate
+public class FormDemo extends BaseForm implements Validatable<ValidationError> {
     private String email;
     private String fullname;
     private int dob, mob, yob;
@@ -66,48 +67,45 @@ public class FormDemo {
      * Form validation method.
      * 
      * @return
-     * @throws Exception
      */
-    public List<ValidationError> validate() throws Exception {
-        List<ValidationError> errors = new ArrayList<>();
-
+    public ValidationError validate() {
         if (StringUtils.isBlank(email)) {
             /*
              * Error for field "email" and the error message is resolved from language files.
              */
-            errors.add(new ValidationError("email", "error.empty_email||"));
+            return new ValidationError(null, "error.empty_email");
         }
         if (!email.matches("^\\\\s*[0-9a-zA-Z_\\\\-\\\\.]+\\\\@[0-9a-zA-Z_\\\\-\\\\.]+\\\\s*\$")) {
             /*
              * Error for field "email" and the error message is custom text
              */
-            errors.add(new ValidationError("email", "Invalid email address!"));
+            return new ValidationError(null, "Invalid email address!");
         }
         if (StringUtils.isBlank(fullname)) {
             /*
              * Error for field "fullname" and the error message is resolved from language files.
              */
-            errors.add(new ValidationError("fullname", "error.empty_fullname||"));
+            return new ValidationError(null, "error.empty_fullname");
         }
         if (dob < 1 || dob > 31) {
             /*
              * Error for field "dob" and the error message is resolved from language files.
              */
-            errors.add(new ValidationError("dob", "error.invalid_dob||"));
+            return new ValidationError(null, "error.invalid_dob");
         }
         if (mob < 1 || mob > 12) {
             /*
              * Error for field "mob" and the error message is resolved from language files.
              */
-            errors.add(new ValidationError("mob", "error.invalid_mob||"));
+            return new ValidationError(null, "error.invalid_mob");
         }
         if (yob < 1970 || yob > 2070) {
             /*
              * Error for field "yob" and the error message is resolved from language files.
              */
-            errors.add(new ValidationError("yob", "error.invalid_yob||"));
+            return new ValidationError(null, "error.invalid_yob");
         }
 
-        return errors != null ? errors : null;
+        return null;
     }
 }

@@ -1,4 +1,4 @@
-@(form: play.data.Form[forms.FormDemo])(implicit messages: play.i18n.Messages)
+@(form: play.data.Form[samples.forms.FormDemo])(implicit messages: play.i18n.Messages)
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,14 +7,14 @@
 <body>
     <h1>@messages.at("msg.welcome")</h1>
 
-    [<a href="@routes.SamplePageController.index">@messages.at("msg.home")</a>]
+    [<a href="@samples.controllers.routes.SamplePageController.index">@messages.at("msg.home")</a>]
     [@messages.at("msg.form_demo")]
     
     <hr />
-    
-    <form method="post" action="@routes.SamplePageController.formDemoSubmit()">
+
+    <form method="post" action="@samples.controllers.routes.SamplePageController.formDemoSubmit()">
         @if(form.hasErrors){
-            @_macro_displayFormErrors(form, Array("email", "fullname", "dob", "mob", "yob"))
+            @_macro_displayFormErrors(form)
         } else {
             <h3>@messages.at("msg.form.submit_ok")</h3>
         }
@@ -22,13 +22,13 @@
         <tr>
             <td nowrap="nowrap">@messages.at("msg.form.email"):</td>
             <td style="width: 100%">
-                <input style="width: 100%" name="email" placeholder="@messages.at("msg.placeholder.email")" value="@form("email").value" />
+                <input style="width: 100%" name="email" placeholder="@messages.at("msg.placeholder.email")" value="@form("email").getValue.orElse("")" />
             </td>
         </tr>
         <tr>
             <td nowrap="nowrap">@messages.at("msg.form.fullname"):</td>
             <td style="width: 100%">
-                <input style="width: 100%" name="fullname" placeholder="@messages.at("msg.placeholder.fullname")" value="@form("fullname").value" />
+                <input style="width: 100%" name="fullname" placeholder="@messages.at("msg.placeholder.fullname")" value="@form("fullname").getValue.orElse("")" />
             </td>
         </tr>
         <tr>
@@ -39,7 +39,7 @@
                         <select name="dob">
                             <option value="0">-= @messages.at("msg.form.dob") =-</option>
                             @for(dob <- 1 to 31){
-                                <option value="@dob" @if(String.valueOf(dob)==form("dob").value){selected="selected"}>@dob</option>
+                                <option value="@dob" @if(String.valueOf(dob)==form("dob").getValue.orElse("")){selected="selected"}>@dob</option>
                             }
                         </select>
                     </td>
@@ -47,7 +47,7 @@
                         <select name="mob">
                             <option value="0">-= @messages.at("msg.form.mob") =-</option>
                             @for(mob <- 1 to 12){
-                                <option value="@mob" @if(String.valueOf(mob)==form("mob").value){selected="selected"}>@mob</option>
+                                <option value="@mob" @if(String.valueOf(mob)==form("mob").getValue.orElse("")){selected="selected"}>@mob</option>
                             }
                         </select>
                     </td>
@@ -55,7 +55,7 @@
                         <select name="yob">
                             <option value="0">-= @messages.at("msg.form.yob") =-</option>
                             @for(yob <- 1970 to 2070){
-                                <option value="@yob" @if(String.valueOf(yob)==form("yob").value){selected="selected"}>@yob</option>
+                                <option value="@yob" @if(String.valueOf(yob)==form("yob").getValue.orElse("")){selected="selected"}>@yob</option>
                             }
                         </select>
                     </td>

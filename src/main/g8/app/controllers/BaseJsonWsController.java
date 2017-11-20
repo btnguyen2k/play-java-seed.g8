@@ -53,7 +53,9 @@ public class BaseJsonWsController extends BaseController {
      * @since template-v0.1.4
      */
     private JsonNode parseRequestBody() throws IOException, RequestEntiryTooLargeException {
-        if (!StringUtils.equalsIgnoreCase(request().method(), "POST")) {
+        String requestMethod = request().method().toUpperCase();
+        if (!StringUtils.equals(requestMethod, "POST") && !StringUtils.equals(requestMethod, "PUT")
+                && !StringUtils.equals(requestMethod, "PATCH")) {
             return null;
         }
 

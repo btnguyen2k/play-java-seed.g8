@@ -8,11 +8,11 @@
     <h1>@messages.at("msg.welcome")</h1>
 
     [@messages.at("msg.home")]
-    [<a href="@routes.SamplePageController.formDemo">@messages.at("msg.form_demo")</a>]
+    [<a href="@samples.controllers.routes.SamplePageController.formDemo">@messages.at("msg.form_demo")</a>]
     |
     @messages.at("msg.languages"):
     @for( (lang,i) <- languages.zipWithIndex ) {
-        <a href="@routes.SamplePageController.switchLang(lang.code())">@messages.at("lang."+lang.code())</a>
+        <a href="@samples.controllers.routes.SamplePageController.switchLang(lang.code())">@messages.at("lang."+lang.code())</a>
         @if(i<languages.size-1){ | }
     }
 

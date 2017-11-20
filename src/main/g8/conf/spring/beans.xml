@@ -23,13 +23,13 @@
         <property name="apiHandlers">
             <map>
                 <entry key="echo">
-                    <util:constant static-field="samples.api.func.ApiFuncSample.API_ECHO"/>
+                    <util:constant static-field="samples.api.ApiFuncSample.API_ECHO"/>
                 </entry>
                 <entry key="info">
-                    <util:constant static-field="samples.api.func.ApiFuncSample.API_INFO"/>
+                    <util:constant static-field="samples.api.ApiFuncSample.API_INFO"/>
                 </entry>
                 <entry key="deny">
-                    <util:constant static-field="samples.api.func.ApiFuncSample.API_DENY"/>
+                    <util:constant static-field="samples.api.ApiFuncSample.API_DENY"/>
                 </entry>
             </map>
         </property>

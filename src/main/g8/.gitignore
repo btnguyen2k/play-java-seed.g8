@@ -11,4 +11,4 @@
 /.cache-tests
 .DS_Store
 /.g8
-
+*.log
