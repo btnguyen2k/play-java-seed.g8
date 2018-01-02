@@ -44,30 +44,30 @@
 	</root>
 
 	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
-	<appender name="FILE_ACTION" class="ch.qos.logback.core.FileAppender">
-		<file><![CDATA[${app.logdir:-.}/action.log]]></file>
+	<appender name="FILE_API_DISPATCHER" class="ch.qos.logback.core.FileAppender">
+		<file><![CDATA[${app.logdir:-.}/api.log]]></file>
 		<encoder>
 			<pattern><![CDATA[%message%n]]></pattern>
 		</encoder>
 	</appender>
-	<appender name="ASYNC_FILE_ACTION" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FILE_ACTION" />
+	<appender name="ASYNC_FILE_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_API_DISPATCHER" />
 	</appender>
 
 	<!-- Log raw messages to stdout, useful for transaction log that can be 
 		replayed -->
-	<appender name="STDOUT_ACTION" class="ch.qos.logback.core.ConsoleAppender">
+	<appender name="STDOUT_API_DISPATCHER" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
 			<pattern><![CDATA[%message%n]]></pattern>
 		</encoder>
 	</appender>
-	<appender name="ASYNC_STDOUT_ACTION" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="STDOUT_ACTION" />
+	<appender name="ASYNC_STDOUT_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="STDOUT_API_DISPATCHER" />
 	</appender>
 
 	<!-- additivity=false ensures action data only goes to the action log -->
-	<logger name="action" level="INFO" additivity="false">
-		<appender-ref ref="ASYNC_FILE_ACTION" />
-		<appender-ref ref="ASYNC_STDOUT_ACTION" />
+	<logger name="API_DISPATCHER" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE_API_DISPATCHER" />
+		<appender-ref ref="ASYNC_STDOUT_API_DISPATCHER" />
 	</logger>
 </configuration>

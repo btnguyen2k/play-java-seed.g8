@@ -1,7 +1,6 @@
 package controllers;
 
 import com.typesafe.config.Config;
-
 import play.mvc.Result;
 
 /**

@@ -14,7 +14,7 @@ public class ApiAuth {
     public final static String HTTP_HEADER_ACCESS_TOKEN = "X-Access-Token";
 
     /**
-     * Build {@link ApiAuth} from HTTP request headers.
+     * Build a {@link ApiAuth} from HTTP request headers.
      *
      * @param request
      * @return

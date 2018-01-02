@@ -1,9 +1,8 @@
 package modules.registry;
 
-import com.typesafe.config.Config;
-
 import akka.actor.ActorSystem;
 import api.ApiDispatcher;
+import com.typesafe.config.Config;
 import play.Application;
 import play.i18n.Lang;
 import play.i18n.MessagesApi;
@@ -23,53 +22,52 @@ public interface IRegistry {
      *
      * @return
      */
-    public Application getPlayApplication();
+    Application getPlayApplication();
 
     /**
      * Get the current Play application's configuration.
      *
      * @return
      */
-    public Config getAppConfig();
+    Config getAppConfig();
 
     /**
-     * Get application's available languages defined in
-     * {@code application.conf}.
+     * Get application's available languages defined in {@code application.conf}.
      *
      * @return
      */
-    public Lang[] getAvailableLanguage();
+    Lang[] getAvailableLanguage();
 
     /**
      * Get the {@link ActorSystem} instance.
      *
      * @return
      */
-    public ActorSystem getActorSystem();
+    ActorSystem getActorSystem();
 
     /**
      * Get the {@link MessagesApi} instance.
      *
      * @return
      */
-    public MessagesApi getMessagesApi();
+    MessagesApi getMessagesApi();
 
     /**
      * Get the {@link WSClient} instance.
      *
      * @return
      */
-    public WSClient getWsClient();
+    WSClient getWsClient();
 
     /**
      * Get a Spring bean by clazz.
      */
-    public <T> T getBean(Class<T> clazz);
+    <T> T getBean(Class<T> clazz);
 
     /**
      * Get a Spring bean by name and clazz.
      */
-    public <T> T getBean(String name, Class<T> clazz);
+    <T> T getBean(String name, Class<T> clazz);
 
     /**
      * Get {@link ApiDispatcher} instance.
@@ -77,7 +75,7 @@ public interface IRegistry {
      * @return
      * @since template-v0.1.4
      */
-    public ApiDispatcher getApiDispatcher();
+    ApiDispatcher getApiDispatcher();
 
     /**
      * Get default {@link ExecutionContextExecutor} instance.
@@ -85,7 +83,7 @@ public interface IRegistry {
      * @return
      * @since template-v2.6.r1
      */
-    public ExecutionContextExecutor getDefaultExecutionContextExecutor();
+    ExecutionContextExecutor getDefaultExecutionContextExecutor();
 
     /**
      * Get custom {@link ExecutionContextExecutor} instance.
@@ -94,5 +92,5 @@ public interface IRegistry {
      * @return
      * @since template-v2.6.r1
      */
-    public ExecutionContextExecutor getExecutionContextExecutor(String id);
+    ExecutionContextExecutor getExecutionContextExecutor(String id);
 }

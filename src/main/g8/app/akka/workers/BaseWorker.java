@@ -2,12 +2,18 @@ package akka.workers;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.github.ddth.dlock.IDLock;
+import com.github.ddth.dlock.IDLockFactory;
+import com.github.ddth.dlock.LockResult;
+import com.github.ddth.dlock.impl.inmem.InmemDLock;
 
 import akka.BaseActor;
 import akka.TickMessage;
 import play.Logger;
 import scala.concurrent.ExecutionContextExecutor;
+
+import utils.IdUtils;
 
 /**
  * Base class to implement workers.
@@ -65,6 +71,55 @@ public abstract class BaseWorker extends BaseActor {
         return channelSubscriptions;
     }
 
+    private IDLockFactory lockFactory;
+    private IDLock lock;
+
+    /**
+     * @return
+     * @since template-v2.6.r4
+     */
+    protected IDLockFactory getDLockFactory() {
+        return lockFactory;
+    }
+
+    /**
+     * @return
+     * @since template-v2.6.r4
+     */
+    protected IDLock getDLock() {
+        return lock;
+    }
+
+    /**
+     * @since template-v2.6.r4
+     */
+    protected void initDLock() {
+        lockFactory = getRegistry().getBean(IDLockFactory.class);
+        String lockName = getActorName();
+        lock = lockFactory != null ? lockFactory.createLock(lockName) : new InmemDLock(lockName);
+    }
+
+    /**
+     * Acquire the lock for a duration.
+     *
+     * @return
+     * @since template-v2.6.r4
+     */
+    protected boolean lock(String lockId, long durationMs) {
+        return lock.lock(lockId, durationMs) == LockResult.SUCCESSFUL;
+    }
+
+    /**
+     * Release the acquired lock.
+     *
+     * @param lockId
+     * @return
+     */
+    protected boolean unlock(String lockId) {
+        LockResult result = lock.unlock(lockId);
+        return result == LockResult.SUCCESSFUL || result == LockResult.NOT_FOUND;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -73,6 +128,8 @@ public abstract class BaseWorker extends BaseActor {
     @Override
     protected void initActor() throws Exception {
         super.initActor();
+
+        initDLock();
 
         // register message handler
         addMessageHandler(TickMessage.class, this::onTick);
@@ -133,8 +190,6 @@ public abstract class BaseWorker extends BaseActor {
         return false;
     }
 
-    private AtomicBoolean LOCK = new AtomicBoolean(false);
-
     protected void onTick(TickMessage tick) {
         ExecutionContextExecutor ecs = getRegistry().getExecutionContextExecutor("worker-dispatcher");
         if (ecs == null) {
@@ -142,7 +197,8 @@ public abstract class BaseWorker extends BaseActor {
         }
         ecs.execute(() -> {
             if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
-                if (LOCK.compareAndSet(false, true)) {
+                final String lockId = IdUtils.nextId();
+                if (lock(lockId, 60000)) {
                     try {
                         lastTick = tick;
                         doJob(tick);
@@ -151,7 +207,7 @@ public abstract class BaseWorker extends BaseActor {
                                 "{" + getActorPath() + "} Error while doing job: " + e.getMessage(),
                                 e);
                     } finally {
-                        LOCK.set(false);
+                        unlock(lockId);
                     }
                 } else {
                     // Busy processing a previous message

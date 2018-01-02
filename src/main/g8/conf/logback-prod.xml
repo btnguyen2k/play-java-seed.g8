@@ -36,23 +36,23 @@
 	</root>
 
 	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
-	<appender name="FILE_ACTION" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file><![CDATA[${app.logdir:-.}/action.log]]></file>
+	<appender name="FILE_API_DISPATCHER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file><![CDATA[${app.logdir:-.}/api.log]]></file>
 		<append>true</append>
 		<encoder>
 			<pattern><![CDATA[%message%n]]></pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern><![CDATA[${app.logdir:-.}/action.log.%d{yyyy-MM-dd}]]></fileNamePattern>
+			<fileNamePattern><![CDATA[${app.logdir:-.}/api.log.%d{yyyy-MM-dd}]]></fileNamePattern>
 		</rollingPolicy>
 	</appender>
-	<appender name="ASYNC_FILE_ACTION" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FILE_ACTION" />
+	<appender name="ASYNC_FILE_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_API_DISPATCHER" />
 	</appender>
 
 	<!-- additivity=false ensures action data only goes to the action log -->
-	<logger name="action" level="INFO" additivity="false">
-		<appender-ref ref="ASYNC_FILE_ACTION" />
+	<logger name="API_DISPATCHER" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE_API_DISPATCHER" />
 	</logger>
 </configuration>

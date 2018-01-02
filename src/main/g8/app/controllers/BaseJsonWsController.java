@@ -7,7 +7,6 @@ import api.ApiParams;
 import api.ApiResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.typesafe.config.Config;
-import modules.registry.RegistryGlobal;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import play.libs.Json;
@@ -73,6 +72,7 @@ public class BaseJsonWsController extends BaseController {
             return jsonNode;
         }
 
+        //fallback: parse request's body from raw text content
         String requestContent = null;
         RawBuffer rawBuffer = requestBody.asRaw();
         if (rawBuffer != null) {
@@ -136,11 +136,13 @@ public class BaseJsonWsController extends BaseController {
         try {
             ApiParams apiParams = parseRequest();
             ApiContext apiContext = ApiContext.newContext(AppConstants.API_GATEWAY_WEB, apiName);
+            apiContext.setContextField("method", request().method());
+            apiContext.setContextField("uri", request().uri());
             ApiAuth apiAuth = ApiAuth.buildFromHttpRequest(request());
-            ApiResult apiResult = RegistryGlobal.registry.getApiDispatcher()
+            ApiResult apiResult = getRegistry().getApiDispatcher()
                     .callApi(apiContext, apiAuth, apiParams);
             return doResponse(
-                    apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR);
+                    apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR.clone());
         } catch (Exception e) {
             return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage()));
         }

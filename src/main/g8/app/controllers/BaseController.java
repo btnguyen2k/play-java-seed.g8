@@ -1,14 +1,10 @@
 package controllers;
 
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.StringUtils;
-
+import akka.actor.ActorSystem;
 import com.google.inject.Provider;
 import com.typesafe.config.Config;
-
-import akka.actor.ActorSystem;
 import modules.registry.IRegistry;
+import org.apache.commons.lang3.StringUtils;
 import play.Application;
 import play.i18n.Lang;
 import play.i18n.Messages;
@@ -20,6 +16,8 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import utils.AppConstants;
 import utils.I18NUtils;
+
+import javax.inject.Inject;
 
 /**
  * Base class for all controllers. Base stuff should go here.
@@ -152,7 +150,7 @@ public class BaseController extends Controller {
     }
 
     /**
-     * Redirect client.
+     * Redirect client to a {@link Call}.
      *
      * @param call
      * @param flashKey

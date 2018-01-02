@@ -33,16 +33,17 @@ scalaVersion := "$scala_version$"
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-val _akkaClusterVersion      = "2.5.6"
+val _akkaClusterVersion      = "2.5.8"
 val _playWsStandaloneVersion = "1.1.3"
 
-val _grpcVersion             = "1.7.0"
+val _grpcVersion             = "1.8.0"
 
-val _springVersion           = "5.0.1.RELEASE"
+val _springVersion           = "5.0.2.RELEASE"
 
-val _ddthCacheAdapterVersion = "0.6.2"
+val _ddthCacheAdapterVersion = "0.6.3.2"
 val _ddthCommonsVersion      = "0.7.1.1"
-val _ddthDaoVersion          = "0.8.3"
+val _ddthDaoVersion          = "0.8.4"
+val _ddthDLockVersion        = "0.1.0"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
@@ -53,7 +54,7 @@ libraryDependencies ++= Seq(
     ,"com.typesafe.akka"         %% "akka-cluster-metrics"        % _akkaClusterVersion
     ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaClusterVersion
 
-    ,"com.typesafe.play"         %% "play-json"                   % "2.6.7"
+    ,"com.typesafe.play"         %% "play-json"                   % "2.6.8"
     ,"com.typesafe.play"         %% "play-ahc-ws-standalone"      % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-json"     % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-xml"      % _playWsStandaloneVersion
@@ -63,11 +64,11 @@ libraryDependencies ++= Seq(
     ,"mysql"                     % "mysql-connector-java"         % "6.0.6"
     ,"org.postgresql"            % "postgresql"                   % "42.1.4"
     ,"com.microsoft.sqlserver"   % "mssql-jdbc"                   % "6.2.2.jre8"
-    ,"com.zaxxer"                % "HikariCP"                     % "2.7.3"
+    ,"com.zaxxer"                % "HikariCP"                     % "2.7.4"
 
     ,"org.apache.thrift"         % "libthrift"                    % "0.10.0"
 
-    ,"com.google.protobuf"       % "protobuf-java"                % "3.5.0"
+    ,"com.google.protobuf"       % "protobuf-java"                % "3.5.1"
     ,"io.grpc"                   % "grpc-core"                    % _grpcVersion
     ,"io.grpc"                   % "grpc-protobuf"                % _grpcVersion
     ,"io.grpc"                   % "grpc-stub"                    % _grpcVersion
@@ -89,6 +90,10 @@ libraryDependencies ++= Seq(
     ,"com.github.ddth"           % "ddth-cache-adapter-core"      % _ddthCacheAdapterVersion
     ,"com.github.ddth"           % "ddth-cache-adapter-redis"     % _ddthCacheAdapterVersion
     ,"com.github.ddth"           % "ddth-cache-adapter-memcached" % _ddthCacheAdapterVersion
+
+    // DLock
+    ,"com.github.ddth"           % "ddth-dlock-core"              % _ddthDLockVersion
+    ,"com.github.ddth"           % "ddth-dlock-redis"             % _ddthDLockVersion
 
     ,filters
     ,javaWs

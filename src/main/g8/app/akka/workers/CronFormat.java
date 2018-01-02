@@ -36,7 +36,7 @@ public class CronFormat {
      * @return
      */
     public static CronFormat parse(String input) {
-        String[] tokens = input.trim().split("[\\\\s\\\\t]+");
+        String[] tokens = input.trim().split("[\\s\\t]+");
         if (tokens == null || (tokens.length != 3 && tokens.length != 6)) {
             throw new IllegalArgumentException("Invalid input [" + input + "]!");
         }
@@ -49,12 +49,12 @@ public class CronFormat {
         return null;
     }
 
-    private final static Pattern PATTERN_TICK = Pattern.compile("^\\\\*\\\\/(\\\\d+)\$");
-    private final static Pattern PATTERN_RANGE = Pattern.compile("^(\\\\d+)-(\\\\d+)\$");
-    private final static Pattern PATTERN_RANGE_NAME = Pattern.compile("^([A-Z]+)-([A-Z]+)\$",
+    private final static Pattern PATTERN_TICK = Pattern.compile("^\\*\\/(\\d+)$");
+    private final static Pattern PATTERN_RANGE = Pattern.compile("^(\\d+)-(\\d+)$");
+    private final static Pattern PATTERN_RANGE_NAME = Pattern.compile("^([A-Z]+)-([A-Z]+)$",
             Pattern.CASE_INSENSITIVE);
-    private final static Pattern PATTERN_EXACT = Pattern.compile("^(\\\\d+)\$");
-    private final static Pattern PATTERN_EXACT_NAME = Pattern.compile("^([A-Z]+)\$",
+    private final static Pattern PATTERN_EXACT = Pattern.compile("^(\\d+)$");
+    private final static Pattern PATTERN_EXACT_NAME = Pattern.compile("^([A-Z]+)$",
             Pattern.CASE_INSENSITIVE);
 
     /**

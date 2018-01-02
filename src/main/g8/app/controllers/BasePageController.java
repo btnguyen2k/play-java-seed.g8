@@ -1,30 +1,28 @@
 package controllers;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-
-import javax.inject.Inject;
-
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
 import play.i18n.Messages;
 import play.twirl.api.Html;
 
+import javax.inject.Inject;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
 /**
  * Base class for controllers that handle form submissions & page renderings.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  */
 public class BasePageController extends BaseController {
 
-    @Inject
-    protected FormFactory formFactory;
+    @Inject protected FormFactory formFactory;
 
     /**
      * Create a dynamic form instance.
-     * 
+     *
      * @return
      */
     protected DynamicForm createForm() {
@@ -33,7 +31,7 @@ public class BasePageController extends BaseController {
 
     /**
      * Create a form instance.
-     * 
+     *
      * @param formClass
      * @return
      */

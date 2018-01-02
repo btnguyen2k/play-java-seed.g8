@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.support.AbstractApplicationContext;
@@ -14,10 +15,10 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 import com.typesafe.config.Config;
 
+import akka.TickFanoutActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.TickFanoutActor;
 import api.ApiDispatcher;
 import play.Application;
 import play.Logger;
@@ -130,21 +131,50 @@ public class RegistryImpl implements IRegistry {
     }
 
     private void initApplicationContext() {
-        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
-        if (!StringUtils.isBlank(configFile)) {
-            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
-                    : new File(playApp.path(), configFile);
-            if (springConfigFile.exists() && springConfigFile.isFile()
-                    && springConfigFile.canRead()) {
+        String strConfig = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
+        String[] configFiles = !StringUtils.isBlank(strConfig) ? strConfig.trim().split("[,;\\s]+")
+                : null;
+        if (configFiles == null || configFiles.length < 1) {
+            Logger.info("No Spring configuration file defined, skip creating ApplicationContext.");
+        } else {
+            List<String> configLocations = new ArrayList<>();
+            for (String configFile : configFiles) {
+                File f = configFile.startsWith("/") ? new File(configFile)
+                        : new File(playApp.path(), configFile);
+                if (f.exists() && f.isFile() && f.canRead()) {
+                    configLocations.add("file:" + f.getAbsolutePath());
+                } else {
+                    Logger.warn("Spring config file [" + f + "] not found or not readable!");
+                }
+            }
+            if (configLocations.size() > 0) {
+                Logger.info("Creating Spring's ApplicationContext with configuration files: "
+                        + configLocations);
                 AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
-                        "file:" + springConfigFile.getAbsolutePath());
+                        configLocations.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
                 applicationContext.start();
                 appContext = applicationContext;
             } else {
                 Logger.warn(
-                        "Spring config file [" + springConfigFile + "] not found or not readable!");
+                        "No Spring configuration file is valid, skip creating ApplicationContext!");
             }
         }
+
+//        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
+//        if (!StringUtils.isBlank(configFile)) {
+//            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
+//                    : new File(playApp.path(), configFile);
+//            if (springConfigFile.exists() && springConfigFile.isFile()
+//                    && springConfigFile.canRead()) {
+//                AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
+//                        "file:" + springConfigFile.getAbsolutePath());
+//                applicationContext.start();
+//                appContext = applicationContext;
+//            } else {
+//                Logger.warn(
+//                        "Spring config file [" + springConfigFile + "] not found or not readable!");
+//            }
+//        }
     }
 
     private void destroyApplicationContext() {

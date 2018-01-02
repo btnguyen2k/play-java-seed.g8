@@ -65,13 +65,13 @@
         <!--
         <bean id="_db_url" class="java.lang.String">
             <constructor-arg
-                value="jdbc:mysql://127.0.0.1:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
+                value="jdbc:mysql://10.0.0.1:3306/dbname?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;useSSL=false&amp;serverTimezone=Asia/Ho_Chi_Minh" />
         </bean>
         <bean id="_db_user" class="java.lang.String">
-            <constructor-arg value="test" />
+            <constructor-arg value="user" />
         </bean>
         <bean id="_db_password" class="java.lang.String">
-            <constructor-arg value="test" />
+            <constructor-arg value="password" />
         </bean>
         -->
     </beans>

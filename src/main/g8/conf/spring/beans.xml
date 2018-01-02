@@ -10,36 +10,23 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <!-- import cahe settings -->
+    <!-- import cache settings -->
     <import resource="cache-beans.xml"/>
 
     <!-- import data source settings -->
     <import resource="datasource-beans.xml"/>
 
-    <import resource="datasource-beans.xml"/>
+    <!-- import ddth-dlock settings -->
+    <import resource="dlock-beans.xml"/>
 
-    <bean id="API_DISPATCHER" class="api.ApiDispatcher" init-method="init" destroy-method="destroy">
-        <!-- Sample API handlers -->
-        <property name="apiHandlers">
-            <map>
-                <entry key="echo">
-                    <util:constant static-field="samples.api.ApiFuncSample.API_ECHO"/>
-                </entry>
-                <entry key="info">
-                    <util:constant static-field="samples.api.ApiFuncSample.API_INFO"/>
-                </entry>
-                <entry key="deny">
-                    <util:constant static-field="samples.api.ApiFuncSample.API_DENY"/>
-                </entry>
-            </map>
-        </property>
-    </bean>
+    <!-- import api settings -->
+    <import resource="api-beans.xml"/>
 
-    <!-- beans for development env -->
     <beans>
+        <!-- beans for development env -->
     </beans>
 
-    <!-- beans for production env -->
     <beans profile="prod,production">
+        <!-- beans for production env -->
     </beans>
 </beans>

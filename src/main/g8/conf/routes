@@ -7,24 +7,5 @@ GET		/									controllers.IndexController.index
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
 
-## Sample routes
-# Examples of controller that handles web-page rendering & form submission
-GET		/samples							samples.controllers.SamplePageController.index
-GET     /samples/switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)
-GET     /samples/form                       samples.controllers.SamplePageController.formDemo
-POST    /samples/form                       samples.controllers.SamplePageController.formDemoSubmit
-
-# Examples of controller that handles web service calls
-GET     /samples/api/info                   samples.controllers.SampleApiController.infoGet
-POST    /samples/api/info                   samples.controllers.SampleApiController.infoPost
-
-GET     /samples/api/echo                   samples.controllers.SampleApiController.echoGet
-POST    /samples/api/echo                   samples.controllers.SampleApiController.echoPost
-PUT     /samples/api/echo                   samples.controllers.SampleApiController.echoPut
-PATCH   /samples/api/echo                   samples.controllers.SampleApiController.echoPatch
-DELETE  /samples/api/echo                   samples.controllers.SampleApiController.echoDelete
-
-GET     /samples/api/noApi                  samples.controllers.SampleApiController.noApi
-POST    /samples/api/noApi                  samples.controllers.SampleApiController.noApi
-PUT     /samples/api/noApi                  samples.controllers.SampleApiController.noApi
-DELETE  /samples/api/noApi                  samples.controllers.SampleApiController.noApi
+## Include routes for samples
+-> /samples samples.Routes

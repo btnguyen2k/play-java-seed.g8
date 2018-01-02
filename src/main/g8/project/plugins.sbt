@@ -2,7 +2,7 @@
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "$play_version$")
 
 // Integrate with Eclipse: https://playframework.com/documentation/latest/IDE
-addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.2.3")
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "5.2.4")
 
 // Web plugins
 addSbtPlugin("com.typesafe.sbt" % "sbt-coffeescript" % "1.0.2") // https://github.com/sbt/sbt-coffeescript
@@ -13,4 +13,3 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.3")       // https://githu
 addSbtPlugin("com.typesafe.sbt" % "sbt-mocha" % "1.1.2")        // https://github.com/sbt/sbt-mocha
 addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.2")         // https://github.com/sbt/sbt-gzip
 addSbtPlugin("org.irundaia.sbt" % "sbt-sassify" % "1.4.11")      // https://github.com/irundaia/sbt-sassify
-

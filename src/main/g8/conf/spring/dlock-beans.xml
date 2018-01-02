@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- In-memory distributed lock: for single node only -->
+    <bean id="DLOCK_FACTORY" class="com.github.ddth.dlock.impl.inmem.InmemDLockFactory"
+          init-method="init" destroy-method="destroy">
+    </bean>
+
+    <!-- Redis-based distributed lock: for multiple nodes -->
+    <!--
+    <bean id="DLOCK_FACTORY" class="com.github.ddth.dlock.impl.redis.RedisDLockFactory"
+          init-method="init" destroy-method="destroy">
+        <property name="redisHostAndPort" ref="_redis_hostAndPort" />
+        <property name="redisPassword" ref="_redis_password" />
+    </bean>
+    -->
+
+    <!-- ClusteredRedis-based distributed lock: for multiple nodes -->
+    <!--
+    <bean id="DLOCK_FACTORY" class="com.github.ddth.dlock.impl.redis.ClusteredRedisDLockFactory"
+          init-method="init" destroy-method="destroy">
+        <property name="redisHostsAndPorts" ref="_redis_hostsAndPorts" />
+        <property name="redisPassword" ref="_redis_password" />
+    </bean>
+    -->
+
+    <!-- beans for development env -->
+    <beans>
+        <!--
+        <bean id="_redis_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:7000" />
+        </bean>
+
+        <bean id="_redis_hostAndPort" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:6379" />
+        </bean>
+
+        <bean id="_redis_password" class="java.lang.String">
+            <constructor-arg value="" />
+        </bean>
+        -->
+    </beans>
+
+    <!-- beans for production env -->
+    <beans profile="prod,production">
+        <!--
+        <bean id="_redis_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="10.0.0.1:7000,10.0.0.2:7000,10.0.0.3:7000" />
+        </bean>
+
+        <bean id="_redis_hostAndPort" class="java.lang.String">
+            <constructor-arg value="10.0.0.1:6379" />
+        </bean>
+
+        <bean id="_redis_password" class="java.lang.String">
+            <constructor-arg value="" />
+        </bean>
+        -->
+    </beans>
+</beans>

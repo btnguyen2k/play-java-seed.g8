@@ -1,16 +1,16 @@
 package api;
 
+import com.github.ddth.commons.utils.MapUtils;
+import utils.IdUtils;
+
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.github.ddth.commons.utils.MapUtils;
-
-import utils.IdUtils;
-
 /**
  * API's running context.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.4
  */
@@ -44,8 +44,18 @@ public class ApiContext {
     }
 
     /**
+     * Get all context fields' values.
+     *
+     * @return
+     * @since template-v2.6.r4
+     */
+    public Map<String, Object> getAllContextFields() {
+        return Collections.unmodifiableMap(context);
+    }
+
+    /**
      * Set a context value.
-     * 
+     *
      * @param name
      * @param value
      * @return
@@ -57,7 +67,7 @@ public class ApiContext {
 
     /**
      * Get a context value
-     * 
+     *
      * @param name
      * @param clazz
      * @return
@@ -81,7 +91,7 @@ public class ApiContext {
 
     /**
      * Get context value: API name.
-     * 
+     *
      * @return
      */
     public String getApiName() {
@@ -90,7 +100,7 @@ public class ApiContext {
 
     /**
      * Get context value: API gateway (e.g. "web" or "thrift").
-     * 
+     *
      * @return
      */
     public String getGateway() {

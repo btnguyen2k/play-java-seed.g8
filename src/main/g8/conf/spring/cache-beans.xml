@@ -10,8 +10,8 @@
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- In-memory cache factory, no expiry -->
-    <bean id="CACHE_FACTORY_INMEM" class="com.github.ddth.cacheadapter.guava.GuavaCacheFactory"
-          scope="singleton" init-method="init" destroy-method="destroy">
+    <bean id="CACHE_FACTORY_INMEM" class="com.github.ddth.cacheadapter.cacheimpl.guava.GuavaCacheFactory"
+          init-method="init" destroy-method="destroy">
         <property name="cloneCacheEntries" value="true" />
         <property name="defaultExpireAfterAccess" value="-1" />
         <property name="defaultExpireAfterWrite" value="-1" />
@@ -19,40 +19,88 @@
 
     <!-- Redis cache factory, expire after write 300s -->
     <!--
-    <bean id="CACHE_FACTORY_REDIS" class="com.github.ddth.cacheadapter.redis.RedisCacheFactory"
-          scope="singleton" init-method="init" destroy-method="destroy">
+    <bean id="CACHE_FACTORY_REDIS" class="com.github.ddth.cacheadapter.cacheimpl.redis.RedisCacheFactory"
+          init-method="init" destroy-method="destroy">
         <property name="defaultExpireAfterAccess" value="-1" />
         <property name="defaultExpireAfterWrite" value="300" />
         <property name="redisHostAndPort" ref="_redis_hostAndPort" />
         <property name="redisPassword" ref="_redis_password" />
         <property name="keyMode" value="NAMESPACE" />
         <property name="cacheEntrySerializer">
-            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
+            <bean class="com.github.ddth.cacheadapter.utils.ces.DefaultCacheEntrySerializer"
                   init-method="init" destroy-method="destroy">
                 <property name="compressor">
-                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
+                    <bean class="com.github.ddth.cacheadapter.utils.compressor.JdkDeflateCompressor"
                           init-method="init" destroy-method="destroy">
                         <property name="compressionLevel" value="1" />
                     </bean>
                 </property>
             </bean>
-        </property>s
+        </property>
+    </bean>
+    -->
+
+    <!-- Sharded-Redis cache factory, expire after write 300s -->
+    <!--
+    <bean id="CACHE_FACTORY_SHARDEDREDIS"
+          class="com.github.ddth.cacheadapter.cacheimpl.redis.ShardedRedisCacheFactory"
+          init-method="init" destroy-method="destroy">
+        <property name="defaultExpireAfterAccess" value="-1" />
+        <property name="defaultExpireAfterWrite" value="300" />
+        <property name="redisHostsAndPorts" ref="_redis_hostsAndPorts" />
+        <property name="redisPassword" ref="_redis_password" />
+        <property name="keyMode" value="NAMESPACE" />
+        <property name="cacheEntrySerializer">
+            <bean class="com.github.ddth.cacheadapter.utils.ces.DefaultCacheEntrySerializer"
+                  init-method="init" destroy-method="destroy">
+                <property name="compressor">
+                    <bean class="com.github.ddth.cacheadapter.utils.compressor.JdkDeflateCompressor"
+                          init-method="init" destroy-method="destroy">
+                        <property name="compressionLevel" value="1" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+    -->
+
+    <!-- Clustered-Redis cache factory, expire after write 300s -->
+    <!--
+    <bean id="CACHE_FACTORY_CLUSTEREDREDIS"
+          class="com.github.ddth.cacheadapter.cacheimpl.redis.ClusteredRedisCacheFactory"
+          init-method="init" destroy-method="destroy">
+        <property name="defaultExpireAfterAccess" value="-1" />
+        <property name="defaultExpireAfterWrite" value="300" />
+        <property name="redisHostsAndPorts" ref="_redis_hostsAndPorts" />
+        <property name="redisPassword" ref="_redis_password" />
+        <property name="keyMode" value="NAMESPACE" />
+        <property name="cacheEntrySerializer">
+            <bean class="com.github.ddth.cacheadapter.utils.ces.DefaultCacheEntrySerializer"
+                  init-method="init" destroy-method="destroy">
+                <property name="compressor">
+                    <bean class="com.github.ddth.cacheadapter.utils.compressor.JdkDeflateCompressor"
+                          init-method="init" destroy-method="destroy">
+                        <property name="compressionLevel" value="1" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
     </bean>
     -->
 
     <!-- Memcached cache factory, expire after access 300s -->
     <!--
-    <bean id="CACHE_FACTORY_MEMCACHED" class="com.github.ddth.cacheadapter.memcached.XMemcachedCacheFactory"
-          scope="singleton" init-method="init" destroy-method="destroy">
+    <bean id="CACHE_FACTORY_MEMCACHED" class="com.github.ddth.cacheadapter.cacheimpl.memcached.XMemcachedCacheFactory"
+          init-method="init" destroy-method="destroy">
         <property name="defaultExpireAfterAccess" value="300" />
         <property name="defaultExpireAfterWrite" value="-1" />
         <property name="memcachedHostsAndPorts" ref="_memcached_hostsAndPorts" />
         <property name="keyMode" value="NAMESPACE" />
         <property name="cacheEntrySerializer">
-            <bean class="com.github.ddth.cacheadapter.ces.DefaultCacheEntrySerializer"
+            <bean class="com.github.ddth.cacheadapter.utils.ces.DefaultCacheEntrySerializer"
                   init-method="init" destroy-method="destroy">
                 <property name="compressor">
-                    <bean class="com.github.ddth.cacheadapter.compressor.JdkDeflateCompressor"
+                    <bean class="com.github.ddth.cacheadapter.utils.compressor.JdkDeflateCompressor"
                           init-method="init" destroy-method="destroy">
                         <property name="compressionLevel" value="1" />
                     </bean>
@@ -65,9 +113,14 @@
     <!-- beans for development env -->
     <beans>
         <!--
+        <bean id="_redis_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="127.0.0.1:7000" />
+        </bean>
+
         <bean id="_redis_hostAndPort" class="java.lang.String">
             <constructor-arg value="127.0.0.1:6379" />
         </bean>
+
         <bean id="_redis_password" class="java.lang.String">
             <constructor-arg value="" />
         </bean>
@@ -83,9 +136,14 @@
     <!-- beans for production env -->
     <beans profile="prod,production">
         <!--
-        <bean id="_redis_hostAndPort" class="java.lang.String">
-            <constructor-arg value="127.0.0.1:6379" />
+        <bean id="_redis_hostsAndPorts" class="java.lang.String">
+            <constructor-arg value="10.0.0.1:7000,10.0.0.2:7000,10.0.0.3:7000" />
         </bean>
+
+        <bean id="_redis_hostAndPort" class="java.lang.String">
+            <constructor-arg value="10.0.0.1:6379" />
+        </bean>
+
         <bean id="_redis_password" class="java.lang.String">
             <constructor-arg value="" />
         </bean>
@@ -93,9 +151,8 @@
 
         <!--
         <bean id="_memcached_hostsAndPorts" class="java.lang.String">
-            <constructor-arg value="127.0.0.1:11211" />
+            <constructor-arg value="10.0.0.1:11211" />
         </bean>
         -->
     </beans>
 </beans>
-
