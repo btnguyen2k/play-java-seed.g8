@@ -40,8 +40,9 @@ Spring Framework: v5.0.2.RELEASE
 
 DDTH:
 - ddth-commons: v0.7.1.1
-- ddth-dao: v0.8.4
 - ddth-cache: v0.6.3.2
+- ddth-dao: v0.8.4
+- ddth-dlock: v0.1.0
 
 Plugins:
 - com.typesafe.sbteclipse:sbteclipse-plugin:5.2.4
