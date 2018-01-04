@@ -22,6 +22,8 @@
     <!-- import api settings -->
     <import resource="api-beans.xml"/>
 
+    <import resource="samples-beans.xml"/>
+
     <beans>
         <!-- beans for development env -->
     </beans>

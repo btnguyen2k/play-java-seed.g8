@@ -10,6 +10,7 @@
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- (Embedded) HSQLDB/HikariCP datasource -->
+    <!--
     <bean id="DATASOURCE_HSQLDB" class="com.zaxxer.hikari.HikariDataSource" scope="singleton">
         <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
         <property name="jdbcUrl" value="jdbc:hsqldb:./data/application.db" />
@@ -22,7 +23,7 @@
         <property name="initializationFailTimeout" value="-1" />
         <property name="leakDetectionThreshold" value="300000" />
     </bean>
-
+    -->
 
     <!-- MySQL/HikariCP datasource -->
     <!--

@@ -18,7 +18,8 @@ import java.util.Arrays;
  */
 public class BasePageController extends BaseController {
 
-    @Inject protected FormFactory formFactory;
+    @Inject
+    protected FormFactory formFactory;
 
     /**
      * Create a dynamic form instance.
@@ -55,7 +56,9 @@ public class BasePageController extends BaseController {
         for (Method method : methods) {
             if (method.getName().equals("render")) {
                 Messages messages = calcMessages();
-                Object[] combinedParams = Arrays.copyOf(params, params.length + 1);
+                Object[] combinedParams = Arrays.copyOf(params, params.length + 2);
+                combinedParams[params.length] = messages;
+                combinedParams[params.length + 1] = getRegistry().getAppConfig();
                 combinedParams[params.length] = messages;
                 return (Html) method.invoke(null, combinedParams);
             }

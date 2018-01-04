@@ -19,8 +19,8 @@ public class IndexController extends BaseController {
         output.append("<a>").append(appFullname).append("</a>")
                 .append(" is running.<br/><br/><br/>\n");
 
-        output.append("Sample: <a href=\"" + samples.controllers.routes.SamplePageController.index()
-                + "\">Form and Languages</a>");
+        output.append("See samples in action: <a href=\""
+                + samples.controllers.routes.SampleController.index() + "\">samples</a>");
 
         return ok(output.toString()).as("text/html; charset=utf-8");
     }

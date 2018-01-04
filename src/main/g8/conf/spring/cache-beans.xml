@@ -10,12 +10,14 @@
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
     <!-- In-memory cache factory, no expiry -->
+    <!--
     <bean id="CACHE_FACTORY_INMEM" class="com.github.ddth.cacheadapter.cacheimpl.guava.GuavaCacheFactory"
           init-method="init" destroy-method="destroy">
         <property name="cloneCacheEntries" value="true" />
         <property name="defaultExpireAfterAccess" value="-1" />
         <property name="defaultExpireAfterWrite" value="-1" />
     </bean>
+    -->
 
     <!-- Redis cache factory, expire after write 300s -->
     <!--

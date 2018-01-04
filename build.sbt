@@ -9,4 +9,3 @@ scriptedLaunchOpts ++= sys.process.javaVmArguments.filter(
 )
 
 // giter8.ScaffoldPlugin.scaffoldSettings
-

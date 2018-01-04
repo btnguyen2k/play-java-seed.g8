@@ -1,5 +1,13 @@
 # Language file for English
 
+msg.login = Log in
+msg.login.info = Please log in using your login account
+msg.logout = Log out
+msg.username = Username
+msg.password = Password
+
+
+
 msg.welcome = Welcome to Play Application
 msg.home = Home
 msg.languages = Languages

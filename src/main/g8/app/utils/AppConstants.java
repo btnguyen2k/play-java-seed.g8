@@ -12,6 +12,7 @@ public class AppConstants {
     public final static Charset UTF8 = Charset.forName("UTF-8");
 
     public final static String CONTENT_TYPE_JSON = "application/json; charset=UTF-8";
+    public final static String CONTENT_TYPE_HTML = "text/html; charset=UTF-8";
 
     public final static String API_GATEWAY_WEB = "WEB";
     public final static String API_GATEWAY_THRIFT = "THRIFT";

@@ -1,6 +1,9 @@
 ## Sample routes
+
+GET         /                           samples.controllers.SampleController.index
+GET         /login                      samples.controllers.SampleController.login(returnUrl: String?="")
+
 # Examples of controller that handles web-page rendering & form submission
-GET		    /							samples.controllers.SamplePageController.index
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)
 GET         /form                       samples.controllers.SamplePageController.formDemo
 POST        /form                       samples.controllers.SamplePageController.formDemoSubmit

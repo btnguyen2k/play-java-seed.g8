@@ -34,7 +34,7 @@ public class SamplePageController extends BasePageController {
         if (lang != null) {
             setLanguage(lang);
         }
-        return redirect(samples.controllers.routes.SamplePageController.index());
+        return redirect(samples.controllers.routes.SampleController.index());
     }
 
     /*----------------------------------------------------------------------*/

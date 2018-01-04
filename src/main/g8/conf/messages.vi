@@ -1,5 +1,13 @@
 # Language file for Vietnamese
 
+msg.login = Đăng Nhập
+msg.login.info = Vui lòng đăng nhập bằng tài khoản của bạn
+msg.logout = Đăng Xuất
+msg.username = Tên Đăng Nhập
+msg.password = Mật Mã
+
+
+
 msg.welcome = Chào mừng đến với ứng dụng phát triển bởi Play Framework
 msg.home = Trang Chủ
 msg.languages = Ngôn Ngữ

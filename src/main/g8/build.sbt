@@ -98,4 +98,6 @@ libraryDependencies ++= Seq(
     ,filters
     ,javaWs
     ,guice
+
+    ,"org.webjars"               % "AdminLTE"                     % "2.4.2"
 )
