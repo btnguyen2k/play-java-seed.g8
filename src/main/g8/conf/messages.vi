@@ -3,9 +3,9 @@
 msg.login = Đăng Nhập
 msg.login.info = Vui lòng đăng nhập bằng tài khoản của bạn
 msg.logout = Đăng Xuất
-msg.username = Tên Đăng Nhập
-msg.password = Mật Mã
 
+error.user_not_found = Lỗi: Tài khoản "{0}" không tồn tại!
+error.login_failed = Lỗi: Mật mã nhập vào không đúng!
 
 
 msg.welcome = Chào mừng đến với ứng dụng phát triển bởi Play Framework

@@ -7,8 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import javax.inject.Inject;
 import javax.sql.DataSource;
 
-import org.apache.commons.text.RandomStringGenerator;
-
 import com.google.inject.Provider;
 
 import modules.registry.IRegistry;
@@ -20,6 +18,7 @@ import samples.bo.user.UserBo;
 import samples.bo.user.UserGroupBo;
 import samples.bo.user.jdbc.JdbcUserDao;
 import samples.utils.SampleContants;
+import samples.utils.UserUtils;
 
 /**
  * Bootstrap samples.
@@ -30,7 +29,7 @@ import samples.utils.SampleContants;
 public class SampleBootstrap {
 
     private Provider<IRegistry> registry;
-    private Application playApp;
+    // private Application playApp;
 
     /**
      * {@inheritDoc}
@@ -38,7 +37,7 @@ public class SampleBootstrap {
     @Inject
     public SampleBootstrap(ApplicationLifecycle lifecycle, Application playApp,
             Provider<IRegistry> registry) {
-        this.playApp = playApp;
+        // this.playApp = playApp;
         this.registry = registry;
 
         lifecycle.addStopHook(() -> {
@@ -89,11 +88,10 @@ public class SampleBootstrap {
 
         UserBo userAdmin = dao.getUser(SampleContants.USERNAME_ADMIN);
         if (userAdmin == null) {
-            String pwd = new RandomStringGenerator.Builder().withinRange('0', '9').build()
-                    .generate(4);
+            String pwd = "secret";
             userAdmin = UserBo.newInstance(SampleContants.USERNAME_ADMIN);
             userAdmin.setGroupId(SampleContants.USERGROUP_ID_ADMIN).setEmail("admin@localhost")
-                    .setFullname("Administrator").setPassword(pwd);
+                    .setFullname("Administrator").setPassword(UserUtils.encryptPassword(pwd));
             dao.create(userAdmin);
             Logger.warn("Created user [" + SampleContants.USERGROUP_ID_ADMIN + "] with password ["
                     + pwd + "]");

@@ -60,8 +60,10 @@ public class AuthRequiredAction extends Action<AuthRequired> {
     public CompletionStage<Result> call(Context ctx) {
         Session session = ctx.session();
         UserBo currentUser = SessionUtils.currentUser(session);
-        if (currentUser == null || ArrayUtils.indexOf(configuration.usergroups(),
-                currentUser.getGroupId()) == ArrayUtils.INDEX_NOT_FOUND) {
+        if (currentUser == null
+                || (configuration.usergroups() != null && configuration.usergroups().length > 0
+                && ArrayUtils.indexOf(configuration.usergroups(),
+                currentUser.getGroupId()) == ArrayUtils.INDEX_NOT_FOUND)) {
             // user not logged in, or not in allowed groups
             return goLogin(ctx, configuration.loginCall(), configuration.flashKey(),
                     configuration.flashMsg());

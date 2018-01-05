@@ -3,9 +3,9 @@
 msg.login = Log in
 msg.login.info = Please log in using your login account
 msg.logout = Log out
-msg.username = Username
-msg.password = Password
 
+error.user_not_found = Error: User "{0}" not found!
+error.login_failed = Error: Password does not match!
 
 
 msg.welcome = Welcome to Play Application

@@ -1,9 +1,14 @@
 package samples.forms;
 
+import java.util.Arrays;
+
 import forms.BaseForm;
 import play.data.validation.Constraints.Validatable;
 import play.data.validation.Constraints.Validate;
 import play.data.validation.ValidationError;
+import samples.bo.user.IUserDao;
+import samples.bo.user.UserBo;
+import samples.utils.UserUtils;
 
 /**
  * Form example: login.
@@ -14,6 +19,11 @@ import play.data.validation.ValidationError;
 @Validate
 public class FormLogin extends BaseForm implements Validatable<ValidationError> {
     private String username, password;
+    private UserBo user;
+
+    public UserBo getUser() {
+        return user;
+    }
 
     /* Getters & Setters are required */
 
@@ -41,49 +51,14 @@ public class FormLogin extends BaseForm implements Validatable<ValidationError> 
      * @return
      */
     public ValidationError validate() {
-        // if (StringUtils.isBlank(email)) {
-        // /*
-        // * Error for field "email" and the error message is resolved from
-        // * language files.
-        // */
-        // return new ValidationError(null, "error.empty_email");
-        // }
-        // if
-        // (!email.matches("^\\s*[0-9a-zA-Z_\\-\\.]+\\@[0-9a-zA-Z_\\-\\.]+\\s*$"))
-        // {
-        // /*
-        // * Error for field "email" and the error message is custom text
-        // */
-        // return new ValidationError(null, "Invalid email address!");
-        // }
-        // if (StringUtils.isBlank(fullname)) {
-        // /*
-        // * Error for field "fullname" and the error message is resolved from
-        // * language files.
-        // */
-        // return new ValidationError(null, "error.empty_fullname");
-        // }
-        // if (dob < 1 || dob > 31) {
-        // /*
-        // * Error for field "dob" and the error message is resolved from
-        // * language files.
-        // */
-        // return new ValidationError(null, "error.invalid_dob");
-        // }
-        // if (mob < 1 || mob > 12) {
-        // /*
-        // * Error for field "mob" and the error message is resolved from
-        // * language files.
-        // */
-        // return new ValidationError(null, "error.invalid_mob");
-        // }
-        // if (yob < 1970 || yob > 2070) {
-        // /*
-        // * Error for field "yob" and the error message is resolved from
-        // * language files.
-        // */
-        // return new ValidationError(null, "error.invalid_yob");
-        // }
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        user = dao.getUser(username);
+        if (user == null) {
+            return new ValidationError(null, "error.user_not_found", Arrays.asList(username));
+        }
+        if (!UserUtils.authenticate(user, password)) {
+            return new ValidationError(null, "error.login_failed");
+        }
 
         return null;
     }

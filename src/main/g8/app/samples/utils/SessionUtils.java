@@ -1,6 +1,7 @@
 package samples.utils;
 
 import modules.registry.RegistryGlobal;
+import play.mvc.Controller;
 import play.mvc.Http.Session;
 import samples.bo.user.IUserDao;
 import samples.bo.user.UserBo;
@@ -18,6 +19,15 @@ public class SessionUtils {
     /**
      * Get the currently logged-in user.
      *
+     * @return
+     */
+    public static UserBo currentUser() {
+        return currentUser(Controller.session());
+    }
+
+    /**
+     * Get the currently logged-in user.
+     *
      * @param session
      * @return
      */
@@ -25,5 +35,15 @@ public class SessionUtils {
         String username = session.get(SESSION_USERNAME);
         IUserDao dao = RegistryGlobal.registry.getBean(IUserDao.class);
         return dao.getUser(username);
+    }
+
+    /**
+     * Log a user in.
+     *
+     * @param session
+     * @param user
+     */
+    public static void login(Session session, UserBo user) {
+        session.put(SESSION_USERNAME, user.getUsername());
     }
 }

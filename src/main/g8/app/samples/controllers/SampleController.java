@@ -4,9 +4,8 @@ import controllers.BasePageController;
 import play.data.Form;
 import play.mvc.Result;
 import play.twirl.api.Html;
-import samples.compositions.AuthRequired;
 import samples.forms.FormLogin;
-import utils.AppConstants;
+import samples.utils.SessionUtils;
 
 /**
  * Sample controller.
@@ -19,10 +18,8 @@ public class SampleController extends BasePageController {
     /**
      * Handle GET /<context>
      */
-    @AuthRequired(loginCall = "samples.controllers.routes:SampleController:login")
     public Result index() throws Exception {
-        StringBuilder sb = new StringBuilder();
-        return ok(sb.toString()).as(AppConstants.CONTENT_TYPE_HTML);
+        return redirect(samples.controllers.routes.SampleControlPanelController.home());
     }
 
     public final static String VIEW_LOGIN = "vsamples.login";
@@ -34,6 +31,19 @@ public class SampleController extends BasePageController {
         Form<FormLogin> form = formFactory.form(FormLogin.class);
         Html html = render(VIEW_LOGIN, form);
         return ok(html);
+    }
+
+    /**
+     * Handle POST /<context>/login?urlReturn=xxx
+     */
+    public Result loginSubmit(String returnUrl) throws Exception {
+        Form<FormLogin> form = formFactory.form(FormLogin.class).bindFromRequest(request());
+        if (form.hasErrors()) {
+            Html html = render(VIEW_LOGIN, form);
+            return ok(html);
+        }
+        SessionUtils.login(session(), form.get().getUser());
+        return redirect(samples.controllers.routes.SampleController.index());
     }
 
 }
