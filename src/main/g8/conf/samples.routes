@@ -4,6 +4,7 @@
 GET         /                           samples.controllers.SampleController.index
 GET         /login                      samples.controllers.SampleController.login(urlReturn: String?="")
 POST        /login                      samples.controllers.SampleController.loginSubmit(urlReturn: String?="")
+GET         /logout                     samples.controllers.SampleController.logout
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /cp                         samples.controllers.SampleControlPanelController.home

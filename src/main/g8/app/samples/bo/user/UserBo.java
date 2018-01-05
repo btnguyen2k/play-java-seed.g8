@@ -1,5 +1,8 @@
 package samples.bo.user;
 
+import java.util.Date;
+
+import com.github.ddth.commons.utils.DateFormatUtils;
 import com.github.ddth.dao.BaseDataJsonFieldBo;
 
 /**
@@ -14,6 +17,7 @@ public class UserBo extends BaseDataJsonFieldBo {
     public static UserBo newInstance() {
         UserBo bo = new UserBo();
         bo.setData("{}");
+        bo.setTimestampCreated(new Date());
         return bo;
     }
 
@@ -32,6 +36,23 @@ public class UserBo extends BaseDataJsonFieldBo {
 
     public UserBo setUsername(String value) {
         setAttribute(ATTR_USERNAME, value != null ? value.trim().toLowerCase() : null);
+        return this;
+    }
+
+    private final static String DATA_TIMESTAMP_CREATED = "tcreated";
+
+    public Date getTimestampCreated() {
+        return getDataAttr(DATA_TIMESTAMP_CREATED, Date.class);
+    }
+
+    public String getTimestampCreatedStr() {
+        Date value = getTimestampCreated();
+        return value != null ? DateFormatUtils.toString(value, DateFormatUtils.DF_ISO8601)
+                : "[null]";
+    }
+
+    public UserBo setTimestampCreated(Date value) {
+        setDataAttr(DATA_TIMESTAMP_CREATED, value);
         return this;
     }
 

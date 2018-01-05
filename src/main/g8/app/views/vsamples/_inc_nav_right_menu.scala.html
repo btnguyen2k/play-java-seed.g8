@@ -188,7 +188,9 @@
             <ul class="dropdown-menu">
                 <!-- User image -->
                 <li class="user-header"><img src="@routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="img-circle" alt="User Image">
-                    <p>@samples.utils.SessionUtils.currentUser().getFullname() - Web Developer <small>Member since Nov. 2012</small></p>
+                    @defining(samples.utils.SessionUtils.currentUser()){user =>
+                    <p>@user.getFullname() - @user.getGroupId() <small>Member since @user.getTimestampCreatedStr()</small></p>
+                    }
                 </li>
                 <li class="user-body">
                     <!-- Menu Body -->
@@ -210,7 +212,7 @@
                         <a href="#" class="btn btn-default btn-flat">Profile</a>
                     </div>
                     <div class="pull-right">
-                        <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                        <a href="@samples.controllers.routes.SampleController.logout()" class="btn btn-default btn-flat">@messages.at("msg.logout")</a>
                     </div>
                 </li>
             </ul>

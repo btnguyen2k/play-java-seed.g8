@@ -22,6 +22,14 @@ public class SampleController extends BasePageController {
         return redirect(samples.controllers.routes.SampleControlPanelController.home());
     }
 
+    /**
+     * Handle GET /<context>/logout
+     */
+    public Result logout() throws Exception {
+        SessionUtils.logout();
+        return redirect(samples.controllers.routes.SampleController.index());
+    }
+
     public final static String VIEW_LOGIN = "vsamples.login";
 
     /**

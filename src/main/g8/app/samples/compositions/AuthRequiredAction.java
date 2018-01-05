@@ -69,8 +69,6 @@ public class AuthRequiredAction extends Action<AuthRequired> {
                     configuration.flashMsg());
         }
 
-        Logger.debug("" + session);
-
         try {
             return delegate.call(ctx);
         } catch (Exception e) {

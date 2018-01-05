@@ -46,4 +46,22 @@ public class SessionUtils {
     public static void login(Session session, UserBo user) {
         session.put(SESSION_USERNAME, user.getUsername());
     }
+
+    /**
+     * Log the current user out.
+     *
+     * @param session
+     */
+    public static void logout() {
+        logout(Controller.session());
+    }
+
+    /**
+     * Log the current user out.
+     *
+     * @param session
+     */
+    public static void logout(Session session) {
+        session.remove(SESSION_USERNAME);
+    }
 }
