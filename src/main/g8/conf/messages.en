@@ -6,6 +6,7 @@ msg.logout = Log out
 msg.actions = Actions
 msg.action = Action
 msg.save = Save
+msg.delete = Delete
 msg.reset = Reset
 msg.ok = Ok
 msg.cancel = Cancel
@@ -35,3 +36,8 @@ error.usergroup.exists = Error: Usergroup "{0}" already existed!
 msg.edit_usergroup = Edit Usergroup
 msg.edit_usergroup.done = Usergroup "{0}" has been updated successfully.
 msg.edit_usergroup.failed = Usergroup "{0}" has failed to be updated.
+
+msg.delete_usergroup = Delete Usergroup
+msg.delete_usergroup.done = Usergroup "{0}" has been deleted successfully.
+msg.delete_usergroup.failed = Usergroup "{0}" has failed to be deleted.
+error.usergroup.cannot_delete_sytem_usergroup = Error: Cannot delete system usergroup "{0}"!

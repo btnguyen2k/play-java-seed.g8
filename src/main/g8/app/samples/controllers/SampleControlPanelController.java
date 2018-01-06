@@ -1,5 +1,7 @@
 package samples.controllers;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.ddth.dao.utils.DaoResult;
 import com.github.ddth.dao.utils.DaoResult.DaoOperationStatus;
 
@@ -13,7 +15,6 @@ import samples.compositions.AuthRequired;
 import samples.forms.FormCreateEditUsergroup;
 import samples.models.UserGroupModel;
 import samples.utils.SampleConstants;
-import utils.AppConstants;
 
 /**
  * Sample control panel controller.
@@ -81,7 +82,8 @@ public class SampleControlPanelController extends BasePageController {
         } else {
             return responseRedirect(
                     samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.failed", bo.getId()));
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_WARNING
+                            + calcMessages().at("msg.create_usergroup.failed", bo.getId()));
         }
     }
 
@@ -109,25 +111,85 @@ public class SampleControlPanelController extends BasePageController {
      * Handle POST /<context>/cp/editUsergroup?id=<usergroup-id>
      */
     public Result editUsergroupSubmit(String id) throws Exception {
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        UserGroupBo bo = dao.getUserGroup(id);
+        if (bo == null) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
+                            + calcMessages().at("error.usergroup.not_found", id));
+        }
         Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
                 .bindFromRequest(request());
         if (form.hasErrors()) {
-            Html html = render(VIEW_CREATE_USERGROUP, form);
+            Html html = render(VIEW_EDIT_USERGROUP, form);
             return ok(html);
         }
         FormCreateEditUsergroup formData = form.get();
-        UserGroupBo ug = UserGroupBo.newInstance(formData.getId())
-                .setDescription(formData.getDescription());
-        IUserDao dao = getRegistry().getBean(IUserDao.class);
-        DaoResult result = dao.create(ug);
+        bo.setDescription(formData.getDescription());
+        DaoResult result = dao.update(bo);
         if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
             return responseRedirect(
                     samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.done", ug.getId()));
+                    VIEW_USERGROUPS, calcMessages().at("msg.edit_usergroup.done", bo.getId()));
         } else {
             return responseRedirect(
                     samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.failed", ug.getId()));
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_WARNING
+                            + calcMessages().at("msg.edit_usergroup.failed", bo.getId()));
+        }
+    }
+
+    public final static String VIEW_DELETE_USERGROUP = "vsamples.delete_usergroup";
+
+    /**
+     * Handle GET /<context>/cp/deleteUsergroup?id=<usergroup-id>
+     */
+    public Result deleteUsergroup(String id) throws Exception {
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        UserGroupBo bo = dao.getUserGroup(id);
+        if (bo == null) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
+                            + calcMessages().at("error.usergroup.not_found", id));
+        } else if (StringUtils.equalsAnyIgnoreCase(id, SampleConstants.USERGROUP_ID_ADMIN)) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR + calcMessages()
+                            .at("error.usergroup.cannot_delete_sytem_usergroup", id));
+        }
+        Html html = render(VIEW_DELETE_USERGROUP, UserGroupModel.newInstance(bo));
+        return ok(html);
+    }
+
+    /**
+     * Handle POST /<context>/cp/deleteUsergroup?id=<usergroup-id>
+     */
+    public Result deleteUsergroupSubmit(String id) throws Exception {
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        UserGroupBo bo = dao.getUserGroup(id);
+        if (bo == null) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
+                            + calcMessages().at("error.usergroup.not_found", id));
+        } else if (StringUtils.equalsAnyIgnoreCase(id, SampleConstants.USERGROUP_ID_ADMIN)) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR + calcMessages()
+                            .at("error.usergroup.cannot_delete_sytem_usergroup", id));
+        }
+        DaoResult result = dao.delete(bo);
+        if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, calcMessages().at("msg.delete_usergroup.done", bo.getId()));
+        } else {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_WARNING
+                            + calcMessages().at("msg.delete_usergroup.failed", bo.getId()));
         }
     }
 }

@@ -1,0 +1,40 @@
+@(usergroup: samples.models.UserGroupModel)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@_layout(
+    active    = "usergroups"
+){
+<section class="content-header">
+    <h1>@messages.at("msg.delete_usergroup")</h1>
+    <ol class="breadcrumb">
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.usergroups()"><i class="fa fa-users"></i> @messages.at("msg.usergroups")</a></li>
+        <li class="active">@messages.at("msg.delete_usergroup")</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-warning">
+				<form role="form" method="post">
+				    <div class="box-body">
+				        <div class="form-group">
+				            <label for="usergroup_id">@messages.at("msg.usergroup.id")</label>
+				            <input readonly="readonly" type="text" class="form-control" id="usergroup_id" name="id" value="@usergroup.getId()">
+				        </div>
+				        <div class="form-group">
+				            <label for="usergroup_desc">@messages.at("msg.usergroup.desc")</label>
+				            <input readonly="readonly" type="text" class="form-control" id="usergroup_desc" name="description" value="@usergroup.getDescription()">
+				        </div>
+				    </div>
+
+				    <div class="box-footer">
+				        <button type="submit" class="btn btn-warning"><i class="fa fa-warning"></i> @messages.at("msg.delete")</button>
+				        <button type="button" class="btn btn-default"
+				            onclick="document.location.href='@samples.controllers.routes.SampleControlPanelController.usergroups()';"><i class="fa fa-close"></i> @messages.at("msg.cancel")</button>
+				    </div>
+				</form>
+            </div>
+        </div>
+    </div>
+</section>
+}

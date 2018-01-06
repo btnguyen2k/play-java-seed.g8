@@ -8,11 +8,14 @@ GET         /logout                     samples.controllers.SampleController.log
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /cp                         samples.controllers.SampleControlPanelController.home
+
 GET         /cp/usergroups              samples.controllers.SampleControlPanelController.usergroups
 GET         /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroup
 POST        /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroupSubmit
 GET         /cp/editUsergroup           samples.controllers.SampleControlPanelController.editUsergroup(id: String?="")
 POST        /cp/editUsergroup           samples.controllers.SampleControlPanelController.editUsergroupSubmit(id: String?="")
+GET         /cp/deleteUsergroup         samples.controllers.SampleControlPanelController.deleteUsergroup(id: String?="")
+POST        /cp/deleteUsergroup         samples.controllers.SampleControlPanelController.deleteUsergroupSubmit(id: String?="")
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)

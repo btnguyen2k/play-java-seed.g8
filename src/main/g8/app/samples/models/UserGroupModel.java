@@ -31,10 +31,12 @@ public class UserGroupModel extends UserGroupBo {
     }
 
     public String urlEdit() {
-        return samples.controllers.routes.SampleControlPanelController.editUsergroup(getId());
+        return samples.controllers.routes.SampleControlPanelController.editUsergroup(getId())
+                .toString();
     }
 
     public String urlDelete() {
-        return "//TODO";
+        return samples.controllers.routes.SampleControlPanelController.deleteUsergroup(getId())
+                .toString();
     }
 }

@@ -6,6 +6,7 @@ msg.logout = Đăng Xuất
 msg.actions = Hành động
 msg.action = Hành động
 msg.save = Lưu
+msg.delete = Xoá
 msg.reset = Hoàn Tác
 msg.ok = Chấp Nhận
 msg.cancel = Quay Lại
@@ -36,3 +37,8 @@ error.usergroup.exists = Lỗi: Nhóm người dùng "{0}" đã tồn tại!
 msg.edit_usergroup = Thay Đổi Nhóm Người Dùng
 msg.edit_usergroup.done = Cập nhật nhóm người dùng "{0}" thành công.
 msg.edit_usergroup.failed = Cập nhật nhóm người dùng "{0}" không thành công.
+
+msg.delete_usergroup = Xoá Nhóm Người Dùng
+msg.delete_usergroup.done = Xoá nhóm người dùng "{0}" thành công.
+msg.delete_usergroup.failed = Xoá nhóm người dùng "{0}" không thành công.
+error.usergroup.cannot_delete_sytem_usergroup = Lỗi: Không thể xoá nhóm người dùng hệ thống "{0}"!
