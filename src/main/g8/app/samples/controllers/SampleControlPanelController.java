@@ -13,6 +13,7 @@ import samples.compositions.AuthRequired;
 import samples.forms.FormCreateEditUsergroup;
 import samples.models.UserGroupModel;
 import samples.utils.SampleConstants;
+import utils.AppConstants;
 
 /**
  * Sample control panel controller.
@@ -36,7 +37,7 @@ public class SampleControlPanelController extends BasePageController {
     public final static String VIEW_USERGROUPS = "vsamples.usergroups";
 
     /**
-     * Handle GET /<context>cp/usergroups
+     * Handle GET /<context>/cp/usergroups
      */
     public Result usergroups() throws Exception {
         IUserDao dao = getRegistry().getBean(IUserDao.class);
@@ -50,7 +51,7 @@ public class SampleControlPanelController extends BasePageController {
     public final static String VIEW_CREATE_USERGROUP = "vsamples.create_usergroup";
 
     /**
-     * Handle GET /<context>cp/createUsergroup
+     * Handle GET /<context>/cp/createUsergroup
      */
     public Result createUsergroup() throws Exception {
         Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class);
@@ -59,9 +60,55 @@ public class SampleControlPanelController extends BasePageController {
     }
 
     /**
-     * Handle POST /<context>cp/createUsergroup
+     * Handle POST /<context>/cp/createUsergroup
      */
     public Result createUsergroupSubmit() throws Exception {
+        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
+                .bindFromRequest(request());
+        if (form.hasErrors()) {
+            Html html = render(VIEW_CREATE_USERGROUP, form);
+            return ok(html);
+        }
+        FormCreateEditUsergroup formData = form.get();
+        UserGroupBo bo = UserGroupBo.newInstance(formData.getId())
+                .setDescription(formData.getDescription());
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        DaoResult result = dao.create(bo);
+        if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.done", bo.getId()));
+        } else {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.failed", bo.getId()));
+        }
+    }
+
+    public final static String VIEW_EDIT_USERGROUP = "vsamples.edit_usergroup";
+
+    /**
+     * Handle GET /<context>/cp/editUsergroup?id=<usergroup-id>
+     */
+    public Result editUsergroup(String id) throws Exception {
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        UserGroupBo bo = dao.getUserGroup(id);
+        if (bo == null) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
+                            + calcMessages().at("error.usergroup.not_found", id));
+        }
+        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
+                .fill(FormCreateEditUsergroup.newInstance(bo));
+        Html html = render(VIEW_EDIT_USERGROUP, form);
+        return ok(html);
+    }
+
+    /**
+     * Handle POST /<context>/cp/editUsergroup?id=<usergroup-id>
+     */
+    public Result editUsergroupSubmit(String id) throws Exception {
         Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
                 .bindFromRequest(request());
         if (form.hasErrors()) {

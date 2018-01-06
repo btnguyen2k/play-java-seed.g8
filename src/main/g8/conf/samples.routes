@@ -11,6 +11,8 @@ GET         /cp                         samples.controllers.SampleControlPanelCo
 GET         /cp/usergroups              samples.controllers.SampleControlPanelController.usergroups
 GET         /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroup
 POST        /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroupSubmit
+GET         /cp/editUsergroup           samples.controllers.SampleControlPanelController.editUsergroup(id: String?="")
+POST        /cp/editUsergroup           samples.controllers.SampleControlPanelController.editUsergroupSubmit(id: String?="")
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)

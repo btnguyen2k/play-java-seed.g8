@@ -1,13 +1,13 @@
 @(form: play.data.Form[samples.forms.FormCreateEditUsergroup])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
-    active    = "usergroups"
+active    = "usergroups"
 ){
 <section class="content-header">
-    <h1>@messages.at("msg.create_usergroup")</h1>
+    <h1>@messages.at("msg.edit_usergroup")</h1>
     <ol class="breadcrumb">
         <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
         <li><a href="@samples.controllers.routes.SampleControlPanelController.usergroups()"><i class="fa fa-users"></i> @messages.at("msg.usergroups")</a></li>
-        <li class="active">@messages.at("msg.create_usergroup")</li>
+        <li class="active">@messages.at("msg.edit_usergroup")</li>
     </ol>
 </section>
 

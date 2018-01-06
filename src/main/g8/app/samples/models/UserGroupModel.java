@@ -31,7 +31,7 @@ public class UserGroupModel extends UserGroupBo {
     }
 
     public String urlEdit() {
-        return "//TODO";
+        return samples.controllers.routes.SampleControlPanelController.editUsergroup(getId());
     }
 
     public String urlDelete() {

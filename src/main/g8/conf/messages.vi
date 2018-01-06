@@ -17,11 +17,14 @@ msg.not_implemented = Thông tin: Chức năng này chưa được thực hiện
 
 msg.dashboard = Trang Nhà
 msg.profile = Hồ Sơ Cá Nhân
+msg.user_management = Quản Lý Người Dùng
 
 msg.usergroups = Nhóm người dùng
 msg.usergroup = Nhóm người dùng
 msg.usergroup.id = Id
 msg.usergroup.desc = Mô tả
+
+error.usergroup.not_found = Lỗi: Nhóm người dùng "{0}" không tồn tại!
 
 msg.create_usergroup = Tạo Nhóm Người Dùng
 msg.create_usergroup.done = Tạo nhóm người dùng "{0}" thành công.
@@ -29,3 +32,7 @@ msg.create_usergroup.failed = Tạo nhóm người dùng "{0}" không thành cô
 
 error.usergroup.empty_id = Lỗi: Vui lòng nhập vào id của nhóm người dùng!
 error.usergroup.exists = Lỗi: Nhóm người dùng "{0}" đã tồn tại!
+
+msg.edit_usergroup = Thay Đổi Nhóm Người Dùng
+msg.edit_usergroup.done = Cập nhật nhóm người dùng "{0}" thành công.
+msg.edit_usergroup.failed = Cập nhật nhóm người dùng "{0}" không thành công.

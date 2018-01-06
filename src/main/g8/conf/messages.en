@@ -17,15 +17,21 @@ msg.not_implemented = Info: This function is not implemented yet!
 
 msg.dashboard = Dashboard
 msg.profile = Profile
+msg.user_management = User Management
 
 msg.usergroups = Usergroups
 msg.usergroup = Usergroup
 msg.usergroup.id = Id
 msg.usergroup.desc = Description
 
+error.usergroup.not_found = Error: Usergroup "{0}" not found!
+
 msg.create_usergroup = Create Usergroup
 msg.create_usergroup.done = Usergroup "{0}" has been created successfully.
 msg.create_usergroup.failed = Usergroup "{0}" has failed to be created.
-
 error.usergroup.empty_id = Error: Usergroup id must not be empty!
 error.usergroup.exists = Error: Usergroup "{0}" already existed!
+
+msg.edit_usergroup = Edit Usergroup
+msg.edit_usergroup.done = Usergroup "{0}" has been updated successfully.
+msg.edit_usergroup.failed = Usergroup "{0}" has failed to be updated.

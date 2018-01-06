@@ -1,4 +1,4 @@
-@(active: String="", customJs: Array[String]=Array(), customCss: Array[String]=Array())(content: Html)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(active: String="home", customJs: Array[String]=Array(), customCss: Array[String]=Array())(content: Html)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 <!DOCTYPE html>
 <html>
 <head>
@@ -92,8 +92,16 @@
         <script type="text/javascript">
     $(document).ready(function() {
     	$('[data-toggle="control-sidebar"]').controlSidebar()
+
         //expand the sub-menu of the active url
+        $.each ($('ul.sidebar-menu a'), function() {
+            if (this.href == window.location) {
+            	$(this).parents('li').addClass('active');
+                return false;
+            }
+        });
         $('section.sidebar li.active').parents('li.treeview').addClass('active');
+
         //$('[data-toggle="tooltip"]').tooltip();
     });
     </script>
