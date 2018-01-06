@@ -8,6 +8,9 @@ GET         /logout                     samples.controllers.SampleController.log
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /cp                         samples.controllers.SampleControlPanelController.home
+GET         /cp/usergroups              samples.controllers.SampleControlPanelController.usergroups
+GET         /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroup
+POST        /cp/createUsergroup         samples.controllers.SampleControlPanelController.createUsergroupSubmit
 
 # Examples of controller that handles web-page rendering & form submission
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)

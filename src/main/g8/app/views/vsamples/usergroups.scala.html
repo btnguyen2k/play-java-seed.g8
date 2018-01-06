@@ -1,0 +1,79 @@
+@(usergroups: Array[samples.models.UserGroupModel])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@_layout(
+    active   = "usergroups",
+    customCss = Array("lib/AdminLTE/plugins/datatables/dataTables.bootstrap.css"),
+    customJs  = Array("lib/AdminLTE/plugins/datatables/jquery.dataTables.min.js",
+        "lib/AdminLTE/plugins/datatables/dataTables.bootstrap.min.js")
+){
+<section class="content-header">
+    <h1>@messages.at("msg.usergroups")</h1>
+    <ol class="breadcrumb">
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
+        <li class="active">@messages.at("msg.usergroups")</li>
+    </ol>
+</section>
+
+<section class="content">
+    @defining(Controller.flash(samples.controllers.SampleControlPanelController.VIEW_USERGROUPS)){msg =>
+	    @if(msg != null){
+	        <div class="row">
+	            <div class="col-xs-12">
+	                @_macro_displayPageFlashMessage(msg)
+	            </div>
+	        </div>
+	    }
+	}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <a href="@samples.controllers.routes.SampleControlPanelController.createUsergroup()" type="button" class="btn btn-primary"><i class="fa fa-plus"></i> @messages.at("msg.create_usergroup")</a>
+                </div>
+                <div class="box-body table-responsive">
+                    <table class="table table-bordered table-condensed table-striped table-hover" id="tbl_usergroups">
+                        <thead>
+                            <tr>
+                                <th style="text-align: center; vertical-align: middle;">@messages.at("msg.usergroup.id")</th>
+                                <th style="text-align: center; vertical-align: middle;">@messages.at("msg.usergroup.desc")</th>
+                                <th style="text-align: center; vertical-align: middle;">@messages.at("msg.actions")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for(ug <- usergroups){
+                                <tr>
+                                    <td style="text-align: center; vertical-align: middle;">@ug.getId()</td>
+                                    <td style="text-align: center; vertical-align: middle;">@ug.getDescription()</td>
+                                    <td style="text-align: center; vertical-align: middle; font-size: x-large;" class="text-nowrap">
+                                        <a href="@ug.urlEdit()" title="@messages.at("msg.edit")" style="color:green;" class="fa fa-edit"></a>
+                                        @if(ug.getId()!=samples.utils.SampleConstants.USERGROUP_ID_ADMIN){
+                                            <a href="@ug.urlDelete()" title="@messages.at("msg.delete")" style="color:red;" class="fa fa-remove"></a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer">
+                    <a href="@samples.controllers.routes.SampleControlPanelController.createUsergroup()" class="btn btn-primary"><i class="fa fa-plus"></i> @messages.at("msg.create_usergroup")</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#tbl_usergroups').DataTable({
+            "paging"      : true,
+            "pageLength"  : 10,
+            "lengthChange": false,
+            "searching"   : true,
+            "ordering"    : false,
+            "info"        : true,
+            "autoWidth"   : false
+        });
+    });
+</script>
+}

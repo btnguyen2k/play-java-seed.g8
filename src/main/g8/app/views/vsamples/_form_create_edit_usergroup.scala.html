@@ -1,0 +1,29 @@
+@(form: play.data.Form[samples.forms.FormCreateEditUsergroup])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@if(form.hasGlobalErrors){
+    <div class="box-header">
+        @_macro_displayFormErrors(form)
+    </div>
+}
+<form role="form" method="post">
+    <input type="hidden" name="editId" value="@form("editId").getValue.orElse("")">
+    <div class="box-body">
+        <div class="form-group">
+            <label for="usergroup_id">@messages.at("msg.usergroup.id")</label>
+            <input @if(form("editId").getValue.orElse("")!=""){readonly="readonly"} type="text" class="form-control"
+                id="usergroup_id" name="id" value="@form("id").getValue.orElse("")" placeholder="@messages.at("msg.usergroup.id")">
+        </div>
+        <div class="form-group">
+            <label for="usergroup_desc">@messages.at("msg.usergroup.desc")</label>
+            <input type="text" class="form-control" id="usergroup_desc" name="description"
+                value="@form("description").getValue.orElse("")" placeholder="@messages.at("msg.usergroup.desc")">
+        </div>
+    </div>
+
+    <div class="box-footer">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @messages.at("msg.save")</button>
+        <button type="reset" class="btn btn-warning"><i class="fa fa-reply"></i> @messages.at("msg.reset")</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-default"
+            onclick="document.location.href='@samples.controllers.routes.SampleControlPanelController.usergroups()';"><i class="fa fa-close"></i> @messages.at("msg.cancel")</button>
+    </div>
+</form>

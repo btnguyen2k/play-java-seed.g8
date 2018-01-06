@@ -1,21 +1,13 @@
 @()(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
-
-@*
-import samples.controllers._ so that we can use shorthand
-routes.SampleControlPanelController.home() instead fully qualified name
-samples.controllers.routes.SampleControlPanelController.home()
-*@
-@import samples.controllers._
-
 @_layout(
-active   = "home",
-customCss = Array(),
-customJs  = Array()
+    active   = "home",
+    customCss = Array(),
+    customJs  = Array()
 ){
 <section class="content-header">
     <h1>@messages.at("msg.dashboard")</h1>
     <ol class="breadcrumb">
-        <li><a href="@routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
         <li class="active">@messages.at("msg.dashboard")</li>
     </ol>
 </section>

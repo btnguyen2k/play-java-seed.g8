@@ -1,5 +1,7 @@
 package samples.bo.user;
 
+import java.util.Collection;
+
 import com.github.ddth.dao.utils.DaoResult;
 
 /**
@@ -16,6 +18,13 @@ public interface IUserDao {
      * @return
      */
     UserBo getUser(String username);
+
+    /**
+     * Get all available users.
+     *
+     * @return
+     */
+    Collection<UserBo> getAllUsers();
 
     /**
      * Create a new user.
@@ -56,6 +65,13 @@ public interface IUserDao {
      * @return
      */
     UserGroupBo getUserGroup(String id);
+
+    /**
+     * Get all available user groups.
+     *
+     * @return
+     */
+    Collection<UserGroupBo> getAllUserGroups();
 
     /**
      * Create a new user group.

@@ -17,7 +17,7 @@ import samples.bo.user.IUserDao;
 import samples.bo.user.UserBo;
 import samples.bo.user.UserGroupBo;
 import samples.bo.user.jdbc.JdbcUserDao;
-import samples.utils.SampleContants;
+import samples.utils.SampleConstants;
 import samples.utils.UserUtils;
 
 /**
@@ -78,22 +78,22 @@ public class SampleBootstrap {
         }
 
         IUserDao dao = registry.get().getBean(IUserDao.class);
-        UserGroupBo ugAdmin = dao.getUserGroup(SampleContants.USERGROUP_ID_ADMIN);
+        UserGroupBo ugAdmin = dao.getUserGroup(SampleConstants.USERGROUP_ID_ADMIN);
         if (ugAdmin == null) {
-            ugAdmin = UserGroupBo.newInstance(SampleContants.USERGROUP_ID_ADMIN);
+            ugAdmin = UserGroupBo.newInstance(SampleConstants.USERGROUP_ID_ADMIN);
             ugAdmin.setDescription("Administrator User Group");
             dao.create(ugAdmin);
-            Logger.warn("Created user group [" + SampleContants.USERGROUP_ID_ADMIN + "]");
+            Logger.warn("Created user group [" + SampleConstants.USERGROUP_ID_ADMIN + "]");
         }
 
-        UserBo userAdmin = dao.getUser(SampleContants.USERNAME_ADMIN);
+        UserBo userAdmin = dao.getUser(SampleConstants.USERNAME_ADMIN);
         if (userAdmin == null) {
             String pwd = "secret";
-            userAdmin = UserBo.newInstance(SampleContants.USERNAME_ADMIN);
-            userAdmin.setGroupId(SampleContants.USERGROUP_ID_ADMIN).setEmail("admin@localhost")
+            userAdmin = UserBo.newInstance(SampleConstants.USERNAME_ADMIN);
+            userAdmin.setGroupId(SampleConstants.USERGROUP_ID_ADMIN).setEmail("admin@localhost")
                     .setFullname("Administrator").setPassword(UserUtils.encryptPassword(pwd));
             dao.create(userAdmin);
-            Logger.warn("Created user [" + SampleContants.USERGROUP_ID_ADMIN + "] with password ["
+            Logger.warn("Created user [" + SampleConstants.USERGROUP_ID_ADMIN + "] with password ["
                     + pwd + "]");
         }
     }

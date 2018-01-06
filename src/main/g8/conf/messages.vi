@@ -3,30 +3,29 @@
 msg.login = Đăng Nhập
 msg.login.info = Vui lòng đăng nhập bằng tài khoản của bạn
 msg.logout = Đăng Xuất
+msg.actions = Hành động
+msg.action = Hành động
+msg.save = Lưu
+msg.reset = Hoàn Tác
+msg.ok = Chấp Nhận
+msg.cancel = Quay Lại
 
 error.user_not_found = Lỗi: Tài khoản "{0}" không tồn tại!
 error.login_failed = Lỗi: Mật mã nhập vào không đúng!
 
+msg.not_implemented = Thông tin: Chức năng này chưa được thực hiện!
 
-msg.welcome = Chào mừng đến với ứng dụng phát triển bởi Play Framework
-msg.home = Trang Chủ
-msg.languages = Ngôn Ngữ
+msg.dashboard = Trang Nhà
+msg.profile = Hồ Sơ Cá Nhân
 
-msg.form_demo = Form Demo
-msg.form.email = Email
-msg.form.fullname = Họ và Tên
-msg.placeholder.email = Nhập vào địa chỉ email
-msg.placeholder.fullname = Nhập vào Họ và Tên
-msg.form.dob = Ngày Sinh
-msg.form.mob = Tháng Sinh
-msg.form.yob = Năm Sinh
+msg.usergroups = Nhóm người dùng
+msg.usergroup = Nhóm người dùng
+msg.usergroup.id = Id
+msg.usergroup.desc = Mô tả
 
-msg.form.submit = Gởi Form
-msg.form.reset = Hoàn Tác
-msg.form.submit_ok = Gởi form thành công.
+msg.create_usergroup = Tạo Nhóm Người Dùng
+msg.create_usergroup.done = Tạo nhóm người dùng "{0}" thành công.
+msg.create_usergroup.failed = Tạo nhóm người dùng "{0}" không thành công.
 
-error.empty_email = Lỗi: Vui lòng nhập vào địa chỉ email!
-error.empty_fullname = Lỗi: Vui lòng nhập vào họ và tên!
-error.invalid_dob = Lỗi: Ngày sinh không hợp lệ (phải nằm trong khoảng 1-31)!
-error.invalid_mob = Lỗi: Tháng sinh không hợp lệ (phải nằm trong khoảng 1-12)!
-error.invalid_yob = Lỗi: Năm sinh không hợp lệ (phải nằm trong khoảng 1970-2070)!
+error.usergroup.empty_id = Lỗi: Vui lòng nhập vào id của nhóm người dùng!
+error.usergroup.exists = Lỗi: Nhóm người dùng "{0}" đã tồn tại!

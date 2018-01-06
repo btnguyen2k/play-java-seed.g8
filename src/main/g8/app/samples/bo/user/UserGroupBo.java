@@ -9,6 +9,9 @@ import com.github.ddth.dao.BaseDataJsonFieldBo;
  * @since template-2.6.r5
  */
 public class UserGroupBo extends BaseDataJsonFieldBo {
+
+    public final static UserGroupBo[] EMPTY_ARRAY = new UserGroupBo[0];
+
     private final static String ATTR_ID = "id";
 
     public static UserGroupBo newInstance() {
@@ -23,7 +26,7 @@ public class UserGroupBo extends BaseDataJsonFieldBo {
         return bo;
     }
 
-    private UserGroupBo() {
+    protected UserGroupBo() {
     }
 
     public String getId() {

@@ -32,6 +32,7 @@ public class UserGroupRowMapper extends AnnotatedGenericRowMapper<UserGroupBo> {
     private Cache<String, String> cacheSQLs = CacheBuilder.newBuilder().build();
 
     private String strAllColumns = StringUtils.join(getAllColumns(), ",");
+    private String strPkColumns = StringUtils.join(getPrimaryKeyColumns(), ",");
     private String strWherePkClause = StringUtils.join(Arrays.asList(getPrimaryKeyColumns())
             .stream().map(col -> col + "=?").toArray(String[]::new), " AND ");
     private String strUpdateSetClause = StringUtils.join(Arrays.asList(getUpdateColumns()).stream()
@@ -53,6 +54,28 @@ public class UserGroupRowMapper extends AnnotatedGenericRowMapper<UserGroupBo> {
             return cacheSQLs.get("SELECT:" + tableName, () -> {
                 return MessageFormat.format("SELECT {2} FROM {0} WHERE {1}", tableName,
                         strWherePkClause, strAllColumns);
+            });
+        } catch (ExecutionException e) {
+            throw new DaoException(e);
+        }
+    }
+
+    /**
+     * Generate SELECT statement to SELECT all BOs, ordered by promary keys.
+     *
+     * <p>
+     * The generated SQL will look like this
+     * {@code SELECT all-columns FROM table ORDER BY pk-1, pk-2...}
+     * </p>
+     *
+     * @param tableName
+     * @return
+     */
+    public String generateSqlSelectAll(String tableName) {
+        try {
+            return cacheSQLs.get("SELECT-ALL:" + tableName, () -> {
+                return MessageFormat.format("SELECT {2} FROM {0} ORDER BY {1}", tableName,
+                        strPkColumns, strAllColumns);
             });
         } catch (ExecutionException e) {
             throw new DaoException(e);

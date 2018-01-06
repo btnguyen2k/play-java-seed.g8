@@ -1,5 +1,7 @@
 package samples.bo.user.jdbc;
 
+import java.util.Collection;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -27,11 +29,14 @@ public class JdbcUserDao extends BaseJdbcDao implements IUserDao {
         super.init();
 
         SQL_SELECT_USER = UserRowMapper.INSTANCE.generateSqlSelect(TABLE_USER);
+        SQL_SELECT_ALL_USERS = UserRowMapper.INSTANCE.generateSqlSelectAll(TABLE_USER);
         SQL_INSERT_USER = UserRowMapper.INSTANCE.generateSqlInsert(TABLE_USER);
         SQL_DELETE_USER = UserRowMapper.INSTANCE.generateSqlDelete(TABLE_USER);
         SQL_UPDATE_USER = UserRowMapper.INSTANCE.generateSqlUpdate(TABLE_USER);
 
         SQL_SELECT_USERGROUP = UserGroupRowMapper.INSTANCE.generateSqlSelect(TABLE_USERGROUP);
+        SQL_SELECT_ALL_USERGROUPS = UserGroupRowMapper.INSTANCE
+                .generateSqlSelectAll(TABLE_USERGROUP);
         SQL_INSERT_USERGROUP = UserGroupRowMapper.INSTANCE.generateSqlInsert(TABLE_USERGROUP);
         SQL_DELETE_USERGROUP = UserGroupRowMapper.INSTANCE.generateSqlDelete(TABLE_USERGROUP);
         SQL_UPDATE_USERGROUP = UserGroupRowMapper.INSTANCE.generateSqlUpdate(TABLE_USERGROUP);
@@ -39,9 +44,10 @@ public class JdbcUserDao extends BaseJdbcDao implements IUserDao {
         return this;
     }
 
-    private String SQL_SELECT_USER, SQL_INSERT_USER, SQL_DELETE_USER, SQL_UPDATE_USER;
-    private String SQL_SELECT_USERGROUP, SQL_INSERT_USERGROUP, SQL_DELETE_USERGROUP,
-            SQL_UPDATE_USERGROUP;
+    private String SQL_SELECT_USER, SQL_SELECT_ALL_USERS, SQL_INSERT_USER, SQL_DELETE_USER,
+            SQL_UPDATE_USER;
+    private String SQL_SELECT_USERGROUP, SQL_SELECT_ALL_USERGROUPS, SQL_INSERT_USERGROUP,
+            SQL_DELETE_USERGROUP, SQL_UPDATE_USERGROUP;
 
     /**
      * {@inheritDoc}
@@ -52,6 +58,14 @@ public class JdbcUserDao extends BaseJdbcDao implements IUserDao {
             return null;
         }
         return executeSelectOne(UserRowMapper.INSTANCE, SQL_SELECT_USER, username);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<UserBo> getAllUsers() {
+        return executeSelect(UserRowMapper.INSTANCE, SQL_SELECT_ALL_USERS);
     }
 
     /**
@@ -133,6 +147,14 @@ public class JdbcUserDao extends BaseJdbcDao implements IUserDao {
             return null;
         }
         return executeSelectOne(UserGroupRowMapper.INSTANCE, SQL_SELECT_USERGROUP, id);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<UserGroupBo> getAllUserGroups() {
+        return executeSelect(UserGroupRowMapper.INSTANCE, SQL_SELECT_ALL_USERGROUPS);
     }
 
     /**

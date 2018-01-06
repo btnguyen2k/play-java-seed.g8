@@ -3,30 +3,29 @@
 msg.login = Log in
 msg.login.info = Please log in using your login account
 msg.logout = Log out
+msg.actions = Actions
+msg.action = Action
+msg.save = Save
+msg.reset = Reset
+msg.ok = Ok
+msg.cancel = Cancel
 
 error.user_not_found = Error: User "{0}" not found!
 error.login_failed = Error: Password does not match!
 
+msg.not_implemented = Info: This function is not implemented yet!
 
-msg.welcome = Welcome to Play Application
-msg.home = Home
-msg.languages = Languages
+msg.dashboard = Dashboard
+msg.profile = Profile
 
-msg.form_demo = Form Demo
-msg.form.email = Email
-msg.form.fullname = Fullname
-msg.placeholder.email = Enter email address
-msg.placeholder.fullname = Enter fullname
-msg.form.dob = Day of Birth
-msg.form.mob = Month of Birth
-msg.form.yob = Year of Birth
+msg.usergroups = Usergroups
+msg.usergroup = Usergroup
+msg.usergroup.id = Id
+msg.usergroup.desc = Description
 
-msg.form.submit = Submit
-msg.form.reset = Reset
-msg.form.submit_ok = Form has been submitted successfully.
+msg.create_usergroup = Create Usergroup
+msg.create_usergroup.done = Usergroup "{0}" has been created successfully.
+msg.create_usergroup.failed = Usergroup "{0}" has failed to be created.
 
-error.empty_email = Error: Email address is empty!
-error.empty_fullname = Error: Fullname is empty!
-error.invalid_dob = Error: Invalid day-of-birth (must be a number between 1 and 31)!
-error.invalid_mob = Error: Invalid month-of-birth (must be a number between 1 and 12)!
-error.invalid_yob = Error: Invalid year-of-birth (must be a number between 1970 and 2070)!
+error.usergroup.empty_id = Error: Usergroup id must not be empty!
+error.usergroup.exists = Error: Usergroup "{0}" already existed!

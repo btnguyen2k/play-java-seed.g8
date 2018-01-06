@@ -1,9 +1,18 @@
 package samples.controllers;
 
+import com.github.ddth.dao.utils.DaoResult;
+import com.github.ddth.dao.utils.DaoResult.DaoOperationStatus;
+
 import controllers.BasePageController;
+import play.data.Form;
 import play.mvc.Result;
+import play.twirl.api.Html;
+import samples.bo.user.IUserDao;
+import samples.bo.user.UserGroupBo;
 import samples.compositions.AuthRequired;
-import samples.utils.SampleContants;
+import samples.forms.FormCreateEditUsergroup;
+import samples.models.UserGroupModel;
+import samples.utils.SampleConstants;
 
 /**
  * Sample control panel controller.
@@ -12,7 +21,7 @@ import samples.utils.SampleContants;
  * @since template-2.6.r5
  */
 @AuthRequired(loginCall = "samples.controllers.routes:SampleController:login", usergroups = {
-        SampleContants.USERGROUP_ID_ADMIN })
+        SampleConstants.USERGROUP_ID_ADMIN })
 public class SampleControlPanelController extends BasePageController {
 
     public final static String VIEW_HOME = "vsamples.home";
@@ -24,4 +33,54 @@ public class SampleControlPanelController extends BasePageController {
         return ok(render(VIEW_HOME));
     }
 
+    public final static String VIEW_USERGROUPS = "vsamples.usergroups";
+
+    /**
+     * Handle GET /<context>cp/usergroups
+     */
+    public Result usergroups() throws Exception {
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        UserGroupModel[] allUsergroups = UserGroupModel.newInstances(dao.getAllUserGroups());
+
+        // Note: cast to Object to make sure the whole array is treated as a
+        // single parameter value!
+        return ok(render(VIEW_USERGROUPS, (Object) allUsergroups));
+    }
+
+    public final static String VIEW_CREATE_USERGROUP = "vsamples.create_usergroup";
+
+    /**
+     * Handle GET /<context>cp/createUsergroup
+     */
+    public Result createUsergroup() throws Exception {
+        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class);
+        Html html = render(VIEW_CREATE_USERGROUP, form);
+        return ok(html);
+    }
+
+    /**
+     * Handle POST /<context>cp/createUsergroup
+     */
+    public Result createUsergroupSubmit() throws Exception {
+        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
+                .bindFromRequest(request());
+        if (form.hasErrors()) {
+            Html html = render(VIEW_CREATE_USERGROUP, form);
+            return ok(html);
+        }
+        FormCreateEditUsergroup formData = form.get();
+        UserGroupBo ug = UserGroupBo.newInstance(formData.getId())
+                .setDescription(formData.getDescription());
+        IUserDao dao = getRegistry().getBean(IUserDao.class);
+        DaoResult result = dao.create(ug);
+        if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.done", ug.getId()));
+        } else {
+            return responseRedirect(
+                    samples.controllers.routes.SampleControlPanelController.usergroups(),
+                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.failed", ug.getId()));
+        }
+    }
 }

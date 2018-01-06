@@ -12,6 +12,9 @@ import com.github.ddth.dao.BaseDataJsonFieldBo;
  * @since template-2.6.r5
  */
 public class UserBo extends BaseDataJsonFieldBo {
+
+    public final static UserBo[] EMPTY_ARRAY = new UserBo[0];
+
     private final static String ATTR_USERNAME = "username";
 
     public static UserBo newInstance() {
@@ -27,7 +30,7 @@ public class UserBo extends BaseDataJsonFieldBo {
         return bo;
     }
 
-    private UserBo() {
+    protected UserBo() {
     }
 
     public String getUsername() {
