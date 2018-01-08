@@ -5,7 +5,7 @@
     </div>
 }
 <form role="form" method="post">
-    <input type="hidden" name="editId" value="@form("editUsername").getValue.orElse("")">
+    <input type="hidden" name="editUsername" value="@form("editUsername").getValue.orElse("")">
     <div class="box-body">
         <div class="form-group">
             <label for="user_username">@messages.at("msg.user.username")</label>

@@ -42,6 +42,14 @@ public class FormCreateEditUser extends BaseForm implements Validatable<Validati
 
     /* Getters & Setters are required */
 
+    public String getEditUsername() {
+        return editUsername;
+    }
+
+    public void setEditUsername(String editUsername) {
+        this.editUsername = editUsername != null ? editUsername.trim().toLowerCase() : null;
+    }
+
     public String getUsername() {
         return username;
     }
@@ -103,10 +111,10 @@ public class FormCreateEditUser extends BaseForm implements Validatable<Validati
         if (StringUtils.isBlank(username)) {
             return new ValidationError("", "error.user.empty_username");
         }
-        if (StringUtils.isBlank(password)) {
+        if (StringUtils.isBlank(editUsername) && StringUtils.isBlank(password)) {
             return new ValidationError("", "error.user.empty_password");
         }
-        if (!StringUtils.equals(password, confirmedPassword)) {
+        if (!StringUtils.isBlank(password) && !StringUtils.equals(password, confirmedPassword)) {
             return new ValidationError("", "error.user.mismatched_password");
         }
 

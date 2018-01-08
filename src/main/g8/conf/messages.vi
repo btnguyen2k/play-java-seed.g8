@@ -62,3 +62,12 @@ error.user.empty_username = Lỗi: Vui lòng nhập vào tên đăng nhập!
 error.user.exists = Lỗi: Người dùng "{0}" đã tồn tại!
 error.user.empty_password = Lỗi: Vui lòng nhập vào mật mã!
 error.user.mismatched_password = Lỗi: Mật mã nhập 2 lần phải giống nhau!
+
+msg.edit_user = Thay Đổi Người Dùng
+msg.edit_user.done = Cập nhật người dùng "{0}" thành công.
+msg.edit_user.failed = Cập nhật người dùng "{0}" không thành công.
+
+msg.delete_user = Xoá Người Dùng
+msg.delete_user.done = Xoá người dùng "{0}" thành công.
+msg.delete_user.failed = Xoá người dùng "{0}" không thành công.
+error.user.cannot_delete_sytem_user = Lỗi: Không thể xoá người dùng hệ thống "{0}"!

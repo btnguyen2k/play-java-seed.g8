@@ -1,0 +1,48 @@
+@(user: samples.models.UserModel)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@_layout(
+    active    = "users"
+){
+<section class="content-header">
+    <h1>@messages.at("msg.delete_user")</h1>
+    <ol class="breadcrumb">
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.usergroups()"><i class="fa fa-users"></i> @messages.at("msg.users")</a></li>
+        <li class="active">@messages.at("msg.delete_user")</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-warning">
+				<form role="form" method="post">
+				    <div class="box-body">
+				        <div class="form-group">
+				            <label for="user_username">@messages.at("msg.user.username")</label>
+				            <input readonly="readonly" type="text" class="form-control" id="user_username" name="username" value="@user.getUsername()">
+				        </div>
+                        <div class="form-group">
+                            <label for="user_group">@messages.at("msg.user.group")</label>
+                            <input readonly="readonly" type="text" class="form-control" id="user_group" name="groupId" value="@user.getGroupId()">
+                        </div>
+                        <div class="form-group">
+                            <label for="user_fullname">@messages.at("msg.user.fullname")</label>
+                            <input readonly="readonly" type="text" class="form-control" id="user_fullname" name="fullname" value="@user.getFullname()">
+                        </div>
+                        <div class="form-group">
+                            <label for="user_email">@messages.at("msg.user.email")</label>
+                            <input readonly="readonly" type="text" class="form-control" id="user_email" name="email" value="@user.getEmail()">
+                        </div>
+				    </div>
+
+				    <div class="box-footer">
+				        <button type="submit" class="btn btn-danger"><i class="fa fa-warning"></i> @messages.at("msg.delete")</button>
+				        <button type="button" class="btn btn-default"
+				            onclick="document.location.href='@samples.controllers.routes.SampleControlPanelController.users()';"><i class="fa fa-close"></i> @messages.at("msg.cancel")</button>
+				    </div>
+				</form>
+            </div>
+        </div>
+    </div>
+</section>
+}

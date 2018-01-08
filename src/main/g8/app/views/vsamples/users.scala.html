@@ -43,16 +43,14 @@
                         <tbody>
                             @for(u <- users){
                                 <tr>
-                                    <td style="text-align: center; vertical-align: middle;">@u.getUsername()</td>
+                                    <td style="text-align: center; vertical-align: middle;"><strong>@u.getUsername()</strong> (@messages.at("msg.user.email"): @u.getEmail())</td>
                                     <td style="text-align: center; vertical-align: middle;">@u.getFullname()</td>
                                     <td style="text-align: center; vertical-align: middle;">@u.getGroupId()</td>
                                     <td style="text-align: center; vertical-align: middle; font-size: x-large;" class="text-nowrap">
-                                        @*
-                                        <a href="@ug.urlEdit()" title="@messages.at("msg.edit")" style="color:green;" class="fa fa-edit"></a>
-                                        @if(ug.getId()!=samples.utils.SampleConstants.USERGROUP_ID_ADMIN){
-                                            <a href="@ug.urlDelete()" title="@messages.at("msg.delete")" style="color:red;" class="fa fa-remove"></a>
+                                        <a href="@u.urlEdit()" title="@messages.at("msg.edit")" style="color:green;" class="fa fa-edit"></a>
+                                        @if(u.getUsername()!=samples.utils.SampleConstants.USERNAME_ADMIN){
+                                            <a href="@u.urlDelete()" title="@messages.at("msg.delete")" style="color:red;" class="fa fa-remove"></a>
                                         }
-                                        *@
                                     </td>
                                 </tr>
                             }

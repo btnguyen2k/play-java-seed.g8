@@ -1,0 +1,23 @@
+@(form: play.data.Form[samples.forms.FormCreateEditUser])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@_layout(
+    active    = "users"
+){
+<section class="content-header">
+    <h1>@messages.at("msg.edit_user")</h1>
+    <ol class="breadcrumb">
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.home()"><i class="fa fa-dashboard"></i> @messages.at("msg.dashboard")</a></li>
+        <li><a href="@samples.controllers.routes.SampleControlPanelController.users()"><i class="fa fa-users"></i> @messages.at("msg.users")</a></li>
+        <li class="active">@messages.at("msg.edit_user")</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-primary">
+                @_form_create_edit_user(form)
+            </div>
+        </div>
+    </div>
+</section>
+}

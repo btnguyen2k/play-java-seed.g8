@@ -61,3 +61,12 @@ error.user.empty_username = Error: Username must not be empty!
 error.user.exists = Error: User "{0}" already existed!
 error.user.empty_password = Error: Password must not be empty!
 error.user.mismatched_password = Error: Password does not match the confirmed one!
+
+msg.edit_user = Edit User
+msg.edit_user.done = User "{0}" has been updated successfully.
+msg.edit_user.failed = User "{0}" has failed to be updated.
+
+msg.delete_user = Delete User
+msg.delete_user.done = User "{0}" has been deleted successfully.
+msg.delete_user.failed = User "{0}" has failed to be deleted.
+error.user.cannot_delete_sytem_user = Error: Cannot delete system user "{0}"!

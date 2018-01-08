@@ -30,4 +30,14 @@ public class UserModel extends UserBo {
         return newInstances(boList.toArray(UserBo.EMPTY_ARRAY));
     }
 
+    public String urlEdit() {
+        return samples.controllers.routes.SampleControlPanelController.editUser(getUsername())
+                .toString();
+    }
+
+    public String urlDelete() {
+        return samples.controllers.routes.SampleControlPanelController.deleteUser(getUsername())
+                .toString();
+    }
+
 }
