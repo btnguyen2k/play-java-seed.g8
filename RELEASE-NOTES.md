@@ -1,5 +1,7 @@
 # Release Notes
 
+
+
 ## 2018-01-02: template-v2.6.r4
 
 **Support multiple Spring's configuration files**

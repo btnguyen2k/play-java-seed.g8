@@ -1,140 +1,87 @@
-package samples.controllers;
+package samples.forms;
 
-import com.github.ddth.dao.utils.DaoResult;
-import com.github.ddth.dao.utils.DaoResult.DaoOperationStatus;
+import java.util.Collections;
 
-import controllers.BasePageController;
-import play.data.Form;
-import play.mvc.Result;
-import play.twirl.api.Html;
+import org.apache.commons.lang3.StringUtils;
+
+import forms.BaseForm;
+import play.data.validation.Constraints.Validatable;
+import play.data.validation.Constraints.Validate;
+import play.data.validation.ValidationError;
 import samples.bo.user.IUserDao;
 import samples.bo.user.UserGroupBo;
-import samples.compositions.AuthRequired;
-import samples.forms.FormCreateEditUsergroup;
-import samples.models.UserGroupModel;
-import samples.utils.SampleConstants;
 
 /**
- * Sample control panel controller.
+ * Form example: create/edit user group.
  *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-2.6.r5
+ * @since template-v2.6.r5
  */
-@AuthRequired(loginCall = "samples.controllers.routes:SampleController:login", usergroups = {
-        SampleConstants.USERGROUP_ID_ADMIN })
-public class SampleControlPanelController extends BasePageController {
+@Validate
+public class FormCreateEditUsergroup extends BaseForm implements Validatable<ValidationError> {
 
-    public final static String VIEW_HOME = "vsamples.home";
-
-    /**
-     * Handle GET /<context>/cp
-     */
-    public Result home() throws Exception {
-        return ok(render(VIEW_HOME));
+    public static FormCreateEditUsergroup newInstance(UserGroupBo bo) {
+        FormCreateEditUsergroup form = new FormCreateEditUsergroup();
+        form.id = bo.getId();
+        form.description = bo.getDescription();
+        form.editId = form.id;
+        return form;
     }
 
-    public final static String VIEW_USERGROUPS = "vsamples.usergroups";
+    private String editId = "";
+    private String id = "", description = "";
+    private UserGroupBo usergroup;
+
+    public UserGroupBo getUsergroup() {
+        return usergroup;
+    }
+
+    /* Getters & Setters are required */
+
+    public String getEditId() {
+        return editId;
+    }
+
+    public void setEditId(String editId) {
+        this.editId = editId != null ? editId.trim().toLowerCase() : null;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id != null ? id.trim().toLowerCase() : null;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description != null ? description.trim() : null;
+    }
+
+    /*----------------------------------------------------------------------*/
 
     /**
-     * Handle GET /<context>/cp/usergroups
+     * Form validation method.
+     *
+     * @return
      */
-    public Result usergroups() throws Exception {
+    @Override
+    public ValidationError validate() {
         IUserDao dao = getRegistry().getBean(IUserDao.class);
-        UserGroupModel[] allUsergroups = UserGroupModel.newInstances(dao.getAllUserGroups());
 
-        // Note: cast to Object to make sure the whole array is treated as a
-        // single parameter value!
-        return ok(render(VIEW_USERGROUPS, (Object) allUsergroups));
-    }
-
-    public final static String VIEW_CREATE_USERGROUP = "vsamples.create_usergroup";
-
-    /**
-     * Handle GET /<context>/cp/createUsergroup
-     */
-    public Result createUsergroup() throws Exception {
-        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class);
-        Html html = render(VIEW_CREATE_USERGROUP, form);
-        return ok(html);
-    }
-
-    /**
-     * Handle POST /<context>/cp/createUsergroup
-     */
-    public Result createUsergroupSubmit() throws Exception {
-        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
-                .bindFromRequest(request());
-        if (form.hasErrors()) {
-            Html html = render(VIEW_CREATE_USERGROUP, form);
-            return ok(html);
+        if (StringUtils.isBlank(id)) {
+            return new ValidationError("", "error.usergroup.empty_id");
         }
-        FormCreateEditUsergroup formData = form.get();
-        UserGroupBo bo = UserGroupBo.newInstance(formData.getId())
-                .setDescription(formData.getDescription());
-        IUserDao dao = getRegistry().getBean(IUserDao.class);
-        DaoResult result = dao.create(bo);
-        if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, calcMessages().at("msg.create_usergroup.done", bo.getId()));
-        } else {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_WARNING
-                            + calcMessages().at("msg.create_usergroup.failed", bo.getId()));
-        }
-    }
 
-    public final static String VIEW_EDIT_USERGROUP = "vsamples.edit_usergroup";
+        UserGroupBo newUsergroup = dao.getUserGroup(id);
+        if (newUsergroup != null && !StringUtils.equals(id, editId)) {
+            return new ValidationError("", "error.usergroup.exists", Collections.singletonList(id));
+        }
 
-    /**
-     * Handle GET /<context>/cp/editUsergroup?id=<usergroup-id>
-     */
-    public Result editUsergroup(String id) throws Exception {
-        IUserDao dao = getRegistry().getBean(IUserDao.class);
-        UserGroupBo bo = dao.getUserGroup(id);
-        if (bo == null) {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
-                            + calcMessages().at("error.usergroup.not_found", id));
-        }
-        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
-                .fill(FormCreateEditUsergroup.newInstance(bo));
-        Html html = render(VIEW_EDIT_USERGROUP, form);
-        return ok(html);
-    }
-
-    /**
-     * Handle POST /<context>/cp/editUsergroup?id=<usergroup-id>
-     */
-    public Result editUsergroupSubmit(String id) throws Exception {
-        IUserDao dao = getRegistry().getBean(IUserDao.class);
-        UserGroupBo bo = dao.getUserGroup(id);
-        if (bo == null) {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_ERROR
-                            + calcMessages().at("error.usergroup.not_found", id));
-        }
-        Form<FormCreateEditUsergroup> form = formFactory.form(FormCreateEditUsergroup.class)
-                .bindFromRequest(request());
-        if (form.hasErrors()) {
-            Html html = render(VIEW_EDIT_USERGROUP, form);
-            return ok(html);
-        }
-        FormCreateEditUsergroup formData = form.get();
-        bo.setDescription(formData.getDescription());
-        DaoResult result = dao.update(bo);
-        if (result.getStatus() == DaoOperationStatus.SUCCESSFUL) {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, calcMessages().at("msg.edit_usergroup.done", bo.getId()));
-        } else {
-            return responseRedirect(
-                    samples.controllers.routes.SampleControlPanelController.usergroups(),
-                    VIEW_USERGROUPS, SampleConstants.FLASH_MSG_PREFIX_WARNING
-                            + calcMessages().at("msg.edit_usergroup.failed", bo.getId()));
-        }
+        return null;
     }
 }
