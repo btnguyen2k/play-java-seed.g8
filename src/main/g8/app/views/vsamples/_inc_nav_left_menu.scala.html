@@ -43,10 +43,20 @@
                     </span>
                 </a>
                 <ul class="treeview-menu">
-                    <li @if(active=="usergroups"){class="active"}><a href="@samples.controllers.routes.SampleControlPanelController.usergroups()"><i
-                            class="fa fa-circle-o"></i> @messages.at("msg.usergroups")</a></li>
-                    <li><a href="samples.controllers.routes.SampleControlPanelController.users()"><i
-                            class="fa fa-circle-o"></i> @messages.at("msg.users")</a></li>
+                    <li @if(active=="usergroups"){class="active"}>
+                        <a href="@samples.controllers.routes.SampleControlPanelController.usergroups()"><i class="fa fa-circle-o"></i> @messages.at("msg.usergroups")
+                            <span class="pull-right-container">
+		                        <small class="label pull-right bg-blue">@samples.utils.UserUtils.countUsergroups()</small>
+		                    </span>
+                        </a>
+                    </li>
+                    <li @if(active=="users"){class="active"}>
+                        <a href="@samples.controllers.routes.SampleControlPanelController.users()"><i class="fa fa-circle-o"></i> @messages.at("msg.users")
+                            <span class="pull-right-container">
+                                <small class="label pull-right bg-green">@samples.utils.UserUtils.countUsers()</small>
+                            </span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

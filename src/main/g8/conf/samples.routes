@@ -17,6 +17,10 @@ POST        /cp/editUsergroup           samples.controllers.SampleControlPanelCo
 GET         /cp/deleteUsergroup         samples.controllers.SampleControlPanelController.deleteUsergroup(id: String?="")
 POST        /cp/deleteUsergroup         samples.controllers.SampleControlPanelController.deleteUsergroupSubmit(id: String?="")
 
+GET         /cp/users                   samples.controllers.SampleControlPanelController.users
+GET         /cp/createUser              samples.controllers.SampleControlPanelController.createUser
+POST        /cp/createUser              samples.controllers.SampleControlPanelController.createUserSubmit
+
 # Examples of controller that handles web-page rendering & form submission
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)
 GET         /form                       samples.controllers.SamplePageController.formDemo

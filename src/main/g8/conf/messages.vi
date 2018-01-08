@@ -42,3 +42,23 @@ msg.delete_usergroup = Xoá Nhóm Người Dùng
 msg.delete_usergroup.done = Xoá nhóm người dùng "{0}" thành công.
 msg.delete_usergroup.failed = Xoá nhóm người dùng "{0}" không thành công.
 error.usergroup.cannot_delete_sytem_usergroup = Lỗi: Không thể xoá nhóm người dùng hệ thống "{0}"!
+
+msg.users = Người Dùng
+msg.user = Người Dùng
+msg.user.username = Tên Đăng Nhập
+msg.user.fullname = Tên Hiển Thị
+msg.user.group = Nhóm Người Dùng
+msg.user.email = Email
+msg.user.password = Mật mã
+msg.user.confirmed_password = Xác nhận lại mật mã
+msg.user.password_change = Nhập mật mã mới để đổi mật mã
+
+error.user.not_found = Lỗi: Người dùng "{0}" không tồn tại!
+
+msg.create_user = Tạo Người Dùng
+msg.create_user.done = Tạo người dùng "{0}" thành công.
+msg.create_user.failed = Tạo người dùng "{0}" không thành công.
+error.user.empty_username = Lỗi: Vui lòng nhập vào tên đăng nhập!
+error.user.exists = Lỗi: Người dùng "{0}" đã tồn tại!
+error.user.empty_password = Lỗi: Vui lòng nhập vào mật mã!
+error.user.mismatched_password = Lỗi: Mật mã nhập 2 lần phải giống nhau!

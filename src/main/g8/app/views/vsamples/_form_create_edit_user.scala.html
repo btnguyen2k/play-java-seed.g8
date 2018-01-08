@@ -1,0 +1,53 @@
+@(form: play.data.Form[samples.forms.FormCreateEditUser])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@if(form.hasGlobalErrors){
+    <div class="box-header">
+        @_macro_displayFormErrors(form)
+    </div>
+}
+<form role="form" method="post">
+    <input type="hidden" name="editId" value="@form("editUsername").getValue.orElse("")">
+    <div class="box-body">
+        <div class="form-group">
+            <label for="user_username">@messages.at("msg.user.username")</label>
+            <input @if(form("editUsername").getValue.orElse("")!=""){readonly="readonly"} type="text" class="form-control"
+                id="user_username" name="username" value="@form("username").getValue.orElse("")" placeholder="@messages.at("msg.user.username")">
+        </div>
+        <div class="form-group">
+            <label for="user_password">@messages.at("msg.user.password")</label>@if(form("editUsername").getValue.orElse("")!=""){ (<small>@messages.at("msg.user.password_change")</small>)}
+            <input type="password" class="form-control"
+                id="user_password" name="password" value="" placeholder="@messages.at("msg.user.password")">
+        </div>
+        <div class="form-group">
+            <label for="user_confirmedPassword">@messages.at("msg.user.confirmed_password")</label>
+            <input type="password" class="form-control"
+                id="user_confirmedPassword" name="confirmedPassword" value="" placeholder="@messages.at("msg.user.confirmed_password")">
+        </div>
+        <hr>
+        <div class="form-group">
+            <label for="user_group">@messages.at("msg.user.group")</label>
+            <select class="form-control" id="user_group" name="groupId">
+                @for(ug <- samples.utils.UserUtils.allUsergroups()){
+                    <option value="@ug.getId()" @if(ug.getId()==form("groupId").getValue.orElse("")){selected="selected"}>@ug.getId()</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="user_fullname">@messages.at("msg.user.fullname")</label>
+            <input type="text" class="form-control"
+                id="user_fullname" name="fullname" value="@form("fullname").getValue.orElse("")" placeholder="@messages.at("msg.user.fullname")">
+        </div>
+        <div class="form-group">
+            <label for="user_email">@messages.at("msg.user.email")</label>
+            <input type="text" class="form-control"
+                id="user_email" name="email" value="@form("email").getValue.orElse("")" placeholder="@messages.at("msg.user.email")">
+        </div>
+    </div>
+
+    <div class="box-footer">
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> @messages.at("msg.save")</button>
+        <button type="reset" class="btn btn-warning"><i class="fa fa-reply"></i> @messages.at("msg.reset")</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-default"
+            onclick="document.location.href='@samples.controllers.routes.SampleControlPanelController.users()';"><i class="fa fa-close"></i> @messages.at("msg.cancel")</button>
+    </div>
+</form>
