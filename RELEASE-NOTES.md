@@ -1,5 +1,25 @@
 # Release Notes
 
+## 2018-01-09: template-v2.6.r5
+
+**Distributed worker**
+
+- `BaseWorker`: use a local in-memory lock, so that `BaseWorker` remains local-only worker.
+- New class `BaseDistributedWorker`: look up `IDLockFactory` from `IRegistry.getBean(IDLockFactory.class)`.
+  - If the looked-up `IDLockFactory` is a non-distributed-implementation (e.g. `InmemDLock`), `BaseDistributedWorker` behaves just like `BaseWorker`.
+  - If the looked-up `IDLockFactory` is a distributed-implementation (e.g. `RedisDLockFactory`), `BaseDistributedWorker` behaves simular to `BaseClusterWorker`.
+
+
+**Sample Admin Control Panel**
+
+- Template: AdminLTE2 admin template.
+- I18N samples: English & Vietnamese.
+- Forms & Pages:
+  - Login & Logout
+  - Usergroup list
+  - Create, Edit, Delete usergroups
+  - User list
+  - Create, Edit, Delete users
 
 
 ## 2018-01-02: template-v2.6.r4

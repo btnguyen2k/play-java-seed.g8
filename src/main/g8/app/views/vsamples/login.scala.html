@@ -36,7 +36,7 @@
     <!-- /.login-logo -->
     <div class="login-box-body">
         @if(form.hasGlobalErrors){
-        @_macro_displayFormErrors(form)
+            @_macro_displayFormErrors(form)
         } else {
         <p class="login-box-msg">
             @defining(Controller.flash(samples.controllers.SampleController.VIEW_LOGIN)){msg =>
@@ -61,6 +61,11 @@
                         <label><input type="checkbox"> Remember Me</label>
                     </div>
                     *@
+                    <select name="language">
+                        @for(lang <- modules.registry.RegistryGlobal.registry.getAvailableLanguage) {
+                        	<option value="@lang.code()">@lang.language() - @messages.at("lang."+lang.code())</option>
+                        }
+                    </select>
                 </div>
                 <div class="col-xs-4">
                     <button type="submit" class="btn btn-primary btn-block btn-flat">@messages.at("msg.login")</button>

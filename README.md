@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r4](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r5](RELEASE-NOTES.md).
 
 ## Features
 
@@ -25,7 +25,8 @@ Latest release: [template-v2.6.r4](RELEASE-NOTES.md).
 - Cluster support
 - Samples:
   - Module
-  - Form & Form controller
+  - Sample Admin Control Panel using AdminLTE2 Template: Form & Page controllers (since [template-v2.6.r5](RELEASE-NOTES.md)).
+  - I18N
   - Workers & Scheduling
   - Cluster workers
   - API handler: JSON-based data format. Support interface:

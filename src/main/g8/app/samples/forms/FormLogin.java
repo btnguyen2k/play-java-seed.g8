@@ -18,7 +18,9 @@ import samples.utils.UserUtils;
  */
 @Validate
 public class FormLogin extends BaseForm implements Validatable<ValidationError> {
+
     private String username, password;
+    private String language;
     private UserBo user;
 
     public UserBo getUser() {
@@ -26,6 +28,14 @@ public class FormLogin extends BaseForm implements Validatable<ValidationError> 
     }
 
     /* Getters & Setters are required */
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 
     public String getUsername() {
         return username;

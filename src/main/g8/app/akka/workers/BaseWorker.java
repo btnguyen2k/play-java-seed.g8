@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import com.github.ddth.dlock.IDLock;
-import com.github.ddth.dlock.IDLockFactory;
 import com.github.ddth.dlock.LockResult;
 import com.github.ddth.dlock.impl.inmem.InmemDLock;
 
@@ -12,7 +11,6 @@ import akka.BaseActor;
 import akka.TickMessage;
 import play.Logger;
 import scala.concurrent.ExecutionContextExecutor;
-
 import utils.IdUtils;
 
 /**
@@ -28,7 +26,14 @@ import utils.IdUtils;
  * checked against worker's scheduling configuration so determine that worker's task should be fired
  * off.</li>
  * <li>If worker's task is due, {@link #doJob(TickMessage)} is called. Sub-class
- * implements this method to perform its own business logic.</li>
+ * implements this method to perform its own business logic.
+ * <ul>
+ * <li>Before calling {@link #doJob(TickMessage)}, a lock will be acquired (see
+ * {@link #lock(String, long)}) so that at one given time only one execution of
+ * {@link #doJob(TickMessage)} is allowed (save affect as
+ * {@code synchronized doJob(TickMessage)}).</li>
+ * </ul>
+ * </li>
  * </ul>
  * </p>
  *
@@ -71,32 +76,13 @@ public abstract class BaseWorker extends BaseActor {
         return channelSubscriptions;
     }
 
-    private IDLockFactory lockFactory;
     private IDLock lock;
-
-    /**
-     * @return
-     * @since template-v2.6.r4
-     */
-    protected IDLockFactory getDLockFactory() {
-        return lockFactory;
-    }
-
-    /**
-     * @return
-     * @since template-v2.6.r4
-     */
-    protected IDLock getDLock() {
-        return lock;
-    }
 
     /**
      * @since template-v2.6.r4
      */
     protected void initDLock() {
-        lockFactory = getRegistry().getBean(IDLockFactory.class);
-        String lockName = getActorName();
-        lock = lockFactory != null ? lockFactory.createLock(lockName) : new InmemDLock(lockName);
+        lock = new InmemDLock(getActorName());
     }
 
     /**
@@ -191,7 +177,8 @@ public abstract class BaseWorker extends BaseActor {
     }
 
     protected void onTick(TickMessage tick) {
-        ExecutionContextExecutor ecs = getRegistry().getExecutionContextExecutor("worker-dispatcher");
+        ExecutionContextExecutor ecs = getRegistry()
+                .getExecutionContextExecutor("worker-dispatcher");
         if (ecs == null) {
             ecs = getRegistry().getDefaultExecutionContextExecutor();
         }
