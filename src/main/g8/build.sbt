@@ -1,45 +1,45 @@
+// App name & version
 import com.typesafe.config._
-
 val conf       = ConfigFactory.parseFile(new File("conf/application.conf")).resolve()
 val appName    = conf.getString("app.name").toLowerCase().replaceAll("\\\\W+", "-")
 val appVersion = conf.getString("app.version")
 
+sbtPlugin := true
+giter8.ScaffoldPlugin.projectSettings
+
+// Custom Maven repository
+resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
+
+// See https://playframework.com/documentation/2.6.x/AkkaHttpServer
+lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttp2Support, SbtWeb).settings(
+    name         := appName,
+    version      := appVersion,
+    organization := "$organization$",
+    scriptedLaunchOpts ++= List("-Xms1024m", "-Xmx1024m", "-XX:ReservedCodeCacheSize=128m", "-XX:MaxPermSize=256m", "-Xss2m", "-Dfile.encoding=UTF-8"),
+    resolvers += Resolver.url("typesafe", url("http://repo.typesafe.com/typesafe/ivy-releases/"))(Resolver.ivyStylePatterns)
+)
+
+// Eclipse configurations
 EclipseKeys.preTasks                 := Seq(compile in Compile)                     // Force compile project before running the eclipse command
 EclipseKeys.skipParents in ThisBuild := false
 EclipseKeys.projectFlavor            := EclipseProjectFlavor.Java                   // Java project. Don't expect Scala IDE
 EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE18)  // expect Java 1.8
 // Use .class files instead of generated .scala files for views and routes
-EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
+//EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
 
 // Exclude the Play's the API documentation
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
 
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
-
 routesGenerator := InjectedRoutesGenerator
-
 pipelineStages := Seq(digest, gzip)
 
-// See https://playframework.com/documentation/2.6.x/AkkaHttpServer
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttp2Support, SbtWeb).settings(
-    name         := appName,
-    version      := appVersion,
-    organization := "$organization$"
-)
-
-scalaVersion := "$scala_version$"
-
-// Custom Maven repository
-resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
-
+// Dependency configurations
 val _akkaClusterVersion      = "2.5.8"
 val _playWsStandaloneVersion = "1.1.3"
-
 val _grpcVersion             = "1.8.0"
-
 val _springVersion           = "5.0.2.RELEASE"
-
 val _ddthCommonsVersion      = "0.7.1.1"
 val _ddthCacheAdapterVersion = "0.6.3.2"
 val _ddthDaoVersion          = "0.8.4"

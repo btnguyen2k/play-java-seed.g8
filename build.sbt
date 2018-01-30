@@ -1,9 +1,11 @@
 // App name & version
 import com.typesafe.config._
-
 val conf       = ConfigFactory.parseFile(new File("conf/application.conf")).resolve()
 val appName    = conf.getString("app.name").toLowerCase().replaceAll("\\W+", "-")
 val appVersion = conf.getString("app.version")
+
+sbtPlugin := true
+giter8.ScaffoldPlugin.projectSettings
 
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
