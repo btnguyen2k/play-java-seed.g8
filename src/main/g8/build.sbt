@@ -30,7 +30,7 @@ EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE1
 // Exclude the Play's the API documentation
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
-
+file:///Users/thanhnb/Dropbox/Private/GHN/Proj/SMEFocus/TrackingScreenMookup/AdminLTE-2.4.2/pages/UI/ghntracking.html
 javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
 routesGenerator := InjectedRoutesGenerator
 pipelineStages := Seq(digest, gzip)
