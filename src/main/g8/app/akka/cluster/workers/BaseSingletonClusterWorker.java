@@ -1,31 +1,28 @@
 package akka.cluster.workers;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-
 import akka.TickMessage;
 import akka.cluster.ClusterConstants;
 import akka.cluster.DistributedDataManager.DDGetResult;
 import akka.workers.CronFormat;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
 /**
  * Base class for singleton-cluster-worker implementation.
- * 
- * <p>
- * Only one singleton worker in the cluster-group-id receives the "tick" message per tick.
- * </p>
- * 
+ *
+ * <p> Only one singleton worker in the cluster-group-id receives the "tick" message per tick. </p>
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-v0.1.5
  * @see BaseClusterWorker
+ * @since template-v0.1.5
  */
 public abstract class BaseSingletonClusterWorker extends BaseClusterWorker {
 
     /**
-     * Group-id to subscribe the worker to topics. Default value is
-     * {@link #getActorName()}.
-     * 
+     * Group-id to subscribe the worker to topics. Default value is {@link #getActorName()}.
+     *
      * @return
      */
     protected String getWorkerGroupId() {
@@ -43,7 +40,7 @@ public abstract class BaseSingletonClusterWorker extends BaseClusterWorker {
 
     /**
      * Get worker's scheduling settings as {@link CronFormat}.
-     * 
+     *
      * @return
      */
     protected abstract CronFormat getScheduling();
@@ -67,26 +64,22 @@ public abstract class BaseSingletonClusterWorker extends BaseClusterWorker {
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>
-     * Note: This feature is experimental! The lock is considered "weak".
-     * </p>
+     *
+     * <p> Note: This feature is experimental! The lock is considered "weak". </p>
      */
     @Override
-    protected boolean lock(long lockId) {
-        return ddLock(getActorName() + "-lock", String.valueOf(lockId), 60, TimeUnit.SECONDS);
+    protected boolean lock(String lockId, long durationMs) {
+        return ddLock(getActorName() + "-lock", lockId, durationMs, TimeUnit.MILLISECONDS);
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * <p>
-     * Note: This feature is experimental! The lock is considered "weak".
-     * </p>
+     *
+     * <p> Note: This feature is experimental! The lock is considered "weak". </p>
      */
     @Override
-    protected boolean unlock(long lockId) {
-        return ddUnlock(getActorName() + "-lock", String.valueOf(lockId));
+    protected boolean unlock(String lockId) {
+        return ddUnlock(getActorName() + "-lock", lockId);
     }
 
 }

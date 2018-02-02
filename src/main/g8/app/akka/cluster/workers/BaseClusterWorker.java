@@ -1,29 +1,27 @@
 package akka.cluster.workers;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicLong;
-
 import akka.TickMessage;
 import akka.cluster.BaseClusterActor;
 import akka.cluster.ClusterConstants;
 import akka.workers.BaseWorker;
 import akka.workers.CronFormat;
+import com.github.ddth.dlock.IDLock;
+import com.github.ddth.dlock.LockResult;
+import com.github.ddth.dlock.impl.inmem.InmemDLock;
 import play.Logger;
-import scala.concurrent.ExecutionContextExecutor;
+import utils.AppConstants;
 import utils.IdUtils;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Base class to implement cluster-workers. See {@link BaseWorker}.
  *
- * <p>
- * Note: there are 2 types of workers
- * <ul>
- * <li>Singleton worker (see {@link BaseSingletonClusterWorker}): only one singleton worker per
- * cluster-group-id will receive "tick" message per tick.</li>
- * <li>Normal worker: all normal workers will receive "tick" message per tick.</li>
- * </ul>
- * <p>
+ * <p> Note: there are 2 types of workers <ul> <li>Singleton worker (see {@link
+ * BaseSingletonClusterWorker}): only one singleton worker per cluster-group-id will receive "tick"
+ * message per tick.</li> <li>Normal worker: all normal workers will receive "tick" message per
+ * tick.</li> </ul> <p>
  *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
@@ -38,8 +36,8 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     }
 
     /**
-     * If {@code true}, the first run will start as soon as the actor starts,
-     * ignoring tick-match check.
+     * If {@code true}, the first run will start as soon as the actor starts, ignoring tick-match
+     * check.
      *
      * @return
      */
@@ -62,8 +60,12 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     protected void initActor() throws Exception {
         super.initActor();
 
+        initDLock();
+
+        // register message handler
         addMessageHandler(TickMessage.class, this::onTick);
 
+        // fire off event for the first time
         if (runFirstTimeRegardlessScheduling()) {
             self().tell(new FirstTimeTickMessage(), self());
         }
@@ -77,8 +79,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
     protected abstract CronFormat getScheduling();
 
     /**
-     * Sub-class implements this method to actually perform worker business
-     * logic.
+     * Sub-class implements this method to actually perform worker business logic.
      *
      * @param tick
      * @throws Exception
@@ -123,20 +124,24 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
         return false;
     }
 
-    private final AtomicLong _LOCK = new AtomicLong(0);
+    private IDLock lock;
+
+    /**
+     * @since template-v2.6.r6
+     */
+    protected void initDLock() {
+        lock = new InmemDLock(getActorName());
+    }
 
     /**
      * Lock so that worker only do one job at a time.
      *
-     * <p>
-     * Note: lock is reentrant!
-     * </p>
-     *
      * @param lockId
+     * @param durationMs
      * @return
      */
-    protected boolean lock(long lockId) {
-        return lockId != 0 && (_LOCK.get() == lockId || _LOCK.compareAndSet(0, lockId));
+    protected boolean lock(String lockId, long durationMs) {
+        return lock.lock(lockId, 60000) == LockResult.SUCCESSFUL;
     }
 
     /**
@@ -145,34 +150,49 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
      * @param lockId
      * @return
      */
-    protected boolean unlock(long lockId) {
-        return _LOCK.compareAndSet(lockId, 0);
+    protected boolean unlock(String lockId) {
+        LockResult result = lock.unlock(lockId);
+        return result == LockResult.SUCCESSFUL || result == LockResult.NOT_FOUND;
+    }
+
+    /**
+     * If returns {@code true} a lock will be acquired (see {@link #lock(String, long)}) so that at
+     * one given time only one execution of {@link #doJob(TickMessage)} is allowed (same affect as
+     * {@code synchronized doJob(TickMessage)}).
+     *
+     * <p>This method returns {@code true}, sub-class may override this method to fit its own
+     * business rule.</p>
+     *
+     * @return
+     * @since template-v2.6.r6
+     */
+    protected boolean isRunOnlyWhenNotBusy() {
+        return true;
     }
 
     protected void onTick(TickMessage tick) {
-        ExecutionContextExecutor ecs = getRegistry()
-                .getExecutionContextExecutor("worker-dispatcher");
-        if (ecs == null) {
-            ecs = getRegistry().getDefaultExecutionContextExecutor();
-        }
-        ecs.execute(() -> {
-            if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
-                long lockId = IdUtils.nextIdAsLong();
-                if (lock(lockId)) {
+        if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
+            getExecutionContextExecutor(AppConstants.THREAD_POOL_WORKER).execute(() -> {
+                final String lockId = isRunOnlyWhenNotBusy() ? IdUtils.nextId() : null;
+                if (lockId == null || lock(lockId, 60000)) {
                     try {
                         updateLastTick(tick);
                         doJob(tick);
                     } catch (Exception e) {
-                        Logger.error("Error while doing job: " + e.getMessage(), e);
+                        Logger.error(
+                                "{" + getActorPath() + "} Error while doing job: " + e.getMessage(),
+                                e);
                     } finally {
-                        unlock(lockId);
+                        if (lockId != null) {
+                            unlock(lockId);
+                        }
                     }
                 } else {
                     // Busy processing a previous message
-                    Logger.warn("{" + getActorPath() + "} Received TICK message from " + sender()
-                            + ", but I am busy! " + tick);
+                    Logger.warn("{" + getActorPath() + "} Received TICK message, but I am busy! "
+                            + tick);
                 }
-            }
-        });
+            });
+        }
     }
 }

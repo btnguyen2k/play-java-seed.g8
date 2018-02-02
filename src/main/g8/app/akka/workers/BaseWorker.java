@@ -1,41 +1,30 @@
 package akka.workers;
 
-import java.util.Collection;
-import java.util.Collections;
-
+import akka.BaseActor;
+import akka.TickMessage;
 import com.github.ddth.dlock.IDLock;
 import com.github.ddth.dlock.LockResult;
 import com.github.ddth.dlock.impl.inmem.InmemDLock;
-
-import akka.BaseActor;
-import akka.TickMessage;
 import play.Logger;
-import scala.concurrent.ExecutionContextExecutor;
+import utils.AppConstants;
 import utils.IdUtils;
+
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * Base class to implement workers.
  *
- * <p>
- * Worker implementation:
- * <ul>
- * <li>Worker is scheduled to perform task. Scheduling configuration is in Cron-like
- * format (see {@link CronFormat} and {@link #getScheduling()}).</li>
- * <li>At every "tick", worker receives a "tick" message (see
- * {@link TickMessage}). The "tick" message carries a timestamp and a unique id. This timestamp is
- * checked against worker's scheduling configuration so determine that worker's task should be fired
- * off.</li>
- * <li>If worker's task is due, {@link #doJob(TickMessage)} is called. Sub-class
- * implements this method to perform its own business logic.
- * <ul>
- * <li>Before calling {@link #doJob(TickMessage)}, a lock will be acquired (see
- * {@link #lock(String, long)}) so that at one given time only one execution of
- * {@link #doJob(TickMessage)} is allowed (save affect as
- * {@code synchronized doJob(TickMessage)}).</li>
- * </ul>
- * </li>
- * </ul>
- * </p>
+ * <p> Worker implementation: <ul> <li>Worker is scheduled to perform task. Scheduling configuration
+ * is in Cron-like format (see {@link CronFormat} and {@link #getScheduling()}).</li> <li>At every
+ * "tick", worker receives a "tick" message (see {@link TickMessage}). The "tick" message carries a
+ * timestamp and a unique id. This timestamp is checked against worker's scheduling configuration so
+ * determine that worker's task should be fired off.</li> <li>If worker's task is due, {@link
+ * #doJob(TickMessage)} is called. Sub-class implements this method to perform its own business
+ * logic. <ul> <li>Before calling {@link #doJob(TickMessage)}, a lock will be acquired (see {@link
+ * #lock(String, long)} and {@link #isRunOnlyWhenNotBusy()}) so that at one given time only one
+ * execution of {@link #doJob(TickMessage)} is allowed (same affect as {@code synchronized
+ * doJob(TickMessage)}).</li> </ul> </li> </ul> </p>
  *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.2
@@ -53,8 +42,8 @@ public abstract class BaseWorker extends BaseActor {
     }
 
     /**
-     * If {@code true}, the first "tick" will fire as soon as the actor starts,
-     * ignoring tick-match check.
+     * If {@code true}, the first "tick" will fire as soon as the actor starts, ignoring tick-match
+     * check.
      *
      * @return
      * @since template-v0.1.2.1
@@ -100,6 +89,7 @@ public abstract class BaseWorker extends BaseActor {
      *
      * @param lockId
      * @return
+     * @since template-v2.6.r4
      */
     protected boolean unlock(String lockId) {
         LockResult result = lock.unlock(lockId);
@@ -134,8 +124,7 @@ public abstract class BaseWorker extends BaseActor {
     protected abstract CronFormat getScheduling();
 
     /**
-     * Sub-class implements this method to actually perform worker business
-     * logic.
+     * Sub-class implements this method to actually perform worker business logic.
      *
      * @param tick
      * @throws Exception
@@ -176,16 +165,26 @@ public abstract class BaseWorker extends BaseActor {
         return false;
     }
 
+    /**
+     * If returns {@code true} a lock will be acquired (see {@link #lock(String, long)}) so that at
+     * one given time only one execution of {@link #doJob(TickMessage)} is allowed (same affect as
+     * {@code synchronized doJob(TickMessage)}).
+     *
+     * <p>This method returns {@code true}, sub-class may override this method to fit its own
+     * business rule.</p>
+     *
+     * @return
+     * @since template-v2.6.r6
+     */
+    protected boolean isRunOnlyWhenNotBusy() {
+        return true;
+    }
+
     protected void onTick(TickMessage tick) {
-        ExecutionContextExecutor ecs = getRegistry()
-                .getExecutionContextExecutor("worker-dispatcher");
-        if (ecs == null) {
-            ecs = getRegistry().getDefaultExecutionContextExecutor();
-        }
-        ecs.execute(() -> {
-            if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
-                final String lockId = IdUtils.nextId();
-                if (lock(lockId, 60000)) {
+        if (isTickMatched(tick) || tick instanceof FirstTimeTickMessage) {
+            getExecutionContextExecutor(AppConstants.THREAD_POOL_WORKER).execute(() -> {
+                final String lockId = isRunOnlyWhenNotBusy() ? IdUtils.nextId() : null;
+                if (lockId == null || lock(lockId, 60000)) {
                     try {
                         lastTick = tick;
                         doJob(tick);
@@ -194,15 +193,16 @@ public abstract class BaseWorker extends BaseActor {
                                 "{" + getActorPath() + "} Error while doing job: " + e.getMessage(),
                                 e);
                     } finally {
-                        unlock(lockId);
+                        if (lockId != null) {
+                            unlock(lockId);
+                        }
                     }
                 } else {
                     // Busy processing a previous message
                     Logger.warn("{" + getActorPath() + "} Received TICK message, but I am busy! "
                             + tick);
                 }
-            }
-        });
+            });
+        }
     }
-
 }

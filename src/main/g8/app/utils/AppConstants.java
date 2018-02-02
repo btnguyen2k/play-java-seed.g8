@@ -9,6 +9,10 @@ import java.nio.charset.Charset;
  * @since template-v0.1.0
  */
 public class AppConstants {
+    public final static String THREAD_POOL_DEFAULT = "default-dispatcher";
+    public final static String THREAD_POOL_DB = "db-dispatcher";
+    public final static String THREAD_POOL_WORKER = "worker-dispatcher";
+
     public final static Charset UTF8 = Charset.forName("UTF-8");
 
     public final static String CONTENT_TYPE_JSON = "application/json; charset=UTF-8";

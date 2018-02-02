@@ -1,73 +1,46 @@
 <!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
-<!-- for Development Env -->
+<!-- for Development Env: Log everything to stdout -->
 <configuration>
-	<conversionRule conversionWord="coloredLevel"
-		converterClass="play.api.libs.logback.ColoredLevel" />
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
-	<!-- Log messages to file -->
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file><![CDATA[${app.logdir:-.}/application.log]]></file>
-		<encoder>
-			<pattern><![CDATA[%date [%level] from %logger in %thread - %message%n%xException]]></pattern>
-		</encoder>
-	</appender>
-	<appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FILE" />
-	</appender>
+    <!-- Log messages to console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<target>System.out</target>-->
+        <encoder>
+            <pattern><![CDATA[%date{yyyy-MM-dd HH:mm:ss.SSSZ} [%level] %logger - %message%n%xException]]></pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC_CONSOLE" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="CONSOLE" />
+    </appender>
 
-	<!-- Log messages to stdout -->
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern><![CDATA[%date %coloredLevel %logger{15} - %message%n%xException{10}]]></pattern>
-		</encoder>
-	</appender>
-	<appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="STDOUT" />
-	</appender>
+    <!-- Log raw messages to console, useful for transaction log that can be replayed -->
+    <appender name="CONSOLE_RAW" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<target>System.out</target>-->
+        <encoder>
+            <pattern><![CDATA[%message%n]]></pattern>
+        </encoder>
+    </appender>
+    <appender name="ASYNC_CONSOLE_RAW" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="CONSOLE_RAW" />
+    </appender>
 
-	<!-- Off these ones as they are annoying, and anyway we manage configuration 
-		ourselves -->
-	<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
-	<logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader"
-		level="OFF" />
-	<logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread"
-		level="OFF" />
-	<logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+    <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
+    <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
+    <logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
+    <logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
+    <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
 
-	<logger name="play" level="INFO" />
-	<logger name="application" level="DEBUG" />
-	<logger name="akka.actor" level="INFO" />
+    <logger name="play" level="INFO" />
+    <logger name="application" level="DEBUG" />
+    <logger name="akka.actor" level="INFO" />
 
-	<root level="INFO">
-		<appender-ref ref="ASYNC_FILE" />
-		<appender-ref ref="ASYNC_STDOUT" />
-	</root>
+    <!-- additivity=false ensures action data only goes to the action log -->
+    <logger name="API_DISPATCHER" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_CONSOLE_RAW" />
+    </logger>
 
-	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
-	<appender name="FILE_API_DISPATCHER" class="ch.qos.logback.core.FileAppender">
-		<file><![CDATA[${app.logdir:-.}/api.log]]></file>
-		<encoder>
-			<pattern><![CDATA[%message%n]]></pattern>
-		</encoder>
-	</appender>
-	<appender name="ASYNC_FILE_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FILE_API_DISPATCHER" />
-	</appender>
-
-	<!-- Log raw messages to stdout, useful for transaction log that can be 
-		replayed -->
-	<appender name="STDOUT_API_DISPATCHER" class="ch.qos.logback.core.ConsoleAppender">
-		<encoder>
-			<pattern><![CDATA[%message%n]]></pattern>
-		</encoder>
-	</appender>
-	<appender name="ASYNC_STDOUT_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="STDOUT_API_DISPATCHER" />
-	</appender>
-
-	<!-- additivity=false ensures action data only goes to the action log -->
-	<logger name="API_DISPATCHER" level="INFO" additivity="false">
-		<appender-ref ref="ASYNC_FILE_API_DISPATCHER" />
-		<appender-ref ref="ASYNC_STDOUT_API_DISPATCHER" />
-	</logger>
+    <root level="INFO">
+        <appender-ref ref="ASYNC_CONSOLE" />
+    </root>
 </configuration>

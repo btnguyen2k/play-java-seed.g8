@@ -1,0 +1,1 @@
+src/main/g8/start_node0.sh

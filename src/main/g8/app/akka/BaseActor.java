@@ -6,6 +6,7 @@ import com.google.inject.Provider;
 import modules.registry.IRegistry;
 import modules.registry.RegistryGlobal;
 import play.Logger;
+import scala.concurrent.ExecutionContextExecutor;
 
 import java.util.Collection;
 import java.util.Map;
@@ -141,6 +142,18 @@ public class BaseActor extends UntypedAbstractActor {
         } finally {
             super.postStop();
         }
+    }
+
+    /**
+     * Get the {@link ExecutionContextExecutor} instance to do async work.
+     *
+     * @param name
+     * @return
+     * @since template-v2.6.r6
+     */
+    protected ExecutionContextExecutor getExecutionContextExecutor(String name) {
+        ExecutionContextExecutor ecs = getRegistry().getExecutionContextExecutor(name);
+        return ecs != null ? ecs : getRegistry().getDefaultExecutionContextExecutor();
     }
 
     /**

@@ -1,25 +1,17 @@
 package modules.registry;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import javax.inject.Inject;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
-import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-
-import com.typesafe.config.Config;
-
+import akka.ConfigurationException;
 import akka.TickFanoutActor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import api.ApiDispatcher;
+import com.typesafe.config.Config;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 import play.Application;
 import play.Logger;
 import play.i18n.Lang;
@@ -28,6 +20,14 @@ import play.inject.ApplicationLifecycle;
 import play.libs.ws.WSClient;
 import scala.concurrent.ExecutionContextExecutor;
 import utils.AppConfigUtils;
+
+import javax.inject.Inject;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Application's central registry implementation.
@@ -50,7 +50,7 @@ public class RegistryImpl implements IRegistry {
      */
     @Inject
     public RegistryImpl(ApplicationLifecycle lifecycle, Application playApp,
-                        ActorSystem actorSystem, MessagesApi messagesApi, WSClient wsClient) {
+            ActorSystem actorSystem, MessagesApi messagesApi, WSClient wsClient) {
         this.playApp = playApp;
         this.appConfig = playApp.config();
         this.actorSystem = actorSystem;
@@ -132,14 +132,16 @@ public class RegistryImpl implements IRegistry {
 
     private void initApplicationContext() {
         String strConfig = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
-        String[] configFiles = !StringUtils.isBlank(strConfig) ? strConfig.trim().split("[,;\\s]+")
+        String[] configFiles = !StringUtils.isBlank(strConfig)
+                ? strConfig.trim().split("[,;\\s]+")
                 : null;
         if (configFiles == null || configFiles.length < 1) {
             Logger.info("No Spring configuration file defined, skip creating ApplicationContext.");
         } else {
             List<String> configLocations = new ArrayList<>();
             for (String configFile : configFiles) {
-                File f = configFile.startsWith("/") ? new File(configFile)
+                File f = configFile.startsWith("/")
+                        ? new File(configFile)
                         : new File(playApp.path(), configFile);
                 if (f.exists() && f.isFile() && f.canRead()) {
                     configLocations.add("file:" + f.getAbsolutePath());
@@ -160,21 +162,21 @@ public class RegistryImpl implements IRegistry {
             }
         }
 
-//        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
-//        if (!StringUtils.isBlank(configFile)) {
-//            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
-//                    : new File(playApp.path(), configFile);
-//            if (springConfigFile.exists() && springConfigFile.isFile()
-//                    && springConfigFile.canRead()) {
-//                AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
-//                        "file:" + springConfigFile.getAbsolutePath());
-//                applicationContext.start();
-//                appContext = applicationContext;
-//            } else {
-//                Logger.warn(
-//                        "Spring config file [" + springConfigFile + "] not found or not readable!");
-//            }
-//        }
+        //        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
+        //        if (!StringUtils.isBlank(configFile)) {
+        //            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
+        //                    : new File(playApp.path(), configFile);
+        //            if (springConfigFile.exists() && springConfigFile.isFile()
+        //                    && springConfigFile.canRead()) {
+        //                AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
+        //                        "file:" + springConfigFile.getAbsolutePath());
+        //                applicationContext.start();
+        //                appContext = applicationContext;
+        //            } else {
+        //                Logger.warn(
+        //                        "Spring config file [" + springConfigFile + "] not found or not readable!");
+        //            }
+        //        }
     }
 
     private void destroyApplicationContext() {
@@ -190,6 +192,7 @@ public class RegistryImpl implements IRegistry {
     }
 
     /*----------------------------------------------------------------------*/
+
     /**
      * {@inheritDoc}
      */
@@ -277,15 +280,22 @@ public class RegistryImpl implements IRegistry {
         return actorSystem.dispatcher();
     }
 
+    private Map<String, Boolean> exceptionLoggedGetECE = new HashMap<>();
+
     /**
      * {@inheritDoc}
      */
     @Override
     public ExecutionContextExecutor getExecutionContextExecutor(String id) {
-        if (StringUtils.startsWith(id, "akka.")) {
+        id = !StringUtils.startsWith(id, "akka.actor.") ? "akka.actor." + id : id;
+        try {
             return actorSystem.dispatchers().lookup(id);
-        } else {
-            return actorSystem.dispatchers().lookup("akka.actor." + id);
+        } catch (ConfigurationException e) {
+            if (exceptionLoggedGetECE.get(id) == null) {
+                Logger.warn(e.getMessage());
+                exceptionLoggedGetECE.put(id, Boolean.TRUE);
+            }
+            return null;
         }
     }
     /*----------------------------------------------------------------------*/

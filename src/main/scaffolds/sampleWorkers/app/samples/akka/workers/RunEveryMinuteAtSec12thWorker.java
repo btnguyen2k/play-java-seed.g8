@@ -1,7 +1,6 @@
 package samples.akka.workers;
 
 import java.util.Date;
-import java.util.Random;
 
 import com.github.ddth.commons.utils.DateFormatUtils;
 
@@ -11,18 +10,17 @@ import akka.workers.CronFormat;
 import play.Logger;
 
 /**
- * Sample worker that runs every 10 seconds.
+ * Sample worker that runs every minute at the 12th second.
  * 
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.2
  */
-public class RunEvery10SecsWorker extends BaseWorker {
+public class RunEveryMinuteAtSec12thWorker extends BaseWorker {
 
-    private CronFormat scheduling = CronFormat.parse("*/10 * *");
-    private Random random = new Random(System.currentTimeMillis());
+    private CronFormat scheduling = CronFormat.parse("12 * *");
 
     /**
-     * Schedule to do job every 10 seconds.
+     * Schedule to do job every minute at the 12th second.
      */
     @Override
     protected CronFormat getScheduling() {
@@ -30,10 +28,8 @@ public class RunEvery10SecsWorker extends BaseWorker {
     }
 
     @Override
-    protected void doJob(TickMessage tick) throws InterruptedException {
-        System.out.println("[" + getActorPath() + "] do job " + tick);
+    protected void doJob(TickMessage tick) {
         Logger.info("[" + getActorPath() + "] do job " + tick);
-        Thread.sleep(7500 + random.nextInt(4000));
     }
 
 }
