@@ -16,6 +16,7 @@
                 <entry key="samples" value="pjHrE7MM3nAczEU995hBbhYAGw7bvthQ" />
             </map>
         </property>
+        <!--
         <property name="apiHandlers">
             <map>
                 <entry key="echo">
@@ -29,6 +30,7 @@
                 </entry>
             </map>
         </property>
+        -->
     </bean>
 
 </beans>

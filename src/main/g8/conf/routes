@@ -12,4 +12,5 @@ GET     /versionedAssets/*file              controllers.Assets.versioned(file)
 #GET     /assets/*file                       controllers.Assets.at(path="/public", file: Asset)
 
 ## Include routes for samples
--> /samples samples.Routes
+-> /samples         samples.Routes
+-> /samplesApi      samplesApi.Routes

@@ -93,25 +93,38 @@ public class RegistryImpl implements IRegistry {
     }
 
     private ActorRef actorTickFanout;
-    private List<ActorRef> actorList = new ArrayList<>();
+    private List<ActorRef> workerList = new ArrayList<>();
 
-    private void initWorkers() throws ClassNotFoundException {
-        // create "tick" fanout actor
+    private ActorRef createWorker(String className) throws ClassNotFoundException {
+        Logger.info("Creating worker [" + className + "]...");
+        Class<?> clazz = Class.forName(className);
+        return actorSystem.actorOf(Props.create(clazz), clazz.getSimpleName());
+    }
+
+    private void initWorkers() {
+        // create "tick" fan-out actor
         Logger.info("Creating actor [" + TickFanoutActor.ACTOR_NAME + "]...");
         actorTickFanout = actorSystem.actorOf(TickFanoutActor.PROPS, TickFanoutActor.ACTOR_NAME);
 
         List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList, "akka.workers");
         if (clazzs != null) {
             for (String clazzName : clazzs) {
-                Class<?> clazz = Class.forName(clazzName);
-                Logger.info("Creating worker [" + clazz + "]...");
-                actorList.add(actorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
+                try {
+                    ActorRef worker = createWorker(clazzName);
+                    if (worker != null) {
+                        workerList.add(worker);
+                    } else {
+                        Logger.warn("Cannot create worker [" + clazzName + "]!");
+                    }
+                } catch (ClassNotFoundException e) {
+                    Logger.error("Error creating worker, class not found [" + clazzName + "]!");
+                }
             }
         }
     }
 
     private void destroyWorkers() {
-        for (ActorRef actorRef : actorList) {
+        for (ActorRef actorRef : workerList) {
             if (actorRef != null) {
                 try {
                     actorSystem.stop(actorRef);
@@ -158,25 +171,9 @@ public class RegistryImpl implements IRegistry {
                 appContext = applicationContext;
             } else {
                 Logger.warn(
-                        "No Spring configuration file is valid, skip creating ApplicationContext!");
+                        "No valid Spring configuration file(s), skip creating ApplicationContext!");
             }
         }
-
-        //        String configFile = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
-        //        if (!StringUtils.isBlank(configFile)) {
-        //            File springConfigFile = configFile.startsWith("/") ? new File(configFile)
-        //                    : new File(playApp.path(), configFile);
-        //            if (springConfigFile.exists() && springConfigFile.isFile()
-        //                    && springConfigFile.canRead()) {
-        //                AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
-        //                        "file:" + springConfigFile.getAbsolutePath());
-        //                applicationContext.start();
-        //                appContext = applicationContext;
-        //            } else {
-        //                Logger.warn(
-        //                        "Spring config file [" + springConfigFile + "] not found or not readable!");
-        //            }
-        //        }
     }
 
     private void destroyApplicationContext() {

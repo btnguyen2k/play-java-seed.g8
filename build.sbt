@@ -4,7 +4,8 @@ val conf       = ConfigFactory.parseFile(new File("conf/application.conf")).reso
 val appName    = conf.getString("app.name").toLowerCase().replaceAll("\\W+", "-")
 val appVersion = conf.getString("app.version")
 
-sbtPlugin := true
+sbtPlugin    := true
+scalaVersion := "2.12.4"
 giter8.ScaffoldPlugin.projectSettings
 
 // Custom Maven repository
@@ -27,13 +28,33 @@ EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE1
 // Use .class files instead of generated .scala files for views and routes
 //EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
 
+/* Docker packaging options */
+// Manual docker build:
+//// 1. dir$ sbt clean docker:stage
+//// 2. dir$ docker build --force-rm --squash -t play-java-seed:2.6.r6 ./target/docker/stage
+// Auto docker build (local):
+//// 1. dir$ sbt clean docker:publishLocal
+dockerCommands := Seq()
+import com.typesafe.sbt.packager.docker._
+dockerCommands := Seq(
+    Cmd("FROM"          , "openjdk:8-jre-alpine"),
+    Cmd("ADD"           , "opt /opt"),
+    Cmd("RUN"           , "apk add --no-cache -U tzdata bash && ln -s /opt/docker /opt/" + appName + " && chown -R daemon:daemon /opt"),
+    Cmd("RUN"           , "cp /usr/share/zoneinfo/Asia/Ho_Chi_Minh /etc/localtime"),
+    Cmd("WORKDIR"       , "/opt/" + appName),
+    Cmd("USER"          , "daemon"),
+    ExecCmd("ENTRYPOINT", "./bin/" + appName)
+)
+packageName in Docker := appName
+version in Docker     := appVersion
+
 // Exclude the Play's the API documentation
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
 
-javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions    ++= Seq("-source", "1.8", "-target", "1.8")
 routesGenerator := InjectedRoutesGenerator
-pipelineStages := Seq(digest, gzip)
+pipelineStages  := Seq(digest, gzip)
 
 // Dependency configurations
 val _akkaClusterVersion      = "2.5.8"

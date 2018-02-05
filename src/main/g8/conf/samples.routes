@@ -29,18 +29,3 @@ POST        /cp/deleteUser              samples.controllers.SampleControlPanelCo
 GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)
 GET         /form                       samples.controllers.SamplePageController.formDemo
 POST        /form                       samples.controllers.SamplePageController.formDemoSubmit
-
-# Examples of controller that handles web service calls
-GET         /api/info                   samples.controllers.SampleApiController.infoGet
-POST        /api/info                   samples.controllers.SampleApiController.infoPost
-
-GET         /api/echo                   samples.controllers.SampleApiController.echoGet
-POST        /api/echo                   samples.controllers.SampleApiController.echoPost
-PUT         /api/echo                   samples.controllers.SampleApiController.echoPut
-PATCH       /api/echo                   samples.controllers.SampleApiController.echoPatch
-DELETE      /api/echo                   samples.controllers.SampleApiController.echoDelete
-
-GET         /api/noApi                  samples.controllers.SampleApiController.noApi
-POST        /api/noApi                  samples.controllers.SampleApiController.noApi
-PUT         /api/noApi                  samples.controllers.SampleApiController.noApi
-DELETE      /api/noApi                  samples.controllers.SampleApiController.noApi
