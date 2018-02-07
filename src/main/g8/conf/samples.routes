@@ -24,8 +24,3 @@ GET         /cp/editUser                samples.controllers.SampleControlPanelCo
 POST        /cp/editUser                samples.controllers.SampleControlPanelController.editUserSubmit(u: String?="")
 GET         /cp/deleteUser              samples.controllers.SampleControlPanelController.deleteUser(u: String?="")
 POST        /cp/deleteUser              samples.controllers.SampleControlPanelController.deleteUserSubmit(u: String?="")
-
-# Examples of controller that handles web-page rendering & form submission
-GET         /switchLang                 samples.controllers.SamplePageController.switchLang(lang: String)
-GET         /form                       samples.controllers.SamplePageController.formDemo
-POST        /form                       samples.controllers.SamplePageController.formDemoSubmit
