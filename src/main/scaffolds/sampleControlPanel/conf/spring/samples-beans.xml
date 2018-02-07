@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans 
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context 
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/util 
+                           http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- In-memory cache, no expiry -->
+    <bean id="CACHE_FACTORY" class="com.github.ddth.cacheadapter.cacheimpl.guava.GuavaCacheFactory"
+          init-method="init" destroy-method="destroy">
+        <property name="cloneCacheEntries" value="true" />
+        <property name="defaultExpireAfterAccess" value="-1" />
+        <property name="defaultExpireAfterWrite" value="-1" />
+    </bean>
+
+    <!-- Datasource: HSQLDB -->
+    <bean id="DATASOURCE" class="com.zaxxer.hikari.HikariDataSource">
+        <property name="driverClassName" value="org.hsqldb.jdbcDriver" />
+        <property name="jdbcUrl" value="jdbc:hsqldb:./data/samples.db" />
+        <property name="username" value="sa" />
+        <property name="password" value="" />
+        <property name="connectionTimeout" value="5000" />
+        <property name="idleTimeout" value="900000" />
+        <property name="maxLifetime" value="1800000" />
+        <property name="maximumPoolSize" value="4" />
+        <property name="initializationFailTimeout" value="-1" />
+        <property name="leakDetectionThreshold" value="300000" />
+    </bean>
+
+    <bean id="DAO_USER" class="samples.bo.user.jdbc.JdbcUserDao" init-method="init" destroy-method="destroy">
+        <property name="cacheFactory" ref="CACHE_FACTORY" />
+        <property name="jdbcHelper">
+            <bean class="com.github.ddth.dao.jdbc.impl.DdthJdbcHelper"
+                  init-method="init" destroy-method="destroy">
+                <property name="dataSource" ref="DATASOURCE"/>
+            </bean>
+        </property>
+    </bean>
+</beans>
