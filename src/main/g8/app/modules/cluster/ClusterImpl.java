@@ -66,18 +66,29 @@ public class ClusterImpl implements ICluster {
         destroyCluster();
     }
 
-    private List<ActorRef> actorList = new ArrayList<>();
+    private List<ActorRef> workerList = new ArrayList<>();
 
-    private void initClusterWorkers() throws ClassNotFoundException {
+    private ActorRef createWorker(String className) throws ClassNotFoundException {
+        Logger.info("Creating cluster-worker [" + className + "]...");
+        Class<?> clazz = Class.forName(className);
+        return clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName());
+    }
+
+    private void initClusterWorkers() {
         if (clusterActorSystem != null) {
-            List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList,
-                    "akka.cluster.workers");
+            List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList, "akka.cluster.workers");
             if (clazzs != null) {
                 for (String clazzName : clazzs) {
-                    Class<?> clazz = Class.forName(clazzName);
-                    Logger.info("Creating cluster-worker " + clazz + "...");
-                    actorList.add(
-                            clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName()));
+                    try {
+                        ActorRef worker = createWorker(clazzName);
+                        if (worker != null) {
+                            workerList.add(worker);
+                        } else {
+                            Logger.warn("Cannot create cluster-worker [" + clazzName + "]!");
+                        }
+                    } catch (ClassNotFoundException e) {
+                        Logger.error("Error creating cluster-worker, class not found [" + clazzName + "]!");
+                    }
                 }
             }
         }
@@ -85,7 +96,7 @@ public class ClusterImpl implements ICluster {
 
     private void destroyClusterWorkers() {
         if (clusterActorSystem != null) {
-            for (ActorRef actorRef : actorList) {
+            for (ActorRef actorRef : workerList) {
                 try {
                     clusterActorSystem.stop(actorRef);
                 } catch (Exception e) {

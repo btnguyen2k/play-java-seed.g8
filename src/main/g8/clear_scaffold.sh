@@ -5,6 +5,7 @@
 echo rm -rf app/samples/akka/
 rm -rf app/samples/akka/
 echo "## Samples: worker configs" > conf/samples.d/samples_worker.conf
+echo "## Samples: cluster-worker configs" > conf/samples.d/samples_cluster_worker.conf
 
 echo rm -rf app/samples/api/
 rm -rf app/samples/api/
