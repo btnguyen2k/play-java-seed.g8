@@ -1,5 +1,5 @@
 <!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
-<!-- for Development Env: Log everything to stdout -->
+<!-- for Docker Env: same as production config, but log everything to console -->
 <configuration>
     <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
@@ -40,7 +40,7 @@
     <logger name="play" level="INFO" additivity="false">
         <appender-ref ref="ASYNC_CONSOLE" />
     </logger>
-    <logger name="application" level="DEBUG" additivity="false">
+    <logger name="application" level="INFO" additivity="false">
         <appender-ref ref="ASYNC_CONSOLE" />
     </logger>
     <logger name="akka.actor" level="INFO" additivity="false">

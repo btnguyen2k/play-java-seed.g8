@@ -103,7 +103,6 @@ doStart() {
     	fi
     fi
     RUN_CMD+=(-Dpidfile.path=\$APP_PID)
-    RUN_CMD+=(-Dakka.log-config-on-start=true)
     if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "0" ]; then
         RUN_CMD+=(-Dhttp.proxyHost=\$APP_PROXY_HOST -Dhttp.proxyPort=\$APP_PROXY_PORT)
         RUN_CMD+=(-Dhttps.proxyHost=\$APP_PROXY_HOST -Dhttps.proxyPort=\$APP_PROXY_PORT)
@@ -135,7 +134,7 @@ doStart() {
     RUN_CMD+=(-J-XX:+UseG1GC -J-XX:G1RSetUpdatingPauseTimePercent=5 -J-XX:MaxGCPauseMillis=500)
     RUN_CMD+=(-J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-XX:+PrintHeapAtGC -J-XX:+PrintTenuringDistribution)
     RUN_CMD+=(-J-XX:+PrintGCApplicationStoppedTime -J-XX:+PrintPromotionFailure -J-XX:PrintFLSStatistics=1)
-    RUN_CMD+=(-J-Xloggc:\${APP_HOME}/logs/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
+    RUN_CMD+=(-J-Xloggc:\${APP_LOGDIR}/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
     RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
     if [ "\$APP_CLUSTER_ADDR" != "" ]; then
         RUN_CMD+=(-D\${_CLUSTER_CONF_PREFIX_}akka.remote.netty.tcp.hostname=\$APP_CLUSTER_ADDR)

@@ -31,5 +31,9 @@ echo rm -rf app/samples/controllers/SampleController.java
 rm -rf app/samples/controllers/SampleController.java
 echo rm -rf app/samples/controllers/SampleControlPanelController.java
 rm -rf app/samples/controllers/SampleControlPanelController.java
+echo rm -rf conf/messages
+rm -rf conf/messages
+echo rm -rf conf/messages.*
+rm -rf conf/messages.*
 echo "## Sample: ControlPanel routes" > conf/samples.routes
 echo "## Enable sample module" > conf/samples.d/samples_module.conf

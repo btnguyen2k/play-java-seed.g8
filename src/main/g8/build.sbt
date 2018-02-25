@@ -30,10 +30,10 @@ EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE1
 
 /* Docker packaging options */
 // Manual docker build:
-//// 1. dir$ sbt clean docker:stage
-//// 2. dir$ docker build --force-rm --squash -t <appName>:<appVersion> ./target/docker/stage
+//// 1. dir\$ sbt clean docker:stage
+//// 2. dir\$ docker build --force-rm --squash -t <appName>:<appVersion> ./target/docker/stage
 // Auto docker build (local):
-//// 1. dir$ sbt clean docker:publishLocal
+//// 1. dir\$ sbt clean docker:publishLocal
 dockerCommands := Seq()
 import com.typesafe.sbt.packager.docker._
 dockerCommands := Seq(

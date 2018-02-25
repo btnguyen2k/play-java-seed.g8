@@ -2,6 +2,7 @@ package samples.controllers;
 
 import controllers.BasePageController;
 import play.data.Form;
+import play.i18n.Lang;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import samples.forms.FormLogin;
@@ -51,6 +52,12 @@ public class SampleController extends BasePageController {
             return ok(html);
         }
         SessionUtils.login(session(), form.get().getUser());
+
+        //set preferred language
+        String langCode = form.get().getLanguage();
+        Lang lang = Lang.forCode(langCode);
+        setLanguage(lang != null ? lang : lang());
+
         return redirect(samples.controllers.routes.SampleController.index());
     }
 

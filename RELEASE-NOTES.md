@@ -1,5 +1,14 @@
 # Release Notes
 
+## 2018-02-xx: template-v2.6.r6
+
+**g8Scaffold**
+
+- Refactor & move samples to scaffolds: `sampleApis`, `sampleControlPanel`, `sampleWorkers`.
+- Script `clear_scaffold.sh` to clean-up scaffolds.
+- Docker support.
+
+
 ## 2018-01-09: template-v2.6.r5
 
 **Distributed worker**

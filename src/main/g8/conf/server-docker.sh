@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# For Production Env                                                            #
+# For Docker Env                                                                #
 # ----------------------------------------------------------------------------- #
 # Start/Stop script on *NIX                                                     #
 # ----------------------------------------------------------------------------- #
@@ -33,13 +33,15 @@ popd > /dev/null
 # Override environment variables if needed after the next line
 . \$_basedir/server-env.sh
 
-DEFAULT_APP_MEM=128
+DEFAULT_APP_MEM=64
 DEFAULT_APP_CONF=application-prod.conf
-DEFAULT_APP_LOGBACK=logback-prod.xml
+DEFAULT_APP_LOGBACK=logback-docker.xml
 
 APP_MEM=\$DEFAULT_APP_MEM
 APP_CONF=\$DEFAULT_APP_CONF
 APP_LOGBACK=\$DEFAULT_APP_LOGBACK
+
+APP_PID=/dev/null
 
 doStart() {
     preStart
@@ -56,17 +58,6 @@ doStart() {
     		RUN_CMD+=(-Dhttps.keyStore=\$FINAL_APP_SSL_KEYSTORE -Dhttps.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     	fi
     fi
-    RUN_CMD+=(-Dpidfile.path=\$APP_PID)
-    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "0" ]; then
-        RUN_CMD+=(-Dhttp.proxyHost=\$APP_PROXY_HOST -Dhttp.proxyPort=\$APP_PROXY_PORT)
-        RUN_CMD+=(-Dhttps.proxyHost=\$APP_PROXY_HOST -Dhttps.proxyPort=\$APP_PROXY_PORT)
-    fi
-    if [ "\$APP_PROXY_USER" != "" ]; then
-        RUN_CMD+=(-Dhttp.proxyUser=\$APP_PROXY_USER -Dhttp.proxyPassword=\$APP_PROXY_PASSWORD)
-    fi
-    if [ "\$APP_NOPROXY_HOST" != "" ]; then
-        RUN_CMD+=(-Dhttp.nonProxyHosts=\$APP_NOPROXY_HOST)
-    fi
     if [ "\$APP_THRIFT_PORT" != "0" -o "\$APP_THRIFT_SSL_PORT" != "0" ]; then
         RUN_CMD+=(-Dthrift.addr=\$APP_THRIFT_ADDR)
         if [ "\$APP_THRIFT_PORT" != "0" ]; then
@@ -82,20 +73,42 @@ doStart() {
     if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
         RUN_CMD+=(-Djavax.net.ssl.keyStore=\$FINAL_APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     fi
+    RUN_CMD+=(-Dpidfile.path=\$APP_PID)
+
+    # Setup proxy from environment variables
+    APP_PROXY_HOST="\$PROXY_HOST"
+    APP_PROXY_PORT="\$PROXY_PORT"
+    APP_NOPROXY_HOST="\$NOPROXY_HOST"
+    APP_PROXY_USER="\$PROXY_USER"
+    APP_PROXY_PASSWORD="\$PROXY_PASSWORD"
+    if [ "\$APP_PROXY_HOST" != "" -a "\$APP_PROXY_PORT" != "0" ]; then
+        RUN_CMD+=(-Dhttp.proxyHost=\$APP_PROXY_HOST -Dhttp.proxyPort=\$APP_PROXY_PORT)
+        RUN_CMD+=(-Dhttps.proxyHost=\$APP_PROXY_HOST -Dhttps.proxyPort=\$APP_PROXY_PORT)
+    fi
+    if [ "\$APP_PROXY_USER" != "" ]; then
+        RUN_CMD+=(-Dhttp.proxyUser=\$APP_PROXY_USER -Dhttp.proxyPassword=\$APP_PROXY_PASSWORD)
+    fi
+    if [ "\$APP_NOPROXY_HOST" != "" ]; then
+        RUN_CMD+=(-Dhttp.nonProxyHosts=\$APP_NOPROXY_HOST)
+    fi
+
+    # Setup memory limit from environment variables
+    if [ "\$MEM_LIMIT" != "" -a "\$MEM_LIMIT" != "0" ]; then
+    	APP_MEM="\$MEM_LIMIT"
+    fi
+    if [ "\$MEMORY_LIMIT" != "" -a "\$MEMORY_LIMIT" != "0" ]; then
+    	APP_MEM="\$MEMORY_LIMIT"
+    fi
     RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
     RUN_CMD+=(-J-XX:+UseThreadPriorities -J-XX:ThreadPriorityPolicy=42 -J-XX:+HeapDumpOnOutOfMemoryError -J-Xss256k)
     RUN_CMD+=(-J-XX:+UseTLAB -J-XX:+ResizeTLAB -J-XX:+UseNUMA -J-XX:+PerfDisableSharedMem)
     RUN_CMD+=(-J-XX:+UseG1GC -J-XX:G1RSetUpdatingPauseTimePercent=5 -J-XX:MaxGCPauseMillis=500)
-    RUN_CMD+=(-J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-XX:+PrintHeapAtGC -J-XX:+PrintTenuringDistribution)
-    RUN_CMD+=(-J-XX:+PrintGCApplicationStoppedTime -J-XX:+PrintPromotionFailure -J-XX:PrintFLSStatistics=1)
-    RUN_CMD+=(-J-Xloggc:\${APP_LOGDIR}/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
+    #RUN_CMD+=(-J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-XX:+PrintHeapAtGC -J-XX:+PrintTenuringDistribution)
+    #RUN_CMD+=(-J-XX:+PrintGCApplicationStoppedTime -J-XX:+PrintPromotionFailure -J-XX:PrintFLSStatistics=1)
+    #RUN_CMD+=(-J-Xloggc:\${APP_LOGDIR}/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)
     RUN_CMD+=(-Dspring.profiles.active=production -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
     RUN_CMD+=(\$JVM_EXTRA_OPS)
-    
-    execStart \${RUN_CMD[@]}
-    
-    echo "STARTED \$APP_NAME `date`"
-    
+
     echo "APP_ADDR            : \$APP_ADDR"
     echo "APP_PORT            : \$APP_PORT"
     echo "APP_HTTPS_PORT      : \$APP_HTTPS_PORT"
@@ -111,6 +124,8 @@ doStart() {
     echo "APP_LOGDIR          : \$APP_LOGDIR"
     echo "APP_PID             : \$APP_PID"
     echo "JVM_EXTRA_OPS       : \$JVM_EXTRA_OPS"
+
+    execStartForeground \${RUN_CMD[@]}
 }
 
 ACTION=\$1

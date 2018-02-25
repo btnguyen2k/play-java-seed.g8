@@ -7,7 +7,7 @@
 		<file><![CDATA[${app.logdir:-.}/application.log]]></file>
 		<append>true</append>
 		<encoder>
-			<pattern><![CDATA[%date [%level] from %logger in %thread - %message%n%xException]]></pattern>
+			<pattern><![CDATA[%date{yyyy-MM-dd HH:mm:ss.SSSZ} [%level] %logger - %message%n%xException]]></pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
@@ -18,41 +18,44 @@
 		<appender-ref ref="FILE" />
 	</appender>
 
-	<!-- Off these ones as they are annoying, and anyway we manage configuration 
-		ourselves -->
-	<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
-	<logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader"
-		level="OFF" />
-	<logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread"
-		level="OFF" />
-	<logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
-
-	<logger name="play" level="INFO" />
-	<logger name="application" level="INFO" />
-	<logger name="akka.actor" level="INFO" />
-
-	<root level="INFO">
-		<appender-ref ref="ASYNC_FILE" />
-	</root>
-
 	<!-- Log raw messages to file, useful for transaction log that can be replayed -->
-	<appender name="FILE_API_DISPATCHER" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file><![CDATA[${app.logdir:-.}/api.log]]></file>
+	<appender name="FILE_RAW" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file><![CDATA[${app.logdir:-.}/raw.log]]></file>
 		<append>true</append>
 		<encoder>
 			<pattern><![CDATA[%message%n]]></pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<!-- daily rollover -->
-			<fileNamePattern><![CDATA[${app.logdir:-.}/api.log.%d{yyyy-MM-dd}]]></fileNamePattern>
+			<fileNamePattern><![CDATA[${app.logdir:-.}/raw.log.%d{yyyy-MM-dd}]]></fileNamePattern>
 		</rollingPolicy>
 	</appender>
-	<appender name="ASYNC_FILE_API_DISPATCHER" class="ch.qos.logback.classic.AsyncAppender">
-		<appender-ref ref="FILE_API_DISPATCHER" />
+	<appender name="ASYNC_FILE_RAW" class="ch.qos.logback.classic.AsyncAppender">
+		<appender-ref ref="FILE_RAW" />
 	</appender>
 
+	<!-- Off these ones as they are annoying -->
+	<logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.core.XmlConfigLoader" level="OFF" />
+	<logger name="com.avaje.ebeaninternal.server.lib.BackgroundThread" level="OFF" />
+	<logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+
+	<root level="INFO">
+		<appender-ref ref="ASYNC_FILE" />
+	</root>
+
 	<!-- additivity=false ensures action data only goes to the action log -->
+
+	<logger name="play" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE" />
+	</logger>
+	<logger name="application" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE" />
+	</logger>
+	<logger name="akka.actor" level="INFO" additivity="false">
+		<appender-ref ref="ASYNC_FILE" />
+	</logger>
 	<logger name="API_DISPATCHER" level="INFO" additivity="false">
-		<appender-ref ref="ASYNC_FILE_API_DISPATCHER" />
+		<appender-ref ref="ASYNC_FILE_RAW" />
 	</logger>
 </configuration>

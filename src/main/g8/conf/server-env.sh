@@ -14,7 +14,7 @@ APP_NAME=$name;format="normalize"$
 
 DEFAULT_APP_ADDR=0.0.0.0
 DEFAULT_APP_PORT=9000
-DEFAULT_APP_HTTPS_PORT=`expr \$DEFAULT_APP_PORT + 22`
+DEFAULT_APP_HTTPS_PORT=`expr \$DEFAULT_APP_PORT + 43`
 DEFAULT_APP_MEM=64
 DEFAULT_APP_CONF=application.conf
 DEFAULT_APP_LOGBACK=logback-dev.xml
@@ -25,8 +25,8 @@ DEFAULT_APP_LOGDIR=\$APP_HOME/logs
 DEFAULT_THRIFT_ADDR=\$DEFAULT_APP_ADDR
 # Thrift API Gateway port, default: DEFAULT_APP_PORT+5
 DEFAULT_THRIFT_PORT=`expr \$DEFAULT_APP_PORT + 5`
-# Thrift API Gateway SSL port, default DEFAULT_THRIFT_PORT+22
-DEFAULT_THRIFT_SSL_PORT=`expr \$DEFAULT_THRIFT_PORT + 22`
+# Thrift API Gateway SSL port, default DEFAULT_THRIFT_PORT+43
+DEFAULT_THRIFT_SSL_PORT=`expr \$DEFAULT_THRIFT_PORT + 43`
 
 # gRPC API Gateway listen address, default: same as DEFAULT_APP_ADDR
 DEFAULT_GRPC_ADDR=\$DEFAULT_APP_ADDR
@@ -178,11 +178,23 @@ execStart() {
         shift
     done
 
-    echo -n "Starting \$APP_NAME: "
+    echo -n "Starting \$APP_NAME on `date`..."
 
     "\${CMD[@]}" &
     disown \$!
-    #echo \$! > "\$APP_PID"
+}
+
+execStartForeground() {
+    local CMD=(\$1)
+    shift
+    while [ "\$1" != "" ]; do
+        CMD+=(\$1)
+        shift
+    done
+
+    echo -n "Starting \$APP_NAME on `date`..."
+
+    "\${CMD[@]}"
 }
 
 usageAndExit() {
