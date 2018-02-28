@@ -2,18 +2,19 @@
 
 Giter8 template for generating a Play project in Java.
 
-This project is the base template for my own Play projects in Java.
+This template is for my personal Play projects, but you are free to use it. Feedback and comments are always welcomed!
 
 To create a project:
 
-```
+```shell
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r5](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r6](RELEASE-NOTES.md).
 
 ## Features
 
+- Docker support (since [template-v2.6.r6](RELEASE-NOTES.md)).
 - HTTPS & HTTP/2 support (since [template-v2.6.r1](RELEASE-NOTES.md)).
 - GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md)).
 - Intended for Linux-based applications
@@ -39,8 +40,8 @@ Latest release: [template-v2.6.r5](RELEASE-NOTES.md).
 
 Commands:
 
-- start: `sh conf/server.sh start` or `sh conf/server-prod.sh start`
-- stop : `sh conf/server.sh stop` or `sh conf/server-prod.sh stop`
+- Start: `sh conf/server.sh start` or `sh conf/server-prod.sh start`
+- Stop : `sh conf/server.sh stop` or `sh conf/server-prod.sh stop`
 
 Command line arguments
 
@@ -88,6 +89,34 @@ Command-line arguments for cluster mode:
 Example:
 
 `./conf/server-cluster.sh start --cluster-name MyAwesomeCluster --cluster-port 9007 --cluster-addr 127.0.0.1 --cluster-seed 127.0.0.1:9007 --cluster-seed 127.0.0.1:9008`
+
+### Docker support
+
+Since `template-v2.6.r6`, application can be packaged into a Docker image.
+
+1- Build and Publish Docker image locally
+
+```shell
+sbt docker:publishLocal
+```
+
+The command will build Docker image `$name$:$version$`.
+
+2- Build Docker image manually (more control over the final Docker image)
+
+Build project and generate necessary files to build Docker image (include `Dockerfile`)
+
+```shell
+sbt docker:stage
+```
+
+The command will create necessary files under directory `./target/docker/`
+
+The generated `Dockerfile` is ready-to-go but you are free to inspect and change it. Once you are happy, build Docker image normally, sample command:
+
+```shell
+docker build --force-rm --squash -t $name$:$version$ ./target/docker/stage
+```
 
 
 ## LICENSE & COPYRIGHT
