@@ -1,5 +1,10 @@
 # Release Notes
 
+## 2018-03-02: template-v2.6.r7
+
+- Bug fixes & enhancements.
+
+
 ## 2018-02-28: template-v2.6.r6
 
 **g8Scaffold**

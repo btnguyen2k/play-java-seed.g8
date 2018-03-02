@@ -1,11 +1,5 @@
 package akka.cluster;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import com.github.ddth.commons.utils.MapUtils;
-import com.google.inject.Provider;
-
 import akka.TickMessage;
 import akka.actor.Address;
 import akka.actor.Cancellable;
@@ -13,20 +7,25 @@ import akka.cluster.ClusterEvent.MemberEvent;
 import akka.cluster.ClusterEvent.MemberRemoved;
 import akka.cluster.ClusterEvent.MemberUp;
 import akka.cluster.ClusterEvent.UnreachableMember;
+import com.github.ddth.commons.utils.MapUtils;
+import com.google.inject.Provider;
 import modules.registry.IRegistry;
 import play.Logger;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Actor that:
- * 
+ *
  * <ul>
  * <li>Keeps track of nodes within the cluster.</li>
  * <li>Publishes "tick" message every tick (only if the current node is leader).
  * </li>
  * </ul>
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
@@ -78,8 +77,9 @@ public class MasterActor extends BaseClusterActor {
         addMessageHandler(ClusterEvent.MemberUp.class, this::eventMemberUp);
         addMessageHandler(ClusterEvent.MemberRemoved.class, this::eventMemberRemoved);
         addMessageHandler(ClusterEvent.UnreachableMember.class, (msg) -> {
-            Logger.warn("Node [" + msg.member().address().toString() + "] with roles "
-                    + msg.member().getRoles() + " detected as unreachable.");
+            Logger.warn(
+                    "Node [" + msg.member().address().toString() + "] with roles " + msg.member()
+                            .getRoles() + " detected as unreachable.");
         });
         addMessageHandler(TickMessage.class, this::eventTick);
     }
@@ -120,8 +120,9 @@ public class MasterActor extends BaseClusterActor {
         final String CLUSTER_GROUP = ClusterConstants.ROLE_ALL;
         Member leader = ClusterMemberManager.getLeader(CLUSTER_GROUP);
         if (leader == null) {
-            Logger.warn("Received TICK message, but cluster group [" + CLUSTER_GROUP
-                    + "] is empty! " + tick);
+            Logger.warn(
+                    "Received TICK message, but cluster group [" + CLUSTER_GROUP + "] is empty! "
+                            + tick);
         } else {
             if (LOCK.compareAndSet(false, true)) {
                 try {

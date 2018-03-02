@@ -1,5 +1,22 @@
 package akka.cluster;
 
+import akka.BaseActor;
+import akka.actor.ActorRef;
+import akka.actor.ActorSystem;
+import akka.cluster.DistributedDataManager.DDGetResult;
+import akka.cluster.DistributedDataManager.DDLock;
+import akka.cluster.DistributedDataManager.DDTags;
+import akka.cluster.ddata.*;
+import akka.cluster.ddata.Replicator.ReadConsistency;
+import akka.cluster.pubsub.DistributedPubSub;
+import akka.cluster.pubsub.DistributedPubSubMediator;
+import com.google.inject.Provider;
+import modules.registry.IRegistry;
+import org.apache.commons.lang3.StringUtils;
+import play.Logger;
+import scala.concurrent.duration.Duration;
+import utils.IdUtils;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
@@ -7,36 +24,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.inject.Provider;
-
-import akka.BaseActor;
-import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import akka.cluster.DistributedDataManager.DDGetResult;
-import akka.cluster.DistributedDataManager.DDLock;
-import akka.cluster.DistributedDataManager.DDTags;
-import akka.cluster.ddata.DistributedData;
-import akka.cluster.ddata.Key;
-import akka.cluster.ddata.ORMultiMap;
-import akka.cluster.ddata.ORMultiMapKey;
-import akka.cluster.ddata.Replicator;
-import akka.cluster.ddata.Replicator.ReadConsistency;
-import akka.cluster.pubsub.DistributedPubSub;
-import akka.cluster.pubsub.DistributedPubSubMediator;
-import modules.registry.IRegistry;
-import play.Logger;
-import scala.concurrent.duration.Duration;
-import utils.IdUtils;
-
 /**
  * Base class to implement Akka cluster actors.
- * 
+ *
  * <p>
  * Akka actor vs cluster actor:
  * <p>
- * 
+ *
  * <ul>
  * <li>Management: actors are created & managed by local {@link ActorSystem}, cluster actors are
  * created and managed by cluster {@link ActorSystem}.</li>
@@ -46,7 +40,7 @@ import utils.IdUtils;
  * <li>Coordination: actors are independent, cluster nodes can share data via
  * {@link DistributedData}.</li>
  * </ul>
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.5
  */
@@ -89,7 +83,7 @@ public class BaseClusterActor extends BaseActor {
             return true;
         }
 
-        for (scala.collection.Iterator<Object> it = set.iterator(); it.hasNext();) {
+        for (scala.collection.Iterator<Object> it = set.iterator(); it.hasNext(); ) {
             Object obj = it.next();
             if (obj instanceof DistributedDataManager.DDLock) {
                 // current lock expired
@@ -105,15 +99,15 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Accquire a lock specified by {@code key}, using Akka's distributed data APIs.
-     * 
+     *
      * <p>
      * Note: lock is reentrant!
      * </p>
-     * 
+     *
      * <p>
      * Note: This feature is experimental! The lock is considered "weak".
      * </p>
-     * 
+     *
      * @param lockId
      * @return
      */
@@ -123,12 +117,12 @@ public class BaseClusterActor extends BaseActor {
         DDTags tags = new DDTags(IdUtils.nextIdAsLong(), key);
         Replicator.Update<ORMultiMap<String, Object>> update = new Replicator.Update<>(dataKey,
                 ORMultiMap.create(), lockWriteConsistency, Optional.of(tags), curr -> {
-                    if (!curr.contains(key) || containsOrExpires(curr.get(key).get(), lock)) {
-                        // if lock does not exist or contains myself, or current lock expires
-                        return curr.put(getCluster(), key, Collections.singleton(lock));
-                    }
-                    return curr;
-                });
+            if (!curr.contains(key) || containsOrExpires(curr.get(key).get(), lock)) {
+                // if lock does not exist or contains myself, or current lock expires
+                return curr.put(getCluster(), key, Collections.singleton(lock));
+            }
+            return curr;
+        });
         replicator.tell(update, self());
         DDGetResult getResult = ddGet(tags, lockReadConsistency, defaultDDGetTimeoutMs,
                 TimeUnit.MILLISECONDS);
@@ -138,11 +132,11 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Release a lock specified by {@code key}, using Akka's distributed data APIs.
-     * 
+     *
      * <p>
      * Note: This feature is experimental! The lock is considered "weak".
      * </p>
-     * 
+     *
      * @param key
      * @param lockId
      * @return
@@ -151,10 +145,9 @@ public class BaseClusterActor extends BaseActor {
         DDLock lock = new DDLock(lockId);
         DDTags tags = new DDTags(IdUtils.nextIdAsLong(), key);
         Replicator.Update<ORMultiMap<String, Object>> update = new Replicator.Update<>(dataKey,
-                ORMultiMap.create(), lockWriteConsistency, Optional.of(tags), curr -> {
-                    return curr.contains(key) && containsOrExpires(curr.get(key).get(), lock)
-                            ? curr.remove(getCluster(), key) : curr;
-                });
+                ORMultiMap.create(), lockWriteConsistency, Optional.of(tags), curr ->
+                curr.contains(key) && containsOrExpires(curr.get(key).get(), lock) ? curr
+                        .remove(getCluster(), key) : curr);
         replicator.tell(update, self());
         DDGetResult getResult = ddGet(tags, lockReadConsistency, defaultDDGetTimeoutMs,
                 TimeUnit.MILLISECONDS);
@@ -168,10 +161,8 @@ public class BaseClusterActor extends BaseActor {
      * @param tags
      */
     protected void ddDelete(DDTags tags) {
-        replicator.tell(
-                new Replicator.Update<>(dataKey, ORMultiMap.create(), writeConsistency,
-                        Optional.of(tags), curr -> curr.remove(getCluster(), tags.getKey())),
-                self());
+        replicator.tell(new Replicator.Update<>(dataKey, ORMultiMap.create(), writeConsistency,
+                Optional.of(tags), curr -> curr.remove(getCluster(), tags.getKey())), self());
     }
 
     /**
@@ -190,16 +181,15 @@ public class BaseClusterActor extends BaseActor {
      * @param value
      */
     protected void ddSet(DDTags tags, Object value) {
-        replicator.tell(
-                new Replicator.Update<>(dataKey,
-                        ORMultiMap.create(), writeConsistency, Optional.of(tags), curr -> curr
-                                .put(getCluster(), tags.getKey(), Collections.singleton(value))),
+        replicator.tell(new Replicator.Update<>(dataKey, ORMultiMap.create(), writeConsistency,
+                        Optional.of(tags),
+                        curr -> curr.put(getCluster(), tags.getKey(), Collections.singleton(value))),
                 self());
     }
 
     /**
      * Set a distributed data record.
-     * 
+     *
      * @param key
      * @param value
      */
@@ -209,7 +199,7 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Get a distributed data record specified by {@code key}.
-     * 
+     *
      * @param key
      * @return
      */
@@ -219,21 +209,34 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Get a distributed data record specified by {@code key}.
-     * 
+     *
      * @param key
      * @param timeout
      * @param timeoutUnit
      * @return
      */
     protected DDGetResult ddGet(String key, long timeout, TimeUnit timeoutUnit) {
-        return ddGet(new DDTags(IdUtils.nextIdAsLong(), key), readConsistency, timeout,
-                timeoutUnit);
+        return ddGet(key, timeout, timeoutUnit, readConsistency);
+    }
+
+    /**
+     * Get a distributed data record specified by {@code key}.
+     *
+     * @param key
+     * @param timeout
+     * @param timeoutUnit
+     * @param readConsistency
+     * @return
+     * @since template-v2.6.r7
+     */
+    protected DDGetResult ddGet(String key, long timeout, TimeUnit timeoutUnit, ReadConsistency
+            readConsistency) {
+        return ddGet(new DDTags(IdUtils.nextIdAsLong(), key), readConsistency, timeout, timeoutUnit);
     }
 
     private DDGetResult ddGet(DDTags tags, ReadConsistency readConsistency, long timeout,
             TimeUnit timeoutUnit) {
-        getRegistry().getDefaultExecutionContextExecutor().execute(() -> replicator
-                .tell(new Replicator.Get<>(dataKey, readConsistency, Optional.of(tags)), self()));
+        replicator.tell(new Replicator.Get<>(dataKey, readConsistency, Optional.of(tags)), self());
         long expiry = System.currentTimeMillis() + timeoutUnit.toMillis(timeout);
         DDGetResult result = DistributedDataManager.getResponse(tags.getId());
         while (result == null && System.currentTimeMillis() <= expiry) {
@@ -245,12 +248,12 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Roles of nodes that the actor is deployed.
-     * 
+     *
      * <p>
      * {@code null} or empty result, or result contains {@link ClusterConstants#ROLE_ALL} means the
      * actor is to be deployed on all cluster nodes.
      * </p>
-     * 
+     *
      * @return
      */
     protected Set<String> getDeployRoles() {
@@ -259,13 +262,13 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Topics (and group-id) that the actor is subscribed to.
-     * 
+     *
      * <ul>
      * <li>First entry of {@code String[]} is topic name, the second one is group-id.</li>
      * <li>The second entry can be omitted. If so, group-id is {@code null}.</li>
      * <li>Actor can subscribe to one topic twice.</li>
      * </ul>
-     * 
+     *
      * @return
      */
     protected Collection<String[]> topicSubscriptions() {
@@ -286,23 +289,24 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Convenient method to perform initializing work.
-     * 
+     *
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
     protected void initActor() throws Exception {
         Set<String> selfRoles = cluster.getSelfRoles();
         Set<String> deployRoles = getDeployRoles();
-        if (deployRoles == null || deployRoles.isEmpty()
-                || deployRoles.contains(ClusterConstants.ROLE_ALL)
-                || !Collections.disjoint(deployRoles, selfRoles)) {
+        if (deployRoles == null || deployRoles.isEmpty() || deployRoles
+                .contains(ClusterConstants.ROLE_ALL) || !Collections
+                .disjoint(deployRoles, selfRoles)) {
             super.initActor();
 
-            addMessageHandler(DistributedPubSubMediator.SubscribeAck.class, (ack) -> Logger.info("{"
-                    + getActorPath() + "} subscribed successfully to [" + ack.subscribe() + "]."));
-            addMessageHandler(DistributedPubSubMediator.UnsubscribeAck.class,
-                    (ack) -> Logger.info("{" + getActorPath() + "} unsubscribed successfully to ["
-                            + ack.unsubscribe() + "]."));
+            addMessageHandler(DistributedPubSubMediator.SubscribeAck.class, (ack) -> Logger
+                    .info("{" + getActorPath() + "} subscribed successfully to [" + ack.subscribe()
+                            + "]."));
+            addMessageHandler(DistributedPubSubMediator.UnsubscribeAck.class, (ack) -> Logger
+                    .info("{" + getActorPath() + "} unsubscribed successfully to [" + ack
+                            .unsubscribe() + "]."));
 
             addMessageHandler(Replicator.DeleteSuccess.class, msg -> {
                 Object _obj = msg.getRequest().orElseGet(null);
@@ -313,8 +317,8 @@ public class BaseClusterActor extends BaseActor {
             addMessageHandler(Replicator.GetFailure.class, msg -> {
                 Object _obj = msg.getRequest().orElseGet(null);
                 DDTags tags = _obj instanceof DDTags ? (DDTags) _obj : DDTags.EMPTY;
-                DistributedDataManager.setResponse(tags.getId(),
-                        DDGetResult.error(tags.getId(), tags.getKey()));
+                DistributedDataManager
+                        .setResponse(tags.getId(), DDGetResult.error(tags.getId(), tags.getKey()));
             });
             addMessageHandler(Replicator.NotFound.class, msg -> {
                 Object _obj = msg.getRequest().orElseGet(null);
@@ -326,7 +330,8 @@ public class BaseClusterActor extends BaseActor {
                 Object _tags = msg.getRequest().orElseGet(null);
                 DDTags tags = _tags instanceof DDTags ? (DDTags) _tags : DDTags.EMPTY;
                 ORMultiMap<String, Object> data = msg.dataValue() instanceof ORMultiMap
-                        ? (ORMultiMap<String, Object>) msg.dataValue() : ORMultiMap.create();
+                        ? (ORMultiMap<String, Object>) msg.dataValue()
+                        : ORMultiMap.create();
                 Set<Object> value = data.getEntries().get(tags.getKey());
                 DistributedDataManager.setResponse(tags.getId(),
                         DDGetResult.ok(tags.getId(), tags.getKey(), value));
@@ -372,13 +377,13 @@ public class BaseClusterActor extends BaseActor {
 
     /**
      * Publish a message to a topic.
-     * 
+     *
      * <p>
      * If {@code sendOneMessageToEachGroup=true}, each message published to the topic is delivered
      * via the supplied {@code RoutingLogic} (default random) to one actor within each subscribing
      * group.
      * </p>
-     * 
+     *
      * <p>
      * Note that if the group id is used it is part of the topic identifier. Messages published with
      * {@code sendOneMessageToEachGroup=false} will not be delivered to subscribers that subscribed
@@ -393,9 +398,8 @@ public class BaseClusterActor extends BaseActor {
      * @param sendOneMessageToEachGroup
      */
     protected void publishToTopic(Object message, String topic, boolean sendOneMessageToEachGroup) {
-        distributedPubSubMediator.tell(
-                new DistributedPubSubMediator.Publish(topic, message, sendOneMessageToEachGroup),
-                self());
+        distributedPubSubMediator.tell(new DistributedPubSubMediator.Publish(topic, message,
+                sendOneMessageToEachGroup), self());
     }
 
     /**
@@ -420,10 +424,12 @@ public class BaseClusterActor extends BaseActor {
                         .tell(new DistributedPubSubMediator.Subscribe(topic, self()), self());
                 Logger.info("{" + self() + "} is subscribing to topic [" + topic + "].");
             } else {
-                distributedPubSubMediator.tell(
-                        new DistributedPubSubMediator.Subscribe(topic, groupId, self()), self());
-                Logger.info("{" + self() + "} is subscribing to topic [" + topic + "] as ["
-                        + groupId + "].");
+                distributedPubSubMediator
+                        .tell(new DistributedPubSubMediator.Subscribe(topic, groupId, self()),
+                                self());
+                Logger.info(
+                        "{" + self() + "} is subscribing to topic [" + topic + "] as [" + groupId
+                                + "].");
             }
         }
     }
@@ -445,14 +451,16 @@ public class BaseClusterActor extends BaseActor {
      */
     protected void unsubscribeFromTopic(String topic, String groupId) {
         if (StringUtils.isBlank(groupId)) {
-            distributedPubSubMediator.tell(new DistributedPubSubMediator.Unsubscribe(topic, self()),
-                    self());
+            distributedPubSubMediator
+                    .tell(new DistributedPubSubMediator.Unsubscribe(topic, self()), self());
             Logger.info("{" + self() + "} is unsubscribing from topic [" + topic + "].");
         } else {
-            distributedPubSubMediator.tell(
-                    new DistributedPubSubMediator.Unsubscribe(topic, groupId, self()), self());
-            Logger.info("{" + self() + "} is unsubscribing from topic [" + topic + "] as [" + groupId
-                    + "].");
+            distributedPubSubMediator
+                    .tell(new DistributedPubSubMediator.Unsubscribe(topic, groupId, self()),
+                            self());
+            Logger.info(
+                    "{" + self() + "} is unsubscribing from topic [" + topic + "] as [" + groupId
+                            + "].");
         }
     }
 

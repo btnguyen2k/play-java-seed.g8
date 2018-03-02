@@ -57,7 +57,7 @@ routesGenerator := InjectedRoutesGenerator
 pipelineStages  := Seq(digest, gzip)
 
 // Dependency configurations
-val _akkaClusterVersion      = "2.5.8"
+val _akkaClusterVersion      = "2.5.11"
 val _playWsStandaloneVersion = "1.1.3"
 val _grpcVersion             = "1.8.0"
 val _springVersion           = "5.0.2.RELEASE"

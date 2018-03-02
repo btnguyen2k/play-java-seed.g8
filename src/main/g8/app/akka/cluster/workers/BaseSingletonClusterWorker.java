@@ -3,6 +3,7 @@ package akka.cluster.workers;
 import akka.TickMessage;
 import akka.cluster.ClusterConstants;
 import akka.cluster.DistributedDataManager.DDGetResult;
+import akka.cluster.ddata.Replicator;
 import akka.workers.CronFormat;
 
 import java.util.Collection;
@@ -39,18 +40,12 @@ public abstract class BaseSingletonClusterWorker extends BaseClusterWorker {
     }
 
     /**
-     * Get worker's scheduling settings as {@link CronFormat}.
-     *
-     * @return
-     */
-    protected abstract CronFormat getScheduling();
-
-    /**
      * {@inheritDoc}
      */
     @Override
     protected TickMessage getLastTick() {
         DDGetResult getResult = ddGet("last-tick");
+        // DDGetResult getResult = ddGet("last-tick", 1, TimeUnit.SECONDS, Replicator.readLocal());
         return getResult != null ? getResult.singleValueAs(TickMessage.class) : null;
     }
 

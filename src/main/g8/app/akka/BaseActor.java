@@ -7,11 +7,12 @@ import modules.registry.IRegistry;
 import modules.registry.RegistryGlobal;
 import play.Logger;
 import scala.concurrent.ExecutionContextExecutor;
+import utils.AppConstants;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 /**
@@ -161,7 +162,7 @@ public class BaseActor extends UntypedAbstractActor {
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void onReceive(Object message) throws Throwable {
+    public void onReceive(Object message) {
         if (message == null) {
             return;
         }
@@ -171,14 +172,16 @@ public class BaseActor extends UntypedAbstractActor {
         Consumer exactConsumer = messageHandler.get(msgClazz);
         if (exactConsumer != null) {
             // exact match
-            exactConsumer.accept(message);
             handled.set(true);
+            getExecutionContextExecutor(AppConstants.THREAD_POOL_WORKER)
+                    .execute(() -> exactConsumer.accept(message));
         } else {
             messageHandler.forEach((Class clazz, Consumer consumer) -> {
                 // match interface/sub-class
                 if (clazz.isAssignableFrom(msgClazz)) {
-                    consumer.accept(message);
                     handled.set(true);
+                    getExecutionContextExecutor(AppConstants.THREAD_POOL_WORKER)
+                            .execute(() -> consumer.accept(message));
                 }
             });
         }
