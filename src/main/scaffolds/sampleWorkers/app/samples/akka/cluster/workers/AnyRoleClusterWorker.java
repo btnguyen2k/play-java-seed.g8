@@ -48,8 +48,10 @@ public class AnyRoleClusterWorker extends BaseClusterWorker {
     @Override
     protected void doJob(TickMessage tick) {
         Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "HH:mm:ss") + "] " + getActorPath()
-                + " do job " + tick + " from " + sender().path());
+        Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                getActorPath(),
+                tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick.getTimestampStr()
+                        + "]", sender().path());
     }
 
 }

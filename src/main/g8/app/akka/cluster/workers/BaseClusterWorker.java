@@ -180,7 +180,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
                         doJob(tick);
                     } catch (Exception e) {
                         Logger.error(
-                                "{" + getActorPath() + "} Error while doing job: " + e.getMessage(),
+                                "{" + getActorName() + "} Error while doing job: " + e.getMessage(),
                                 e);
                     } finally {
                         if (lockId != null) {
@@ -189,7 +189,7 @@ public abstract class BaseClusterWorker extends BaseClusterActor {
                     }
                 } else {
                     // Busy processing a previous message
-                    Logger.warn("{" + getActorPath() + "} Received TICK message, but I am busy! "
+                    Logger.warn("{" + getActorName() + "} Received TICK message, but I am busy! "
                             + tick);
                 }
             });

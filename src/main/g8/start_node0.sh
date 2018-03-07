@@ -10,5 +10,6 @@ sbt -jvm-debug 9999 -Dconfig.file=conf/application-cluster.conf -Dlogger.file=co
 	-Dplay.server.https.keyStore.password=pl2yt3mpl2t3 \
 	-Dhttp2.enabled=true -Dplay.server.akka.http2.enabled=true \
 	-Dplay.akka.actor-system=MyCluster -Dakka.cluster.name=MyCluster -Dakka.remote.netty.tcp.hostname=127.0.0.1 -Dakka.remote.netty.tcp.port=9051 \
+	-Dakka.cluster.roles.0=master \
 	-Dakka.cluster.seed-nodes.0=akka.tcp://MyCluster@127.0.0.1:9051 \
 	run

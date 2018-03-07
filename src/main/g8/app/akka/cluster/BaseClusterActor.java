@@ -145,8 +145,8 @@ public class BaseClusterActor extends BaseActor {
         DDLock lock = new DDLock(lockId);
         DDTags tags = new DDTags(IdUtils.nextIdAsLong(), key);
         Replicator.Update<ORMultiMap<String, Object>> update = new Replicator.Update<>(dataKey,
-                ORMultiMap.create(), lockWriteConsistency, Optional.of(tags), curr ->
-                curr.contains(key) && containsOrExpires(curr.get(key).get(), lock) ? curr
+                ORMultiMap.create(), lockWriteConsistency, Optional.of(tags),
+                curr -> curr.contains(key) && containsOrExpires(curr.get(key).get(), lock) ? curr
                         .remove(getCluster(), key) : curr);
         replicator.tell(update, self());
         DDGetResult getResult = ddGet(tags, lockReadConsistency, defaultDDGetTimeoutMs,
@@ -229,9 +229,10 @@ public class BaseClusterActor extends BaseActor {
      * @return
      * @since template-v2.6.r7
      */
-    protected DDGetResult ddGet(String key, long timeout, TimeUnit timeoutUnit, ReadConsistency
-            readConsistency) {
-        return ddGet(new DDTags(IdUtils.nextIdAsLong(), key), readConsistency, timeout, timeoutUnit);
+    protected DDGetResult ddGet(String key, long timeout, TimeUnit timeoutUnit,
+            ReadConsistency readConsistency) {
+        return ddGet(new DDTags(IdUtils.nextIdAsLong(), key), readConsistency, timeout,
+                timeoutUnit);
     }
 
     private DDGetResult ddGet(DDTags tags, ReadConsistency readConsistency, long timeout,
@@ -302,10 +303,10 @@ public class BaseClusterActor extends BaseActor {
             super.initActor();
 
             addMessageHandler(DistributedPubSubMediator.SubscribeAck.class, (ack) -> Logger
-                    .info("{" + getActorPath() + "} subscribed successfully to [" + ack.subscribe()
+                    .info("{" + getActorName() + "} subscribed successfully to [" + ack.subscribe()
                             + "]."));
             addMessageHandler(DistributedPubSubMediator.UnsubscribeAck.class, (ack) -> Logger
-                    .info("{" + getActorPath() + "} unsubscribed successfully to [" + ack
+                    .info("{" + getActorName() + "} unsubscribed successfully from [" + ack
                             .unsubscribe() + "]."));
 
             addMessageHandler(Replicator.DeleteSuccess.class, msg -> {
@@ -346,7 +347,7 @@ public class BaseClusterActor extends BaseActor {
                 });
             }
         } else {
-            Logger.info("Actor [" + getActorPath() + "] is configured to start on node with roles "
+            Logger.info("Actor {" + getActorName() + "} is configured to start on node with roles "
                     + deployRoles + " but this node " + cluster.selfAddress() + " has roles "
                     + selfRoles);
             getContext().stop(self());
@@ -422,14 +423,13 @@ public class BaseClusterActor extends BaseActor {
             if (StringUtils.isBlank(groupId)) {
                 distributedPubSubMediator
                         .tell(new DistributedPubSubMediator.Subscribe(topic, self()), self());
-                Logger.info("{" + self() + "} is subscribing to topic [" + topic + "].");
+                Logger.info("{" + getActorName() + "} is subscribing to topic [" + topic + "].");
             } else {
                 distributedPubSubMediator
                         .tell(new DistributedPubSubMediator.Subscribe(topic, groupId, self()),
                                 self());
-                Logger.info(
-                        "{" + self() + "} is subscribing to topic [" + topic + "] as [" + groupId
-                                + "].");
+                Logger.info("{" + getActorName() + "} is subscribing to topic [" + topic + "] as ["
+                        + groupId + "].");
             }
         }
     }
@@ -453,14 +453,13 @@ public class BaseClusterActor extends BaseActor {
         if (StringUtils.isBlank(groupId)) {
             distributedPubSubMediator
                     .tell(new DistributedPubSubMediator.Unsubscribe(topic, self()), self());
-            Logger.info("{" + self() + "} is unsubscribing from topic [" + topic + "].");
+            Logger.info("{" + getActorName() + "} is unsubscribing from topic [" + topic + "].");
         } else {
             distributedPubSubMediator
                     .tell(new DistributedPubSubMediator.Unsubscribe(topic, groupId, self()),
                             self());
-            Logger.info(
-                    "{" + self() + "} is unsubscribing from topic [" + topic + "] as [" + groupId
-                            + "].");
+            Logger.info("{" + getActorName() + "} is unsubscribing from topic [" + topic + "] as ["
+                    + groupId + "].");
         }
     }
 

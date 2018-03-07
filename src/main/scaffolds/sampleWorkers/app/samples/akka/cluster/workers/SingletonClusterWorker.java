@@ -31,8 +31,10 @@ public class SingletonClusterWorker extends BaseSingletonClusterWorker {
     @Override
     protected void doJob(TickMessage tick) throws InterruptedException {
         Date d = new Date(tick.timestampMs);
-        Logger.info("[" + DateFormatUtils.toString(d, "yyyy-MM-dd HH:mm:ss") + "] " + self()
-                + " do job " + tick);
+        Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                getActorPath(),
+                tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick.getTimestampStr()
+                        + "]", sender().path());
         long sleepTime = 4000 + random.nextInt(3000);
         // Logger.info("\tSlepping " + sleepTime);
         Thread.sleep(sleepTime);
