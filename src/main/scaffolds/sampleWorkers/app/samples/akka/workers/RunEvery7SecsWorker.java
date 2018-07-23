@@ -7,25 +7,30 @@ import com.github.ddth.akka.scheduling.annotation.Scheduling;
 import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 
+import java.util.Random;
+
 /**
- * Sample worker that runs every minute at the 12th second.
+ * Sample worker that runs every 7 seconds.
  *
  * <pre>
  * - Non-cluster worker: this worker does not require Akka to run in cluster mode.
- * - TAKE_ALL_TASKS: worker instance takes all tasks. Multiple tasks can be executed
- * simultaneously on same or different nodes.
+ * - GLOBAL_SINGLETON: once worker takes a task, all of its instances on all nodes are marked
+ * "busy" and can no longer take any more task until free.
  * </pre>
  *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  */
-@Scheduling(value = "12 * *", workerCoordinationPolicy = WorkerCoordinationPolicy.TAKE_ALL_TASKS)
-public class RunEveryMinuteAtSec12thWorker extends BaseWorker {
+@Scheduling(value = "*/7 * *", workerCoordinationPolicy = WorkerCoordinationPolicy.GLOBAL_SINGLETON)
+public class RunEvery7SecsWorker extends BaseWorker {
+
+    private Random random = new Random(System.currentTimeMillis());
 
     @Override
-    protected void doJob(String dlockId, TickMessage tick) {
+    protected void doJob(String dlockId, TickMessage tick) throws InterruptedException {
         long timeStart = System.currentTimeMillis();
         try {
-            Logger.info("[" + getActorPath() + "] do job " + tick);
+            Logger.info("[" + getActorPath().name() + "] do job " + tick);
+            Thread.sleep(6500 + random.nextInt(2000));
         } finally {
             if (!StringUtils.isBlank(dlockId) && System.currentTimeMillis() - timeStart > 1000) {
                 /*
@@ -37,5 +42,4 @@ public class RunEveryMinuteAtSec12thWorker extends BaseWorker {
             }
         }
     }
-
 }

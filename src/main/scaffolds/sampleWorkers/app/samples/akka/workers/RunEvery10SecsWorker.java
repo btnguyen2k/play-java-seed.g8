@@ -1,39 +1,45 @@
 package samples.akka.workers;
 
-import java.util.Date;
-import java.util.Random;
-
-import com.github.ddth.commons.utils.DateFormatUtils;
-
-import akka.TickMessage;
-import akka.workers.BaseWorker;
-import akka.workers.CronFormat;
+import com.github.ddth.akka.scheduling.BaseWorker;
+import com.github.ddth.akka.scheduling.TickMessage;
+import com.github.ddth.akka.scheduling.WorkerCoordinationPolicy;
+import com.github.ddth.akka.scheduling.annotation.Scheduling;
+import org.apache.commons.lang3.StringUtils;
 import play.Logger;
+
+import java.util.Random;
 
 /**
  * Sample worker that runs every 10 seconds.
- * 
+ *
+ * <pre>
+ * - Non-cluster worker: this worker does not require Akka to run in cluster mode.
+ * - LOCAL_SINGLETON: on one node, worker can take only one task at a time. But workers on other
+ * nodes can execute tasks simultaneously.
+ * </pre>
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
- * @since template-v0.1.2
  */
+@Scheduling(value = "*/10 * *", workerCoordinationPolicy = WorkerCoordinationPolicy.LOCAL_SINGLETON)
 public class RunEvery10SecsWorker extends BaseWorker {
 
-    private CronFormat scheduling = CronFormat.parse("*/10 * *");
     private Random random = new Random(System.currentTimeMillis());
 
-    /**
-     * Schedule to do job every 10 seconds.
-     */
     @Override
-    protected CronFormat getScheduling() {
-        return scheduling;
+    protected void doJob(String dlockId, TickMessage tick) throws InterruptedException {
+        long timeStart = System.currentTimeMillis();
+        try {
+            Logger.info("[" + getActorPath().name() + "] do job " + tick);
+            Thread.sleep(7500 + random.nextInt(4000));
+        } finally {
+            if (!StringUtils.isBlank(dlockId) && System.currentTimeMillis() - timeStart > 1000) {
+                /*
+                 * it is good practice to release lock after finishing task, but be noted:
+                 * - not necessary if workerCoordinationPolicy = TAKE_ALL_TASKS
+                 * - if task is ultra-fast, let the caller (i.e. BaseWorker) release the lock
+                 */
+                unlock(dlockId);
+            }
+        }
     }
-
-    @Override
-    protected void doJob(TickMessage tick) throws InterruptedException {
-        System.out.println("[" + getActorPath() + "] do job " + tick);
-        Logger.info("[" + getActorPath() + "] do job " + tick);
-        Thread.sleep(7500 + random.nextInt(4000));
-    }
-
 }
