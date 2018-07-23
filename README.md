@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r7](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r8](RELEASE-NOTES.md).
 
 ## Features
 
@@ -31,7 +31,7 @@ Latest release: [template-v2.6.r7](RELEASE-NOTES.md).
   - Workers & Scheduling
   - Cluster workers
   - API handler: JSON-based data format. Support interface:
-    - HTTP/S
+    - HTTP(S)
     - Apache Thrift (since [template-v1.4.0](RELEASE-NOTES.md)).
     - gRPC (since [template-v2.6.r2](RELEASE-NOTES.md)).
 - JVM tuning & GC logging

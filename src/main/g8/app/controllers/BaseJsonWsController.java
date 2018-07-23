@@ -23,8 +23,8 @@ import java.io.IOException;
 /**
  * Base class for Json-based web-service controllers.
  *
- * <p> This controller accepts request data in JSON format, and response to client also in JSON. All
- * responses have the following format: </p>
+ * <p> This controller accepts request data in JSON format, and response to client also in JSON.
+ * All responses have the following format: </p>
  *
  * <pre>
  * {
@@ -144,7 +144,8 @@ public class BaseJsonWsController extends BaseController {
             return doResponse(
                     apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR.clone());
         } catch (Exception e) {
-            return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER, e.getMessage()));
+            return doResponse(new ApiResult(ApiResult.STATUS_ERROR_SERVER,
+                    "[" + e.getClass() + "] " + e.getMessage()));
         }
     }
 

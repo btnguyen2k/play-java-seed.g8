@@ -1,14 +1,15 @@
 package modules.registry;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.github.ddth.commons.utils.ValueUtils;
 
-import com.github.ddth.commons.utils.DPathUtils;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Global static repository where DI is not visible.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
+ * @see com.github.btnguyen2k.akkascheduledjob.RegistryGlobal
  * @since template-v0.1.0
  */
 public class RegistryGlobal {
@@ -17,17 +18,59 @@ public class RegistryGlobal {
      */
     public static IRegistry registry;
 
-    private static Map<String, Object> storage = new HashMap<>();
+    private static ConcurrentMap<String, Object> globalStorage = new ConcurrentHashMap<>();
 
-    public static void put(String key, Object value) {
-        storage.put(key, value);
+    /**
+     * Remove an item from application's global storage.
+     *
+     * @param key
+     * @return the previous value associated with {@code key}, or {@code null} if there was no
+     * mapping for {@code key}.
+     * @since template-v2.6.r8
+     */
+    public static Object removeFromGlobalStorage(String key) {
+        return globalStorage.remove(key);
     }
 
-    public static Object get(String key) {
-        return storage.get(key);
+    /**
+     * Put an item to application's global storage.
+     *
+     * @param key
+     * @param value
+     * @return the previous value associated with {@code key}, or {@code null} if there was no
+     * mapping for {@code key}.
+     * @since template-v2.6.r8
+     */
+    public static Object putToGlobalStorage(String key, Object value) {
+        if (value == null) {
+            return removeFromGlobalStorage(key);
+        } else {
+            return globalStorage.put(key, value);
+        }
     }
 
-    public static <T> T get(String key, Class<T> clazz) {
-        return DPathUtils.getValue(storage, key, clazz);
+    /**
+     * Get an item from application's global storage.
+     *
+     * @param key
+     * @return
+     * @since template-v2.6.r8
+     */
+    public static Object getFromGlobalStorage(String key) {
+        return globalStorage.get(key);
+    }
+
+    /**
+     * Get an item from application's global storage.
+     *
+     * @param key
+     * @param clazz
+     * @param <T>
+     * @return
+     * @since template-v2.6.r8
+     */
+    public static <T> T getFromGlobalStorage(String key, Class<T> clazz) {
+        Object value = getFromGlobalStorage(key);
+        return ValueUtils.convertValue(value, clazz);
     }
 }

@@ -1,29 +1,24 @@
 package modules.cluster;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.inject.Provider;
-import com.typesafe.config.Config;
-
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.cluster.Cluster;
 import akka.cluster.ClusterActorRefProvider;
-import akka.cluster.MasterActor;
+import com.github.ddth.akka.cluster.MasterActor;
+import com.google.inject.Provider;
+import com.typesafe.config.Config;
 import modules.registry.IRegistry;
+import org.apache.commons.lang3.StringUtils;
 import play.Application;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
 import utils.AppConfigUtils;
 import utils.AppConstants;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Stack;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class ClusterImpl implements ICluster {
@@ -40,7 +35,7 @@ public class ClusterImpl implements ICluster {
      */
     @Inject
     public ClusterImpl(ApplicationLifecycle lifecycle, Application playApp,
-                       Provider<IRegistry> registry) {
+            Provider<IRegistry> registry) {
         this.appConfig = playApp.config();
         this.registry = registry;
 
@@ -56,52 +51,28 @@ public class ClusterImpl implements ICluster {
         }
     }
 
+    private final Stack<Runnable> shutdownHooks = new Stack<>();
+
+    /**
+     * Add a shutdown hook, which to be called right before application's shutdown.
+     *
+     * @param r
+     * @since template-v2.6.r8
+     */
+    public void addShutdownHook(Runnable r) {
+        shutdownHooks.add(r);
+    }
+
     private void init() throws Exception {
         initCluster();
-        initClusterWorkers();
     }
 
     private void destroy() {
-        destroyClusterWorkers();
-        destroyCluster();
-    }
-
-    private List<ActorRef> workerList = new ArrayList<>();
-
-    private ActorRef createWorker(String className) throws ClassNotFoundException {
-        Logger.info("Creating cluster-worker [" + className + "]...");
-        Class<?> clazz = Class.forName(className);
-        return clusterActorSystem.actorOf(Props.create(clazz), clazz.getSimpleName());
-    }
-
-    private void initClusterWorkers() {
-        if (clusterActorSystem != null) {
-            List<String> clazzs = AppConfigUtils.getOrNull(appConfig::getStringList, "akka.cluster.workers");
-            if (clazzs != null) {
-                for (String clazzName : clazzs) {
-                    try {
-                        ActorRef worker = createWorker(clazzName);
-                        if (worker != null) {
-                            workerList.add(worker);
-                        } else {
-                            Logger.warn("Cannot create cluster-worker [" + clazzName + "]!");
-                        }
-                    } catch (ClassNotFoundException e) {
-                        Logger.error("Error creating cluster-worker, class not found [" + clazzName + "]!");
-                    }
-                }
-            }
-        }
-    }
-
-    private void destroyClusterWorkers() {
-        if (clusterActorSystem != null) {
-            for (ActorRef actorRef : workerList) {
-                try {
-                    clusterActorSystem.stop(actorRef);
-                } catch (Exception e) {
-                    Logger.warn(e.getMessage(), e);
-                }
+        while (!shutdownHooks.isEmpty()) {
+            try {
+                shutdownHooks.pop().run();
+            } catch (Exception e) {
+                Logger.warn(e.getMessage(), e);
             }
         }
     }
@@ -125,37 +96,26 @@ public class ClusterImpl implements ICluster {
             Logger.debug(
                     "Starting cluster mode with configurations: " + appConfig.getConfig("akka"));
         }
-        // clusterActorSystem = ActorSystem.create(clusterName, clusterConfig.underlying());
         clusterActorSystem = registry.get().getActorSystem();
 
         Cluster cluster = Cluster.get(clusterActorSystem);
         if (cluster.getSelfRoles().contains(AppConstants.CLUSTER_ROLE_MASTER)) {
-            // create master worker
-            Logger.info("Creating " + MasterActor.class);
-            Props props = Props.create(MasterActor.class, registry);
-            clusterActorSystem.actorOf(props, MasterActor.class.getSimpleName());
+            /* remember to create one "master" actor instance */
+            ActorRef masterActor = MasterActor.newInstance(clusterActorSystem);
+            Logger.info("Created master actor [" + masterActor + "]");
         }
-    }
-
-    private void destroyCluster() {
-        if (clusterActorSystem != null) {
-            try {
-                Cluster cluster = Cluster.get(clusterActorSystem);
-                Logger.info("Node " + cluster.selfAddress() + " is shutting down...");
-                // cluster.leave(cluster.selfAddress());
-                cluster.down(cluster.selfAddress());
-                Thread.sleep(1234);
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
+        addShutdownHook(() -> {
+            if (clusterActorSystem != null) {
+                try {
+                    Logger.info("Node " + cluster.selfAddress() + " is shutting down...");
+                    cluster.down(cluster.selfAddress());
+                    Thread.sleep(1234);
+                } catch (Exception e) {
+                    Logger.warn(e.getMessage(), e);
+                }
+                clusterActorSystem = null;
             }
-
-            // try {
-            // // and terminate the Actor System
-            // clusterActorSystem.terminate();
-            // } catch (Exception e) {
-            // Logger.warn(e.getMessage(), e);
-            // }
-        }
+        });
     }
 
     /**

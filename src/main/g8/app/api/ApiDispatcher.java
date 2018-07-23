@@ -1,10 +1,9 @@
 package api;
 
 import com.github.ddth.commons.utils.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 import play.Logger.ALogger;
-
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
@@ -73,6 +72,17 @@ public class ApiDispatcher {
     }
 
     /**
+     * @param appId
+     * @param appAuthKey
+     * @return
+     * @since template-v2.6.r8
+     */
+    public ApiDispatcher addApiAuth(String appId, String appAuthKey) {
+        apiAuths.put(appId, appAuthKey);
+        return this;
+    }
+
+    /**
      * Register an API handler.
      *
      * @param apiName
@@ -118,7 +128,7 @@ public class ApiDispatcher {
 
             String systemAuth =
                     auth != null && auth.appId != null ? apiAuths.get(auth.appId) : null;
-                if (systemAuth == null || !StringUtils.equals(systemAuth, auth.accessToken)) {
+            if (systemAuth == null || !StringUtils.equals(systemAuth, auth.accessToken)) {
                 apiResult = new ApiResult(ApiResult.STATUS_NO_PERMISSION,
                         "App [" + auth.appId + "] not found, or invalid access token!");
             } else {
