@@ -1,15 +1,16 @@
 package controllers;
 
 import akka.util.ByteString;
-import api.ApiAuth;
-import api.ApiContext;
-import api.ApiParams;
-import api.ApiResult;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.ddth.recipes.apiservice.ApiAuth;
+import com.github.ddth.recipes.apiservice.ApiContext;
+import com.github.ddth.recipes.apiservice.ApiParams;
+import com.github.ddth.recipes.apiservice.ApiResult;
 import com.typesafe.config.Config;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Http.RawBuffer;
 import play.mvc.Http.RequestBody;
 import play.mvc.Result;
@@ -124,6 +125,12 @@ public class BaseJsonWsController extends BaseController {
         return apiParams;
     }
 
+    protected ApiAuth buildApiAuthFromRequest(Http.Request request) {
+        String appId = request.header("X-App-Id").orElse("");
+        String accessToken = request.header("X-Access-Token").orElse("");
+        return new ApiAuth(appId, accessToken);
+    }
+
     /**
      * Perform API call via web-service.
      *
@@ -138,8 +145,8 @@ public class BaseJsonWsController extends BaseController {
             ApiContext apiContext = ApiContext.newContext(AppConstants.API_GATEWAY_WEB, apiName);
             apiContext.setContextField("method", request().method());
             apiContext.setContextField("uri", request().uri());
-            ApiAuth apiAuth = ApiAuth.buildFromHttpRequest(request());
-            ApiResult apiResult = getRegistry().getApiDispatcher()
+            ApiAuth apiAuth = buildApiAuthFromRequest(request());
+            ApiResult apiResult = getRegistry().getApiRouter()
                     .callApi(apiContext, apiAuth, apiParams);
             return doResponse(
                     apiResult != null ? apiResult : ApiResult.DEFAULT_RESULT_UNKNOWN_ERROR.clone());

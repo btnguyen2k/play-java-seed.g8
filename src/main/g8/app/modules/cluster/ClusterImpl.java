@@ -92,17 +92,18 @@ public class ClusterImpl implements ICluster {
             Logger.warn("[akka.cluster.name] configuration not found or empty!");
         }
 
-        if (Logger.isDebugEnabled()) {
-            Logger.debug(
-                    "Starting cluster mode with configurations: " + appConfig.getConfig("akka"));
-        }
+        //if (Logger.isDebugEnabled()) {
+        //    Logger.debug(
+        //            "Starting cluster mode with configurations: " + appConfig.getConfig("akka"));
+        //}
         clusterActorSystem = registry.get().getActorSystem();
 
         Cluster cluster = Cluster.get(clusterActorSystem);
         if (cluster.getSelfRoles().contains(AppConstants.CLUSTER_ROLE_MASTER)) {
             /* remember to create one "master" actor instance */
             ActorRef masterActor = MasterActor.newInstance(clusterActorSystem);
-            Logger.info("Created master actor [" + masterActor + "]");
+            Logger.info("Created master actor: " + masterActor + " / Actor system: "
+                    + clusterActorSystem);
         }
         addShutdownHook(() -> {
             if (clusterActorSystem != null) {

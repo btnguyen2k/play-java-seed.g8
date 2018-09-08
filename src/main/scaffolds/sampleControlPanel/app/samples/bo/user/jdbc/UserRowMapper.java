@@ -1,11 +1,5 @@
 package samples.bo.user.jdbc;
 
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.github.ddth.dao.jdbc.annotations.AnnotatedGenericRowMapper;
 import com.github.ddth.dao.jdbc.annotations.ColumnAttribute;
 import com.github.ddth.dao.jdbc.annotations.PrimaryKeyColumns;
@@ -13,8 +7,12 @@ import com.github.ddth.dao.jdbc.annotations.UpdateColumns;
 import com.github.ddth.dao.utils.DaoException;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-
+import org.apache.commons.lang3.StringUtils;
 import samples.bo.user.UserBo;
+
+import java.text.MessageFormat;
+import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 
 /**
  * RowMapper: ResultSet -> UserBo
@@ -22,10 +20,10 @@ import samples.bo.user.UserBo;
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-2.6.r5
  */
-@PrimaryKeyColumns(columns = { "uname" })
-@UpdateColumns(columns = { "udata" })
 @ColumnAttribute(column = "uname", attr = "username", attrClass = String.class)
 @ColumnAttribute(column = "udata", attr = "data", attrClass = String.class)
+@PrimaryKeyColumns({ "uname" })
+@UpdateColumns({ "udata" })
 public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public final static UserRowMapper INSTANCE = new UserRowMapper();
 
@@ -33,17 +31,19 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
 
     private String strAllColumns = StringUtils.join(getAllColumns(), ",");
     private String strPkColumns = StringUtils.join(getPrimaryKeyColumns(), ",");
-    private String strWherePkClause = StringUtils.join(Arrays.asList(getPrimaryKeyColumns())
-            .stream().map(col -> col + "=?").toArray(String[]::new), " AND ");
-    private String strUpdateSetClause = StringUtils.join(Arrays.asList(getUpdateColumns()).stream()
-            .map(col -> col + "=?").toArray(String[]::new), ",");
+    private String strWherePkClause = StringUtils
+            .join(Arrays.asList(getPrimaryKeyColumns()).stream().map(col -> col + "=?")
+                    .toArray(String[]::new), " AND ");
+    private String strUpdateSetClause = StringUtils
+            .join(Arrays.asList(getUpdateColumns()).stream().map(col -> col + "=?")
+                    .toArray(String[]::new), ",");
 
     /**
      * Generate SELECT statement to select a BO.
      *
      * <p>
-     * The generated SQL will look like this
-     * {@code SELECT all-columns FROM table WHERE pk-1=? AND pk-2=?...}
+     * The generated SQL will look like this {@code SELECT all-columns FROM table WHERE pk-1=? AND
+     * pk-2=?...}
      * </p>
      *
      * @param tableName
@@ -52,8 +52,9 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public String generateSqlSelect(String tableName) {
         try {
             return cacheSQLs.get("SELECT:" + tableName, () -> {
-                return MessageFormat.format("SELECT {2} FROM {0} WHERE {1}", tableName,
-                        strWherePkClause, strAllColumns);
+                return MessageFormat
+                        .format("SELECT {2} FROM {0} WHERE {1}", tableName, strWherePkClause,
+                                strAllColumns);
             });
         } catch (ExecutionException e) {
             throw new DaoException(e);
@@ -64,8 +65,8 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
      * Generate SELECT statement to SELECT all BOs, ordered by promary keys.
      *
      * <p>
-     * The generated SQL will look like this
-     * {@code SELECT all-columns FROM table ORDER BY pk-1, pk-2...}
+     * The generated SQL will look like this {@code SELECT all-columns FROM table ORDER BY pk-1,
+     * pk-2...}
      * </p>
      *
      * @param tableName
@@ -74,8 +75,9 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public String generateSqlSelectAll(String tableName) {
         try {
             return cacheSQLs.get("SELECT-ALL:" + tableName, () -> {
-                return MessageFormat.format("SELECT {2} FROM {0} ORDER BY {1}", tableName,
-                        strPkColumns, strAllColumns);
+                return MessageFormat
+                        .format("SELECT {2} FROM {0} ORDER BY {1}", tableName, strPkColumns,
+                                strAllColumns);
             });
         } catch (ExecutionException e) {
             throw new DaoException(e);
@@ -86,8 +88,8 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
      * Generate INSERT statement to insert a BO.
      *
      * <p>
-     * The generated SQL will look like this
-     * {@code INSERT INTO table (all-columns) VALUES (?,?,...)}
+     * The generated SQL will look like this {@code INSERT INTO table (all-columns) VALUES
+     * (?,?,...)}
      * </p>
      *
      * @param tableName
@@ -96,8 +98,9 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public String generateSqlInsert(String tableName) {
         try {
             return cacheSQLs.get("INSERT:" + tableName, () -> {
-                return MessageFormat.format("INSERT INTO {0} ({1}) VALUES ({2})", tableName,
-                        strAllColumns, StringUtils.repeat("?", ",", getAllColumns().length));
+                return MessageFormat
+                        .format("INSERT INTO {0} ({1}) VALUES ({2})", tableName, strAllColumns,
+                                StringUtils.repeat("?", ",", getAllColumns().length));
             });
         } catch (ExecutionException e) {
             throw new DaoException(e);
@@ -108,8 +111,7 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
      * Generate DELETE statement to delete an existing BO.
      *
      * <p>
-     * The generated SQL will look like this
-     * {@code DELETE FROM table WHERE pk-1=? AND pk-2=?...}
+     * The generated SQL will look like this {@code DELETE FROM table WHERE pk-1=? AND pk-2=?...}
      * </p>
      *
      * @param tableName
@@ -118,8 +120,8 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public String generateSqlDelete(String tableName) {
         try {
             return cacheSQLs.get("DELETE:" + tableName, () -> {
-                return MessageFormat.format("DELETE FROM {0} WHERE {1}", tableName,
-                        strWherePkClause);
+                return MessageFormat
+                        .format("DELETE FROM {0} WHERE {1}", tableName, strWherePkClause);
             });
         } catch (ExecutionException e) {
             throw new DaoException(e);
@@ -130,8 +132,8 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
      * Generate UPDATE statement to update an existing BO.
      *
      * <p>
-     * The generated SQL will look like this
-     * {@code UPDATE table SET col1=?, col2=?...WHERE pk-1=? AND pk-2=?...}
+     * The generated SQL will look like this {@code UPDATE table SET col1=?, col2=?...WHERE pk-1=?
+     * AND pk-2=?...}
      * </p>
      *
      * @param tableName
@@ -140,8 +142,9 @@ public class UserRowMapper extends AnnotatedGenericRowMapper<UserBo> {
     public String generateSqlUpdate(String tableName) {
         try {
             return cacheSQLs.get("UPDATE:" + tableName, () -> {
-                return MessageFormat.format("UPDATE {0} SET {2} WHERE {1}", tableName,
-                        strWherePkClause, strUpdateSetClause);
+                return MessageFormat
+                        .format("UPDATE {0} SET {2} WHERE {1}", tableName, strWherePkClause,
+                                strUpdateSetClause);
             });
         } catch (ExecutionException e) {
             throw new RuntimeException(e);

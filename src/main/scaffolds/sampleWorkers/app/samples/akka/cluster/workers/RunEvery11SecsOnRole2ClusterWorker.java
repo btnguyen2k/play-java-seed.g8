@@ -27,7 +27,7 @@ import java.util.Set;
 @Scheduling(value = "*/11 * *", workerCoordinationPolicy = WorkerCoordinationPolicy.LOCAL_SINGLETON)
 public class RunEvery11SecsOnRole2ClusterWorker extends BaseClusterWorker {
 
-    private final static Set<String> DEPLOY_ROLES = Collections.singleton("Role1");
+    private final static Set<String> DEPLOY_ROLES = Collections.singleton("Role2");
 
     /**
      * {@inheritDoc}
@@ -43,8 +43,10 @@ public class RunEvery11SecsOnRole2ClusterWorker extends BaseClusterWorker {
         long timeStart = System.currentTimeMillis();
         try {
             Date d = tick.getTimestamp();
-            Logger.info("[" + DateFormatUtils.toString(d, "HH:mm:ss") + "] " + getActorPath().name()
-                    + " do job " + tick + " from " + sender().path());
+            Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                    getActorPath().name(),
+                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
+                            .getTimestampStr("HH:mm:ss") + "]", sender().path());
         } finally {
             if (!StringUtils.isBlank(lockId) && System.currentTimeMillis() - timeStart > 1000) {
                 /*

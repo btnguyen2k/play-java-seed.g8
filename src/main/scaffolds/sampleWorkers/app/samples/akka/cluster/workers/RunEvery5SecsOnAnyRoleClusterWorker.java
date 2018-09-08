@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 
 import java.util.Date;
-import java.util.Set;
 
 /**
  * Sample cluster worker that runs every 5 seconds on all nodes (node with any role).
@@ -26,23 +25,15 @@ import java.util.Set;
 @Scheduling(value = "*/5 * *", workerCoordinationPolicy = WorkerCoordinationPolicy.TAKE_ALL_TASKS)
 public class RunEvery5SecsOnAnyRoleClusterWorker extends BaseClusterWorker {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Set<String> getDeployRoles() {
-        //run on nodes with any role
-        return null;
-    }
-
     @Override
     protected void doJob(String lockId, TickMessage tick) {
         long timeStart = System.currentTimeMillis();
         try {
             Date d = tick.getTimestamp();
             Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
-                    getActorPath(),
-                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick.getTimestampStr("HH:mm:ss yyyy-MM-dd") + "]", sender().path());
+                    getActorPath().name(),
+                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
+                            .getTimestampStr("HH:mm:ss") + "]", sender().path());
         } finally {
             if (!StringUtils.isBlank(lockId) && System.currentTimeMillis() - timeStart > 1000) {
                 /*

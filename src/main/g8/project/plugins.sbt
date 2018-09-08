@@ -1,5 +1,5 @@
 // The Play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.16")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.6.18")
 
 // Integrate with Eclipse: https://playframework.com/documentation/latest/IDE
 // https://github.com/typesafehub/sbteclipse

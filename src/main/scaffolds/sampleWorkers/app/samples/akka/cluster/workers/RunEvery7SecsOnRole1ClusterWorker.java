@@ -43,8 +43,10 @@ public class RunEvery7SecsOnRole1ClusterWorker extends BaseClusterWorker {
         long timeStart = System.currentTimeMillis();
         try {
             Date d = tick.getTimestamp();
-            Logger.info("[" + DateFormatUtils.toString(d, "HH:mm:ss") + "] " + getActorPath().name()
-                    + " do job " + tick + " from " + sender().path());
+            Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                    getActorPath().name(),
+                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
+                            .getTimestampStr("HH:mm:ss") + "]", sender().path());
         } finally {
             if (!StringUtils.isBlank(lockId) && System.currentTimeMillis() - timeStart > 1000) {
                 /*

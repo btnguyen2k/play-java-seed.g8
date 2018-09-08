@@ -1,7 +1,7 @@
 package modules.registry;
 
 import akka.actor.ActorSystem;
-import api.ApiDispatcher;
+import com.github.ddth.recipes.apiservice.ApiRouter;
 import com.typesafe.config.Config;
 import play.Application;
 import play.i18n.Lang;
@@ -70,12 +70,12 @@ public interface IRegistry {
     <T> T getBean(String name, Class<T> clazz);
 
     /**
-     * Get {@link ApiDispatcher} instance.
+     * Get {@link ApiRouter} instance.
      *
      * @return
-     * @since template-v0.1.4
+     * @since template-v2.6.r8
      */
-    ApiDispatcher getApiDispatcher();
+    ApiRouter getApiRouter();
 
     /**
      * Get default {@link ExecutionContextExecutor} instance.

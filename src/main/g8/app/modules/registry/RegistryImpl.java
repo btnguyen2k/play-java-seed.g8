@@ -5,7 +5,6 @@ import akka.actor.Actor;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import api.ApiDispatcher;
 import com.github.ddth.akka.cluster.scheduling.ClusterTickFanOutActor;
 import com.github.ddth.akka.scheduling.tickfanout.MultiNodePubSubBasedTickFanOutActor;
 import com.github.ddth.akka.scheduling.tickfanout.SingleNodeTickFanOutActor;
@@ -20,6 +19,7 @@ import com.github.ddth.pubsub.IPubSubHub;
 import com.github.ddth.pubsub.impl.AbstractPubSubHub;
 import com.github.ddth.pubsub.impl.universal.idint.UniversalInmemPubSubHub;
 import com.github.ddth.pubsub.impl.universal.idint.UniversalRedisPubSubHub;
+import com.github.ddth.recipes.apiservice.ApiRouter;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -503,8 +503,8 @@ public class RegistryImpl implements IRegistry {
      * {@inheritDoc}
      */
     @Override
-    public ApiDispatcher getApiDispatcher() {
-        return getBean(ApiDispatcher.class);
+    public ApiRouter getApiRouter() {
+        return getBean(ApiRouter.class);
     }
 
     /**

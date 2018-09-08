@@ -9,15 +9,37 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util.xsd">
 
-    <bean id="API_DISPATCHER" class="api.ApiDispatcher" init-method="init" destroy-method="destroy">
-        <!-- Sample API handlers -->
+    <bean id="API_ROUTER" class="com.github.ddth.recipes.apiservice.ApiRouter" init-method="init" destroy-method="destroy">
+        <!-- Sample API authenticator: allow all API calls -->
+        <property name="apiAuthenticator">
+            <bean class="com.github.ddth.recipes.apiservice.auth.AllowAllApiAuthenticator" />
+        </property>
+
+        <!-- Sample API authenticator: authenticate API clients using a map {app-id:access-code} -->
         <!--
-        <property name="apiAuths">
-            <map>
-                <entry key="samples" value="pjHrE7MM3nAczEU995hBbhYAGw7bvthQ" />
-            </map>
+        <property name="apiAuthenticator">
+            <bean class="com.github.ddth.recipes.apiservice.auth.BasicApiAuthenticator">
+                <property name="apiAuths">
+                    <map>
+                        <entry key="app-id-demo">
+                            <bean class="com.github.ddth.recipes.apiservice.ApiAuth">
+                                <property name="appId" value="app-id-demo" />
+                                <property name="accessToken" value="access-token-demo" />
+                            </bean>
+                        </entry>
+                        <entry key="app-id-test">
+                            <bean class="com.github.ddth.recipes.apiservice.ApiAuth">
+                                <property name="appId" value="app-id-test" />
+                                <property name="accessToken" value="access-token-test" />
+                            </bean>
+                        </entry>
+                    </map>
+                </property>
+            </bean>
         </property>
         -->
+
+        <!-- Sample API handlers -->
         <!--
         <property name="apiHandlers">
             <map>

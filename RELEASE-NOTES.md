@@ -1,43 +1,44 @@
 # Release Notes
 
-## 2018-07-xx: template-v2.6.r8
+## 2018-09-08: template-v2.6.r8
 
 **Highlighted changes**
 
-- `Play! Framework v2.6.16`
+- `Play! Framework v2.6.18`
 - New configuration `bootstrap-actors`: a list of application actors to be created when application starts
   - Format: a list of `fully-qualified-class-name[;actor-name]`
 - Schedule jobs using `ddth-akka`; top level package `akka` is no longer needed, hence it is removed.
 - Implement API service using `ddth-recipes`; top level package `api` is no longer needed, hence it is removed.
 
-**Upgrade to Play! Framework v2.6.16:**
+**Upgrade to Play! Framework v2.6.18:**
 
-- Play! Framework   : v2.6.16
+- Play! Framework   : v2.6.18
 - Scala             : v2.12.6
-- Akka              : v2.5.14
-- play-json         : v2.6.9
-- play-ws-standalone: v1.1.9
+- Akka              : v2.5.16
+- play-json         : v2.6.10
+- play-ws-standalone: v1.1.10
 
 RDMBS JDBC drivers & Connection Pool:
 - HikariCP  : v3.2.0
 - HSQLDB    : v2.4.1
-- MySQL     : v8.0.11
-- PostgreSQL: v42.2.4
-- MSSQL     : v6.4.0.jre8
+- MySQL     : v8.0.12
+- PostgreSQL: v42.2.5
+- MSSQL     : v7.0.0.jre8
 
-Spring Framework: v5.0.7.RELEASE
+Spring Framework: v5.0.8.RELEASE
 
 RPC:
 - libthrift: v0.11.0
-- protobuf : v3.6.0
-- gRPC     : v1.13.2
+- protobuf : v3.6.1
+- gRPC     : v1.14.0
+- netty-tcnative-boringssl-static: v2.0.15.Final
 
 DDTH:
 - ddth-recipes      : v0.2.0.1
 - ddth-commons      : v0.9.1.7
 - ddth-cache-adapter: v0.6.3.3
-- ddth-dao          : v0.9.0.2
-- ddth-akka         : v0.1.3
+- ddth-dao          : v0.9.0.4
+- ddth-akka         : v0.1.4
 - ddth-dlock        : v0.1.2
 - ddth-queue        : v0.7.1.2
 

@@ -4,9 +4,11 @@ import com.github.ddth.akka.scheduling.BaseWorker;
 import com.github.ddth.akka.scheduling.TickMessage;
 import com.github.ddth.akka.scheduling.WorkerCoordinationPolicy;
 import com.github.ddth.akka.scheduling.annotation.Scheduling;
+import com.github.ddth.commons.utils.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -29,7 +31,11 @@ public class RunEvery10SecsWorker extends BaseWorker {
     protected void doJob(String dlockId, TickMessage tick) throws InterruptedException {
         long timeStart = System.currentTimeMillis();
         try {
-            Logger.info("[" + getActorPath().name() + "] do job " + tick);
+            Date d = tick.getTimestamp();
+            Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                    getActorPath().name(),
+                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
+                            .getTimestampStr("HH:mm:ss YYYY-mm-dd") + "]", sender().path());
             Thread.sleep(7500 + random.nextInt(4000));
         } finally {
             if (!StringUtils.isBlank(dlockId) && System.currentTimeMillis() - timeStart > 1000) {

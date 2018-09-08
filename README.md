@@ -17,7 +17,7 @@ Latest release: [template-v2.6.r8](RELEASE-NOTES.md).
 - Docker support (since [template-v2.6.r6](RELEASE-NOTES.md)).
 - HTTPS & HTTP/2 support (since [template-v2.6.r1](RELEASE-NOTES.md)).
 - GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md)).
-- Intended for Linux-based applications
+- Start/Stop scripts for Linux
 - Separated configurations for production and non-production environments:
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
   - For non-production: `conf/application.conf` and `conf/logback-dev.xml`
@@ -30,7 +30,7 @@ Latest release: [template-v2.6.r8](RELEASE-NOTES.md).
   - I18N
   - Workers & Scheduling
   - Cluster workers
-  - API handler: JSON-based data format. Support interface:
+  - APIs: JSON-based data format. Supported interfaces:
     - HTTP(S)
     - Apache Thrift (since [template-v1.4.0](RELEASE-NOTES.md)).
     - gRPC (since [template-v2.6.r2](RELEASE-NOTES.md)).

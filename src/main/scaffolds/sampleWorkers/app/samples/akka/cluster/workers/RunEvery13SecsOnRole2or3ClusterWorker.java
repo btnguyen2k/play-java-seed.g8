@@ -8,7 +8,11 @@ import com.github.ddth.commons.utils.DateFormatUtils;
 import org.apache.commons.lang3.StringUtils;
 import play.Logger;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * Sample cluster worker that runs every 13 seconds only on nodes with roles contain "Role2" or
@@ -43,8 +47,10 @@ public class RunEvery13SecsOnRole2or3ClusterWorker extends BaseClusterWorker {
         long timeStart = System.currentTimeMillis();
         try {
             Date d = tick.getTimestamp();
-            Logger.info("[" + DateFormatUtils.toString(d, "HH:mm:ss") + "] " + getActorPath().name()
-                    + " do job " + tick + " from " + sender().path());
+            Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
+                    getActorPath().name(),
+                    tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
+                            .getTimestampStr("HH:mm:ss") + "]", sender().path());
         } finally {
             if (!StringUtils.isBlank(lockId) && System.currentTimeMillis() - timeStart > 1000) {
                 /*

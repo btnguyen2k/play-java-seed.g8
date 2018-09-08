@@ -34,9 +34,9 @@ public class RunEvery5SecsClusterWorker extends BaseClusterWorker {
         try {
             Date d = tick.getTimestamp();
             Logger.info("[{}] {{}} do job {{}} from {{}}", DateFormatUtils.toString(d, "HH:mm:ss"),
-                    getActorPath(),
+                    getActorPath().name(),
                     tick.getClass().getSimpleName() + "[" + tick.getId() + "," + tick
-                            .getTimestampStr("HH:mm:ss YYYY-mm-dd") + "]", sender().path());
+                            .getTimestampStr("HH:mm:ss") + "]", sender().path());
             long sleepTime = 4000 + random.nextInt(3000);
             Thread.sleep(sleepTime);
         } finally {

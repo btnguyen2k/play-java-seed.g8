@@ -1,6 +1,6 @@
 package samples.controllers;
 
-import api.ApiDispatcher;
+import com.github.ddth.recipes.apiservice.ApiRouter;
 import com.google.inject.Provider;
 import controllers.BaseJsonWsController;
 import modules.registry.IRegistry;
@@ -19,10 +19,16 @@ public class SampleApiController extends BaseJsonWsController {
 
     @Inject
     public SampleApiController(Provider<IRegistry> registryProvider) {
-        ApiDispatcher apiDispatcher = registryProvider.get().getApiDispatcher();
-        apiDispatcher.registerApiHandler("echo", ApiFuncSample.API_ECHO);
-        apiDispatcher.registerApiHandler("info", ApiFuncSample.API_INFO);
-        apiDispatcher.registerApiHandler("deny", ApiFuncSample.API_DENY);
+        new Thread(()->{
+            try {
+                Thread.sleep(5000);
+                ApiRouter apiRouter = registryProvider.get().getApiRouter();
+                apiRouter.registerApiHandler("echo", ApiFuncSample.API_ECHO);
+                apiRouter.registerApiHandler("info", ApiFuncSample.API_INFO);
+                apiRouter.registerApiHandler("deny", ApiFuncSample.API_DENY);
+            } catch (Exception e) {
+            }
+        }).start();
     }
 
     /*
