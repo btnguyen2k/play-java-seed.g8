@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2018-09-08: template-v2.6.r8
+## 2018-09-12: template-v2.6.r8
 
 **Highlighted changes**
 
