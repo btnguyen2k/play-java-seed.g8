@@ -1,5 +1,15 @@
 # Release Notes
 
+## 2018-10-03: template-v2.6.r9
+
+- Upgrade to Play! Framework v2.6.19
+- Add custom error pages for 400, 403, 404, 500
+- Other libs:
+   - `ddth-dao:0.9.0.5`
+   
+
+
+
 ## 2018-09-12: template-v2.6.r8
 
 **Highlighted changes**

@@ -4,6 +4,11 @@
 
 GET		/									controllers.IndexController.index
 
+GET     /400                                controllers.IndexController.error400(msg: String?="")
+GET     /403                                controllers.IndexController.error403(msg: String?="")
+GET     /404                                controllers.IndexController.error404(msg: String?="")
+GET     /error                              controllers.IndexController.errorServer(msg: String?="")
+
 # Map static resources from the /public folder to the /assets URL path
 # prefix must match `play.assets.urlPrefix`
 GET     /assets/*file                       controllers.Assets.at(file)

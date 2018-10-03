@@ -10,7 +10,7 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r8](RELEASE-NOTES.md).
+Latest release: [template-v2.6.r9](RELEASE-NOTES.md).
 
 ## Features
 
@@ -35,6 +35,7 @@ Latest release: [template-v2.6.r8](RELEASE-NOTES.md).
     - Apache Thrift (since [template-v1.4.0](RELEASE-NOTES.md)).
     - gRPC (since [template-v2.6.r2](RELEASE-NOTES.md)).
 - JVM tuning & GC logging
+- Custom error pages (since [template-v2.6.r9](RELEASE-NOTES.md)).
 
 ### Start/Stop Scripts
 
