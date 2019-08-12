@@ -1,5 +1,58 @@
 # Release Notes
 
+## 2019-08-11: template-v2.7.r1
+
+**Highlighted changes:**
+
+- Migrate to `Java 11`
+- Upgrade to `Play! Framework v2.7.3`:
+  - [What’s new in Play 2.7](https://www.playframework.com/documentation/2.7.x/Highlights27)
+  - [Play 2.7 Migration Guide](https://www.playframework.com/documentation/2.7.x/Migration27)
+
+**Upgrade to Play! Framework v2.7.3:**
+
+- Play! Framework   : v2.7.3
+- Scala             : v2.12.9
+- Sbt               : v1.2.8
+- Akka              : v2.5.23
+- play-ws-standalone: v2.0.7
+- play-json         : v2.7.4
+
+RDMBS JDBC drivers & Connection Pool:
+- HikariCP: v3.3.1
+- HSQLDB  : v2.5.0
+
+Spring Framework: v5.1.9.RELEASE
+
+RPC:
+- libthrift: v0.12.0
+- protobuf : v3.9.1
+- gRPC     : v1.22.1
+- netty-tcnative-boringssl-static: v2.0.25.Final
+
+DDTH:
+- ddth-akka         : v1.0.0
+- ddth-cache-adapter: v1.0.0
+- ddth-commons      : v1.1.0
+- ddth-dao          : v1.0.0
+- ddth-dlock        : v1.0.0
+- ddth-queue        : v1.0.0
+- ddth-recipes      : v1.0.0
+
+Others:
+- Google's Guava        : v28.0-jre
+- Apache's commons-pool2: v2.7.0
+- Webjars AdminLTE      : v2.4.15
+
+Plugins:
+- com.typesafe.sbteclipse:sbteclipse-plugin:5.2.4
+- com.typesafe.sbt:sbt-native-packager:1.3.25
+- com.typesafe.sbt:sbt-rjs:1.0.10
+- com.typesafe.sbt:sbt-digest:1.1.4
+- com.typesafe.sbt:sbt-gzip:1.0.2
+- Gitter8 Scaffold: `org.foundweekends.giter8:sbt-giter8-scaffold:0.12.0-M2`
+
+
 ## 2018-10-03: template-v2.6.r9
 
 - Upgrade to Play! Framework v2.6.19
@@ -7,8 +60,6 @@
 - Other libs:
    - `ddth-dao:0.9.0.5`
    
-
-
 
 ## 2018-09-12: template-v2.6.r8
 

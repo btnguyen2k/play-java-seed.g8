@@ -1,6 +1,8 @@
 package errors;
 
 /**
+ * Thrown to indicate that there was an error caused by client's input.
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v2.6.r9
  */

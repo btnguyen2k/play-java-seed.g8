@@ -1,7 +1,7 @@
 package api.impl;
 
+import com.github.ddth.recipes.global.GlobalRegistry;
 import modules.registry.IRegistry;
-import modules.registry.RegistryGlobal;
 
 /**
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
@@ -9,6 +9,6 @@ import modules.registry.RegistryGlobal;
  */
 public class BaseApi {
     protected static IRegistry getRegistry() {
-        return RegistryGlobal.registry;
+        return GlobalRegistry.getFromGlobalStorage(IRegistry.REG_KEY_REGISTRY, IRegistry.class);
     }
 }

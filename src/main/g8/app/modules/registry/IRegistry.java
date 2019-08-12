@@ -16,6 +16,9 @@ import scala.concurrent.ExecutionContextExecutor;
  * @since template-v0.1.0
  */
 public interface IRegistry {
+    String REG_KEY_REGISTRY = "registry";
+    String REG_KEY_DLOCK_FACTORY = "dlock-factory";
+    String REG_KEY_PUBSUB_HUB = "pubsub-hub";
 
     /**
      * Get the current running Play application.
@@ -32,7 +35,7 @@ public interface IRegistry {
     Config getAppConfig();
 
     /**
-     * Get application's available languages defined in {@code application.conf}.
+     * Get application's available languages, defined in {@code application.conf}.
      *
      * @return
      */
@@ -83,7 +86,9 @@ public interface IRegistry {
      * @return
      * @since template-v2.6.r1
      */
-    ExecutionContextExecutor getDefaultExecutionContextExecutor();
+    default ExecutionContextExecutor getDefaultExecutionContextExecutor() {
+        return getActorSystem().dispatcher();
+    }
 
     /**
      * Get custom {@link ExecutionContextExecutor} instance.

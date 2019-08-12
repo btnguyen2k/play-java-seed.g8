@@ -1,6 +1,5 @@
 package samples.utils;
 
-import modules.registry.RegistryGlobal;
 import play.mvc.Controller;
 import play.mvc.Http.Session;
 import samples.bo.user.IUserDao;

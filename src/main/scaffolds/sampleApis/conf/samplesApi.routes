@@ -1,16 +1,34 @@
 ## Sample: API routes
 
 # Examples of controller that handles web service calls
-GET         /api/info                   samples.controllers.SampleApiController.infoGet
-POST        /api/info                   samples.controllers.SampleApiController.infoPost
+GET         /                           samples.controllers.SampleApiController.index
 
-GET         /api/echo                   samples.controllers.SampleApiController.echoGet
-POST        /api/echo                   samples.controllers.SampleApiController.echoPost
-PUT         /api/echo                   samples.controllers.SampleApiController.echoPut
-PATCH       /api/echo                   samples.controllers.SampleApiController.echoPatch
-DELETE      /api/echo                   samples.controllers.SampleApiController.echoDelete
+GET         /api/employees              samples.controllers.SampleApiController.listEmployees(request: Request)
+POST        /api/employee               samples.controllers.SampleApiController.createEmployee(request: Request)
+GET         /api/employee/:id           samples.controllers.SampleApiController.getEmployee(request: Request, id: String)
+PUT         /api/employee/:id           samples.controllers.SampleApiController.updateEmployee(request: Request, id: String)
+DELETE      /api/employee/:id           samples.controllers.SampleApiController.deleteEmployee(request: Request, id: String)
 
-GET         /api/noApi                  samples.controllers.SampleApiController.noApi
-POST        /api/noApi                  samples.controllers.SampleApiController.noApi
-PUT         /api/noApi                  samples.controllers.SampleApiController.noApi
-DELETE      /api/noApi                  samples.controllers.SampleApiController.noApi
+DELETE      /api/echo                   samples.controllers.SampleApiController.echoDelete(request: Request)
+GET         /api/echo                   samples.controllers.SampleApiController.echoGet(request: Request)
+PATCH       /api/echo                   samples.controllers.SampleApiController.echoPatch(request: Request)
+POST        /api/echo                   samples.controllers.SampleApiController.echoPost(request: Request)
+PUT         /api/echo                   samples.controllers.SampleApiController.echoPut(request: Request)
+
+DELETE      /api/info                   samples.controllers.SampleApiController.info(request: Request)
+GET         /api/info                   samples.controllers.SampleApiController.info(request: Request)
+PATCH       /api/info                   samples.controllers.SampleApiController.info(request: Request)
+POST        /api/info                   samples.controllers.SampleApiController.info(request: Request)
+PUT         /api/info                   samples.controllers.SampleApiController.info(request: Request)
+
+DELETE      /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+GET         /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+PATCH       /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+POST        /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+PUT         /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+
+DELETE      /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
+GET         /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
+PATCH       /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
+POST        /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
+PUT         /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)

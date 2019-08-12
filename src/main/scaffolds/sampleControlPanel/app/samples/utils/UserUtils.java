@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.ddth.commons.utils.HashUtils;
 
-import modules.registry.RegistryGlobal;
 import samples.bo.user.IUserDao;
 import samples.bo.user.UserBo;
 import samples.bo.user.UserGroupBo;

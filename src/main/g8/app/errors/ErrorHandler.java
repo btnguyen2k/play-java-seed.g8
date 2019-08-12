@@ -21,14 +21,13 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 /**
- * Custom error handler.
+ * Custom errors handler.
  *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v2.6.r9
  */
 @Singleton
 public class ErrorHandler extends DefaultHttpErrorHandler {
-
     protected final Config config;
     protected final Environment environment;
     protected final OptionalSourceMapper sourceMapper;
@@ -45,8 +44,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     @Override
-    public CompletionStage<Result> onClientError(RequestHeader request, int statusCode,
-            String message) {
+    public CompletionStage<Result> onClientError(RequestHeader request, int statusCode, String message) {
         String viewKey = "error_pages.view_" + statusCode;
         String viewName = TypesafeConfigUtils.getString(config, viewKey);
         if (StringUtils.isBlank(viewName)) {
@@ -59,8 +57,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 for (Method method : methods) {
                     if (method.getName().equals("render")) {
                         Object[] params = { request, statusCode, message };
-                        return CompletableFuture
-                                .completedFuture(Results.ok((Html) method.invoke(null, params)));
+                        return CompletableFuture.completedFuture(Results.ok((Html) method.invoke(null, params)));
                     }
                 }
             } catch (ClassNotFoundException e) {
@@ -81,14 +78,11 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
         return super.onServerError(request, exception);
     }
 
-    private CompletionStage<Result> serverError(boolean devMode, RequestHeader request,
-            UsefulException exception) {
+    private CompletionStage<Result> serverError(boolean devMode, RequestHeader request, UsefulException exception) {
         String viewKey = "error_pages.view_server";
         String viewName = TypesafeConfigUtils.getString(config, viewKey);
         if (StringUtils.isBlank(viewName)) {
-            return devMode
-                    ? super.onDevServerError(request, exception)
-                    : super.onProdServerError(request, exception);
+            return devMode ? super.onDevServerError(request, exception) : super.onProdServerError(request, exception);
         } else {
             try {
                 String clazzName = "views.html." + viewName;
@@ -97,31 +91,26 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
                 for (Method method : methods) {
                     if (method.getName().equals("render")) {
                         Object[] params = { request, exception.cause };
-                        return CompletableFuture
-                                .completedFuture(Results.ok((Html) method.invoke(null, params)));
+                        return CompletableFuture.completedFuture(Results.ok((Html) method.invoke(null, params)));
                     }
                 }
             } catch (ClassNotFoundException e) {
-                return devMode
-                        ? super.onDevServerError(request, exception)
-                        : super.onProdServerError(request, exception);
+                return devMode ?
+                        super.onDevServerError(request, exception) :
+                        super.onProdServerError(request, exception);
             } catch (Exception e) {
-                return devMode
-                        ? super.onDevServerError(request, throwableToUsefulException(e))
-                        : super.onProdServerError(request, throwableToUsefulException(e));
+                return devMode ?
+                        super.onDevServerError(request, throwableToUsefulException(e)) :
+                        super.onProdServerError(request, throwableToUsefulException(e));
             }
         }
-        return devMode
-                ? super.onDevServerError(request, exception)
-                : super.onProdServerError(request, exception);
+        return devMode ? super.onDevServerError(request, exception) : super.onProdServerError(request, exception);
     }
 
     @Override
-    protected CompletionStage<Result> onDevServerError(RequestHeader request,
-            UsefulException exception) {
-        boolean overrideDevMode = TypesafeConfigUtils
-                .getBooleanOptional(config, "error_pages.override_dev_mode").orElse(Boolean.FALSE)
-                .booleanValue();
+    protected CompletionStage<Result> onDevServerError(RequestHeader request, UsefulException exception) {
+        boolean overrideDevMode = TypesafeConfigUtils.getBooleanOptional(config, "error_pages.override_dev_mode")
+                .orElse(Boolean.FALSE).booleanValue();
         if (!overrideDevMode) {
             return super.onDevServerError(request, exception);
         }
@@ -129,9 +118,7 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     @Override
-    protected CompletionStage<Result> onProdServerError(RequestHeader request,
-            UsefulException exception) {
+    protected CompletionStage<Result> onProdServerError(RequestHeader request, UsefulException exception) {
         return serverError(false, request, exception);
     }
-
 }

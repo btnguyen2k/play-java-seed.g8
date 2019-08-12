@@ -8,12 +8,11 @@ import scala.collection.Seq;
 
 /**
  * Registry module: register application's global items to the central registry.
- * 
+ *
  * @author Thanh Nguyen <btnguyen2k@gmail.com>
  * @since template-v0.1.0
  */
 public class RegistryModule extends Module {
-
     /**
      * {@inheritDoc}
      */
@@ -22,5 +21,4 @@ public class RegistryModule extends Module {
         Seq<Binding<?>> bindings = seq(bind(IRegistry.class).to(RegistryImpl.class).eagerly());
         return bindings;
     }
-
 }

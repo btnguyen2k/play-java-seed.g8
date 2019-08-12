@@ -6,13 +6,13 @@ val appVersion = conf.getString("app.version")
 
 sbtPlugin    := true
 scalaVersion := "$scala_version$"
-giter8.ScaffoldPlugin.projectSettings
+//giter8.ScaffoldPlugin.projectSettings
 
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-// See https://playframework.com/documentation/2.6.x/AkkaHttpServer
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttpServer, PlayAkkaHttp2Support, SbtWeb).settings(
+// See https://playframework.com/documentation/latest/AkkaHttpServer
+lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttpServer, PlayAkkaHttp2Support, SbtWeb).disablePlugins(ScriptedPlugin).settings(
     name         := appName,
     version      := appVersion,
     organization := "$organization$",
@@ -21,10 +21,10 @@ lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAk
 )
 
 // Eclipse configurations
-EclipseKeys.preTasks                 := Seq(compile in Compile)                     // Force compile project before running the eclipse command
+EclipseKeys.preTasks                 := Seq(compile in Compile, compile in Test)    // Force compile project before running the eclipse command
 EclipseKeys.skipParents in ThisBuild := false
 EclipseKeys.projectFlavor            := EclipseProjectFlavor.Java                   // Java project. Don't expect Scala IDE
-EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE18)  // expect Java 1.8
+//EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE18)  // No Java11 yet, manually switch to JDK11 in Eclipse!
 // Use .class files instead of generated .scala files for views and routes
 //EclipseKeys.createSrc                := EclipseCreateSrc.ValueSet(EclipseCreateSrc.ManagedClasses, EclipseCreateSrc.ManagedResources)
 
@@ -37,10 +37,10 @@ EclipseKeys.executionEnvironment     := Some(EclipseExecutionEnvironment.JavaSE1
 dockerCommands := Seq()
 import com.typesafe.sbt.packager.docker._
 dockerCommands := Seq(
-    Cmd("FROM"          , "openjdk:8-jre-alpine"),
+    Cmd("FROM"          , "openjdk:11-jre-alpine"),
     Cmd("LABEL"         , "maintainer=\"$author$\""),
     Cmd("ADD"           , "opt /opt"),
-    Cmd("RUN"           , "apk add --no-cache -U tzdata bash && ln -s /opt/docker /opt/" + appName + " && chown -R daemon:daemon /opt"),
+    Cmd("RUN"           , "apk add --no-cache -U bash ca-certificates tzdata && ln -s /opt/docker /opt/" + appName + " && chown -R daemon:daemon /opt && chmod 755 /opt/docker/conf/*.sh && chmod 755 /opt/docker/bin/*"),
     Cmd("RUN"           , "cp /usr/share/zoneinfo/$timezone$ /etc/localtime"),
     Cmd("WORKDIR"       , "/opt/" + appName),
     Cmd("USER"          , "daemon"),
@@ -53,25 +53,25 @@ version in Docker     := appVersion
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, packageDoc) := false
 
-javacOptions    ++= Seq("-source", "1.8", "-target", "1.8")
+javacOptions    ++= Seq("-source", "11", "-target", "11")
 routesGenerator := InjectedRoutesGenerator
-pipelineStages  := Seq(digest, gzip)
+pipelineStages  := Seq(rjs, digest, gzip)
 
 // Dependency configurations
-val _akkaVersion             = "2.5.16"
-val _playWsStandaloneVersion = "1.1.10"
-val _grpcVersion             = "1.14.0"
-val _springVersion           = "5.0.8.RELEASE"
-val _ddthCommonsVersion      = "0.9.1.7"
-val _ddthCacheAdapterVersion = "0.6.3.3"
-val _ddthDaoVersion          = "0.9.0.5"
-val _ddthAkkaVersion         = "0.1.4.1"
-val _ddthDLockVersion        = "0.1.2"
-val _ddthQueueVersion        = "0.7.1.2"
+val _akkaVersion             = "2.5.23"
+val _playWsStandaloneVersion = "2.0.7"
+val _grpcVersion             = "1.22.1"
+val _springVersion           = "5.1.9.RELEASE"
+val _ddthAkkaVersion         = "1.0.0"
+val _ddthCacheAdapterVersion = "1.0.0"
+val _ddthCommonsVersion      = "1.1.0"
+val _ddthDaoVersion          = "1.0.0"
+val _ddthDLockVersion        = "1.0.0"
+val _ddthQueueVersion        = "1.0.0"
 
 libraryDependencies ++= Seq(
     // we use Slf4j/Logback, so redirect Log4j to Slf4j
-    "org.slf4j"                  % "log4j-over-slf4j"             % "1.7.25"
+    "org.slf4j"                  % "log4j-over-slf4j"             % "1.7.27"
 
     // Akka actor
     ,"com.typesafe.akka"         %% "akka-actor"                  % _akkaVersion
@@ -81,32 +81,34 @@ libraryDependencies ++= Seq(
     ,"com.typesafe.akka"         %% "akka-cluster-tools"          % _akkaVersion
 
     // Play JSON & WebServices
-    ,"com.typesafe.play"         %% "play-json"                   % "2.6.10"
+    ,"com.typesafe.play"         %% "play-json"                   % "2.7.4"
     ,"com.typesafe.play"         %% "play-ahc-ws-standalone"      % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-json"     % _playWsStandaloneVersion
     ,"com.typesafe.play"         %% "play-ws-standalone-xml"      % _playWsStandaloneVersion
 
     // RDMBS JDBC drivers & Connection Pool
-    ,"com.zaxxer"                % "HikariCP"                     % "3.2.0"
-    ,"org.hsqldb"                % "hsqldb"                       % "2.4.1"
-    ,"mysql"                     % "mysql-connector-java"         % "8.0.12"
-    ,"org.postgresql"            % "postgresql"                   % "42.2.5"
-    ,"com.microsoft.sqlserver"   % "mssql-jdbc"                   % "7.0.0.jre8"
+    ,"com.zaxxer"                % "HikariCP"                     % "3.3.1"
 
-    ,"com.google.guava"          % "guava"                        % "20.0"
-    ,"org.apache.commons"        % "commons-pool2"                % "2.6.0"
-    ,"com.github.ddth"           % "ddth-recipes"                 % "0.2.0.1"
+    //// comment out or remove unused JDBC drivers
+    ,"org.hsqldb"                % "hsqldb"                       % "2.5.0"
+    //,"mysql"                     % "mysql-connector-java"         % "8.0.17"
+    //,"org.postgresql"            % "postgresql"                   % "42.2.6"
+    //,"com.microsoft.sqlserver"   % "mssql-jdbc"                   % "7.4.1.jre11"
+
+    ,"com.google.guava"          % "guava"                        % "28.0-jre"
+    ,"org.apache.commons"        % "commons-pool2"                % "2.7.0"
+    ,"com.github.ddth"           % "ddth-recipes"                 % "1.0.0"
 
     // RPC: Thrift
-    ,"org.apache.thrift"         % "libthrift"                    % "0.11.0"
+    ,"org.apache.thrift"         % "libthrift"                    % "0.12.0"
 
     // RPC: gRPC
-    ,"com.google.protobuf"       % "protobuf-java"                % "3.6.1"
+    ,"com.google.protobuf"       % "protobuf-java"                % "3.9.1"
     ,"io.grpc"                   % "grpc-netty"                   % _grpcVersion
     ,"io.grpc"                   % "grpc-protobuf"                % _grpcVersion
     ,"io.grpc"                   % "grpc-stub"                    % _grpcVersion
     ,"io.grpc"                   % "grpc-core"                    % _grpcVersion
-    ,"io.netty"                  % "netty-tcnative-boringssl-static" %  "2.0.15.Final"
+    ,"io.netty"                  % "netty-tcnative-boringssl-static" %  "2.0.25.Final"
 
     // Spring Framework
     ,"org.springframework"       % "spring-beans"                 % _springVersion
@@ -140,5 +142,5 @@ libraryDependencies ++= Seq(
     ,javaWs
     ,guice
 
-    ,"org.webjars"               % "AdminLTE"                     % "2.4.2" //do NOT use v2.4.3
+    ,"org.webjars"               % "AdminLTE"                     % "2.4.15"
 )

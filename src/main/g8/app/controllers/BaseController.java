@@ -1,18 +1,16 @@
 package controllers;
 
-import akka.actor.ActorSystem;
 import com.google.inject.Provider;
 import com.typesafe.config.Config;
 import modules.registry.IRegistry;
 import org.apache.commons.lang3.StringUtils;
-import play.Application;
 import play.i18n.Lang;
 import play.i18n.Messages;
 import play.i18n.MessagesApi;
 import play.libs.Json;
-import play.libs.ws.WSClient;
 import play.mvc.Call;
 import play.mvc.Controller;
+import play.mvc.Http;
 import play.mvc.Result;
 import utils.AppConstants;
 import utils.I18NUtils;
@@ -26,10 +24,10 @@ import javax.inject.Inject;
  * @since template-v0.1.0
  */
 public class BaseController extends Controller {
-
     public static String SESSION_LANG = "_l_";
 
-    protected @Inject Provider<IRegistry> registryProvider;
+    @Inject
+    protected Provider<IRegistry> registryProvider;
 
     /**
      * Get the {@link IRegistry} instance.
@@ -38,15 +36,6 @@ public class BaseController extends Controller {
      */
     protected IRegistry getRegistry() {
         return registryProvider.get();
-    }
-
-    /**
-     * Get the current running Play application.
-     *
-     * @return
-     */
-    protected Application getPlayApplication() {
-        return getRegistry().getPlayApplication();
     }
 
     /**
@@ -59,15 +48,6 @@ public class BaseController extends Controller {
     }
 
     /**
-     * Get the {@link ActorSystem} instance.
-     *
-     * @return
-     */
-    protected ActorSystem getActorSystem() {
-        return getRegistry().getActorSystem();
-    }
-
-    /**
      * Get the {@link MessagesApi} instance.
      *
      * @return
@@ -77,52 +57,70 @@ public class BaseController extends Controller {
     }
 
     /**
-     * Get the {@link WSClient} instance.
-     *
-     * @return
-     */
-    protected WSClient getWsClient() {
-        return getRegistry().getWsClient();
-    }
-
-    /**
-     * Switch to the specified language.
+     * Switch to the specified language: store language code in session at key {@link #SESSION_LANG}.
      *
      * @param lang
      */
-    protected void setLanguage(Lang lang) {
-        session(SESSION_LANG, lang.code());
+    protected void setLanguage(Result result, Lang lang) {
+        setLanguage(result.session(), lang);
     }
 
     /**
-     * Get the language for the current context.
+     * Switch to the specified language: store language code in session at key {@link #SESSION_LANG}.
      *
-     * @return
+     * @param session
+     * @param lang
+     * @since template-v2.7.r1
      */
-    protected Lang calcLang() {
-        String langCode = session(SESSION_LANG);
-        Lang lang = Lang.forCode(langCode);
-        return lang != null ? lang : lang();
+    protected void setLanguage(Http.Session session, Lang lang) {
+        session.adding(SESSION_LANG, lang.code());
     }
 
     /**
-     * Get the {@link Messages} instance for the current context.
+     * Get the language for the current context (request/session).
      *
      * @return
      */
-    protected Messages calcMessages() {
-        Lang lang = calcLang();
+    protected Lang calcLang(Http.Request request) {
+        return calcLang(request.session());
+    }
+
+    /**
+     * Get the language for the current context (request/session).
+     *
+     * @return
+     * @since template-v2.7.r1
+     */
+    protected Lang calcLang(Http.Session session) {
+        String langCode = session.getOptional(SESSION_LANG).orElse(null);
+        Lang lang = langCode != null ? Lang.forCode(langCode) : null;
+        return lang != null ? lang : Lang.defaultLang().asJava();
+    }
+
+    /**
+     * Get the {@link Messages} instance for the current context (request/session).
+     *
+     * @param request
+     * @return
+     * @since template-v2.7.r1
+     */
+    protected Messages calcMessages(Http.Request request) {
+        return calcMessages(request.session());
+    }
+
+    /**
+     * Get the {@link Messages} instance for the current context (request/session).
+     *
+     * @param session
+     * @return
+     * @since template-v2.7.r1
+     */
+    protected Messages calcMessages(Http.Session session) {
+        Lang lang = calcLang(session);
         return I18NUtils.calcMesages(getMessagesApi(), lang);
     }
 
-    /**
-     * Get all available languages.
-     *
-     * @return
-     */
-    protected Lang[] availableLanguages() {
-        return getRegistry().getAvailableLanguage();
-    }
+    /*----------------------------------------------------------------------*/
 
     /**
      * Response to client as Json.
@@ -143,10 +141,11 @@ public class BaseController extends Controller {
      * @return
      */
     protected Result responseRedirect(String url, String flashKey, String flashMsg) {
+        Result result = redirect(url);
         if (!StringUtils.isBlank(flashKey) && !StringUtils.isBlank(flashMsg)) {
-            flash(flashKey, flashMsg);
+            result.flashing(flashKey, flashMsg);
         }
-        return redirect(url);
+        return result;
     }
 
     /**
@@ -158,10 +157,10 @@ public class BaseController extends Controller {
      * @return
      */
     protected Result responseRedirect(Call call, String flashKey, String flashMsg) {
+        Result result = redirect(call);
         if (!StringUtils.isBlank(flashKey) && !StringUtils.isBlank(flashMsg)) {
-            flash(flashKey, flashMsg);
+            result.flashing(flashKey, flashMsg);
         }
-        return redirect(call);
+        return result;
     }
-
 }

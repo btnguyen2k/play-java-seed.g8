@@ -2,7 +2,10 @@
 
 Giter8 template for generating a Play project in Java.
 
-This template is for my personal Play projects, but you are free to use it. Feedback and comments are always welcomed!
+This template is cloned from [playframework/play-java-seed.g8](https://github.com/playframework/play-java-seed.g8)
+and is for my personal Play projects.
+
+However, you are welcomed to use it. Feedback and comments are appreciated!
 
 To create a project:
 
@@ -10,30 +13,40 @@ To create a project:
 sbt new btnguyen2k/play-java-seed.g8
 ```
 
-Latest release: [template-v2.6.r9](RELEASE-NOTES.md).
+Scaffolding:
+- [RESTFul/Thrift/gRPC APIs](src/main/scaffolds/sampleApis/README.md).
+- [Scheduled jobs](src/main/scaffolds/sampleWorkers/README.md).
+- [GUI: a ControlPanel using Bootstrap](src/main/scaffolds/sampleControlPanel/README.md).
+
+Latest release: [template-v2.7.r1](RELEASE-NOTES.md).
 
 ## Features
 
+- Play! Framework v2.7.x:
+  - [What’s new in Play 2.7](https://www.playframework.com/documentation/2.7.x/Highlights27)
+  - [Play 2.7 Migration Guide](https://www.playframework.com/documentation/2.7.x/Migration27)
+- Scheduled jobs with `ddth-akka` (since [template-v2.6.r8](RELEASE-NOTES.md)).
+- API service (JSON-based data format) using `ddth-recipes` (since [template-v2.6.r8](RELEASE-NOTES.md)); supported interfaces:
+  - HTTP
+  - [Apache Thrift](https://thrift.apache.org).
+  - [gRPC](https://grpc.io).
 - Docker support (since [template-v2.6.r6](RELEASE-NOTES.md)).
 - HTTPS & HTTP/2 support (since [template-v2.6.r1](RELEASE-NOTES.md)).
 - GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md)).
-- Start/Stop scripts for Linux
+- Cluster support.
 - Separated configurations for production and non-production environments:
   - For production: `conf/application-prod.conf` and `conf/logback-prod.xml`
   - For non-production: `conf/application.conf` and `conf/logback-dev.xml`
   - For cluster: `conf/application-cluster.conf`
-- Start/Stop scripts (Linux shell scripts): `conf/server-prod.sh` for production, `conf/server.sh` for non-production
-- Cluster support
-- Samples:
-  - Module
-  - Sample Admin Control Panel using AdminLTE2 Template: Form & Page controllers (since [template-v2.6.r5](RELEASE-NOTES.md)).
+- Start/Stop scripts for Linux:
+  - For production: `conf/server-prod.sh`
+  - For non-production: `conf/server.sh`
+- Scaffolding & Samples:
+  - [RESTFul/Thrift/gRPC APIs](src/main/scaffolds/sampleApis/README.md).
+  - [Scheduled jobs](src/main/scaffolds/sampleWorkers/README.md).
+  - [GUI: a ControlPanel using Bootstrap](src/main/scaffolds/sampleControlPanel/README.md).
+  - Modules
   - I18N
-  - Workers & Scheduling
-  - Cluster workers
-  - APIs: JSON-based data format. Supported interfaces:
-    - HTTP(S)
-    - Apache Thrift (since [template-v1.4.0](RELEASE-NOTES.md)).
-    - gRPC (since [template-v2.6.r2](RELEASE-NOTES.md)).
 - JVM tuning & GC logging
 - Custom error pages (since [template-v2.6.r9](RELEASE-NOTES.md)).
 
@@ -41,7 +54,7 @@ Latest release: [template-v2.6.r9](RELEASE-NOTES.md).
 
 Commands:
 
-- Start: `sh conf/server.sh start` or `sh conf/server-prod.sh start`
+- Start: `sh conf/server.sh start` (non-production) or `sh conf/server-prod.sh start` (production)
 - Stop : `sh conf/server.sh stop` or `sh conf/server-prod.sh stop`
 
 Command line arguments
@@ -123,11 +136,11 @@ docker build --force-rm --squash -t $name$:$version$ ./target/docker/stage
 ## LICENSE & COPYRIGHT
 
 This template is distributed under the same license as the original [`playframework/play-java-seed.g8`](https://github.com/playframework/play-java-seed.g8) template.
+A copy of its licence can be found in [LICENSE.md](LICENSE.md).
 
-You are free to clone the repository, use, modify and redistribute the template.
+You are free to clone the repository and use, modify and redistribute the template.
 
 
 ## Giter8 template. 
 
 For information on giter8 templates, please see http://www.foundweekends.org/giter8/
-

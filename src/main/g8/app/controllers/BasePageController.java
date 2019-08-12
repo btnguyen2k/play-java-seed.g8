@@ -1,9 +1,11 @@
 package controllers;
 
+import com.typesafe.config.Config;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.data.FormFactory;
 import play.i18n.Messages;
+import play.mvc.Http;
 import play.twirl.api.Html;
 
 import javax.inject.Inject;
@@ -17,7 +19,6 @@ import java.util.Arrays;
  * @since template-v0.1.0
  */
 public class BasePageController extends BaseController {
-
     @Inject
     protected FormFactory formFactory;
 
@@ -43,27 +44,49 @@ public class BasePageController extends BaseController {
     /**
      * Render a HTML view.
      *
+     * <p>This method add 2 more parameters to the HTML page:</p>
+     * <ul>
+     *     <li>{@link Messages} {@code messages}: for i18n.</li>
+     *     <li>{@link Config} {@code config}: to access application's config from inside template.</li>
+     * </ul>
+     *
      * @param view
      * @param params
      * @return
      * @throws Exception
+     * @since template-v2.7.r1
      */
-    protected Html render(String view, Object... params) throws Exception {
+    protected Html render(Http.Session session, String view, Object... params) throws Exception {
+        return render(calcMessages(session), view, params);
+    }
+
+    /**
+     * Render a HTML view.
+     *
+     * <p>This method add 2 more parameters to the HTML page:</p>
+     * <ul>
+     *     <li>{@link Messages} {@code messages}: for i18n.</li>
+     *     <li>{@link Config} {@code config}: to access application's config from inside template.</li>
+     * </ul>
+     *
+     * @param view
+     * @param params
+     * @return
+     * @throws Exception
+     * @since template-v2.7.r1
+     */
+    protected Html render(Messages messages, String view, Object... params) throws Exception {
         String clazzName = "views.html." + view;
         Class<?> clazz = Class.forName(clazzName);
-
         Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             if (method.getName().equals("render")) {
-                Messages messages = calcMessages();
                 Object[] combinedParams = Arrays.copyOf(params, params.length + 2);
                 combinedParams[params.length] = messages;
                 combinedParams[params.length + 1] = getRegistry().getAppConfig();
-                combinedParams[params.length] = messages;
                 return (Html) method.invoke(null, combinedParams);
             }
         }
         return null;
     }
-
 }

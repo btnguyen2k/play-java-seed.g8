@@ -20,6 +20,7 @@ import com.github.ddth.pubsub.impl.AbstractPubSubHub;
 import com.github.ddth.pubsub.impl.universal.idint.UniversalInmemPubSubHub;
 import com.github.ddth.pubsub.impl.universal.idint.UniversalRedisPubSubHub;
 import com.github.ddth.recipes.apiservice.ApiRouter;
+import com.github.ddth.recipes.global.GlobalRegistry;
 import com.typesafe.config.Config;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +50,7 @@ import java.util.concurrent.CompletableFuture;
  * @since template-v0.1.0
  */
 public class RegistryImpl implements IRegistry {
+    private final Logger.ALogger LOGGER = Logger.of(RegistryImpl.class);
 
     private Application playApp;
     private Config appConfig;
@@ -58,12 +60,9 @@ public class RegistryImpl implements IRegistry {
     private Lang[] availableLanguages;
     private AbstractApplicationContext appContext;
 
-    /**
-     * {@inheritDoc}
-     */
     @Inject
-    public RegistryImpl(ApplicationLifecycle lifecycle, Application playApp,
-            ActorSystem actorSystem, MessagesApi messagesApi, WSClient wsClient) {
+    public RegistryImpl(ApplicationLifecycle lifecycle, Application playApp, ActorSystem actorSystem,
+            MessagesApi messagesApi, WSClient wsClient) {
         this.playApp = playApp;
         this.appConfig = playApp.config();
         this.actorSystem = actorSystem;
@@ -83,20 +82,8 @@ public class RegistryImpl implements IRegistry {
     }
 
     /*----------------------------------------------------------------------*/
-    private final Stack<Runnable> shutdownHooks = new Stack<>();
-
-    /**
-     * Add a shutdown hook, which to be called right before application's shutdown.
-     *
-     * @param r
-     * @since template-v2.6.r8
-     */
-    public void addShutdownHook(Runnable r) {
-        shutdownHooks.add(r);
-    }
-
     private void init() {
-        RegistryGlobal.registry = this;
+        GlobalRegistry.putToGlobalStorage(REG_KEY_REGISTRY, this);
         initAvailableLanguages();
         initApplicationContext();
         initActors();
@@ -104,19 +91,14 @@ public class RegistryImpl implements IRegistry {
     }
 
     private void destroy() {
-        while (!shutdownHooks.isEmpty()) {
-            try {
-                shutdownHooks.pop().run();
-            } catch (Exception e) {
-                Logger.warn(e.getMessage(), e);
-            }
-        }
+        //EMPTY
     }
 
     /*----------------------------------------------------------------------*/
 
     private void initAvailableLanguages() {
         List<String> codes = AppConfigUtils.getOrNull(appConfig::getStringList, "play.i18n.langs");
+        LOGGER.info("Available languages: " + codes);
         availableLanguages = new Lang[codes != null ? codes.size() : 0];
         if (codes != null) {
             for (int i = 0, n = codes.size(); i < n; i++) {
@@ -140,8 +122,7 @@ public class RegistryImpl implements IRegistry {
      * @since template-v2.6.r8
      */
     private void initActors() {
-        List<String> configs = TypesafeConfigUtils
-                .getStringListOptional(appConfig, "bootstrap-actors")
+        List<String> configs = TypesafeConfigUtils.getStringListOptional(appConfig, "bootstrap-actors")
                 .orElse(Collections.emptyList());
         if (configs != null && configs.size() != 0) {
             for (String config : configs) {
@@ -152,26 +133,26 @@ public class RegistryImpl implements IRegistry {
                     if (Actor.class.isAssignableFrom(clazz)) {
                         String actorName = tokens.length > 1 ? tokens[1] : clazz.getSimpleName();
                         ActorRef actor = actorSystem.actorOf(Props.create(clazz), actorName);
-                        Logger.info("Created actor [" + actor + "] of type " + className);
                         actors.add(actor);
+                        LOGGER.info("Created actor [" + actor + "] of type " + className);
                     } else {
-                        Logger.warn("Bootstrap-actor [" + className + "] must be an actor!");
+                        LOGGER.warn("Bootstrap-actor [" + className + "] must be an actor.");
                     }
                 } catch (ClassNotFoundException cnfe) {
-                    Logger.error("Error: Class [" + className + "] not found!", cnfe);
+                    LOGGER.error("Class [" + className + "] not found.", cnfe);
                 }
             }
         } else {
-            Logger.info("No bootstrap-actors defined! "
-                    + "Defined list of bootstrap-actors at config key [bootstrap-actors]!");
+            LOGGER.info("No bootstrap-actors defined. "
+                    + "Defined list of bootstrap-actors at config key [bootstrap-actors].");
         }
-        addShutdownHook(() -> {
+        GlobalRegistry.addShutdownHook(() -> {
             actors.forEach(actor -> {
                 try {
+                    LOGGER.info("Stopping actor [" + actor + "]...");
                     actorSystem.stop(actor);
-                    Logger.info("Stopped actor [" + actor + "]");
                 } catch (Exception e) {
-                    Logger.warn(e.getMessage(), e);
+                    LOGGER.warn(e.getMessage(), e);
                 }
             });
             actors.clear();
@@ -189,31 +170,29 @@ public class RegistryImpl implements IRegistry {
      * @since templatev-2.6.r8
      */
     private IDLockFactory buildDlockFactory() {
-        IDLockFactory dlockFactory = RegistryGlobal
-                .getFromGlobalStorage("dlock-factory", IDLockFactory.class);
+        IDLockFactory dlockFactory = GlobalRegistry.getFromGlobalStorage(REG_KEY_DLOCK_FACTORY, IDLockFactory.class);
         if (dlockFactory == null) {
             String dlockPrefix = TypesafeConfigUtils
                     .getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.lock-prefix")
                     .orElse(TypesafeConfigUtils.getString(appConfig, "app.shortname"));
             AbstractDLockFactory factory;
-            String type = TypesafeConfigUtils
-                    .getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.type")
+            String type = TypesafeConfigUtils.getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.type")
                     .orElse(null);
             if (StringUtils.equalsAnyIgnoreCase("redis", type)) {
-                String redisHostAndPort = TypesafeConfigUtils.getStringOptional(appConfig,
-                        "ddth-akka-scheduling.dlock-backend.redis-host-and-port")
+                String redisHostAndPort = TypesafeConfigUtils
+                        .getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.redis-host-and-port")
                         .orElse("localhost:6379");
-                String redisPassword = TypesafeConfigUtils.getStringOptional(appConfig,
-                        "ddth-akka-scheduling.dlock-backend.redis-password").orElse(null);
-                Logger.info("Creating Redis dlock factory [" + redisHostAndPort + "]...");
-                factory = new RedisDLockFactory().setRedisHostAndPort(redisHostAndPort)
-                        .setRedisPassword(redisPassword).setLockNamePrefix(dlockPrefix).init();
+                String redisPassword = TypesafeConfigUtils
+                        .getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.redis-password").orElse(null);
+                LOGGER.info("Creating Redis dlock factory [" + redisHostAndPort + "]...");
+                factory = new RedisDLockFactory().setRedisHostAndPort(redisHostAndPort).setRedisPassword(redisPassword)
+                        .setLockNamePrefix(dlockPrefix).init();
             } else {
-                Logger.info("Creating in-memory dlock factory...");
+                LOGGER.info("Creating in-memory dlock factory...");
                 factory = new InmemDLockFactory().setLockNamePrefix(dlockPrefix).init();
             }
-            addShutdownHook(() -> factory.destroy());
-            RegistryGlobal.putToGlobalStorage("dlock-factory", factory);
+            GlobalRegistry.addShutdownHook(() -> factory.destroy());
+            GlobalRegistry.putToGlobalStorage(REG_KEY_DLOCK_FACTORY, factory);
             dlockFactory = factory;
         }
         return dlockFactory;
@@ -228,28 +207,27 @@ public class RegistryImpl implements IRegistry {
      * @since templatev-2.6.r8
      */
     private IPubSubHub<?, byte[]> buildPubSubHub() {
-        IPubSubHub<?, byte[]> pubSubHub = RegistryGlobal
-                .getFromGlobalStorage("pubsub-hub", IPubSubHub.class);
+        IPubSubHub<?, byte[]> pubSubHub = GlobalRegistry.getFromGlobalStorage(REG_KEY_PUBSUB_HUB, IPubSubHub.class);
         if (pubSubHub == null) {
-            String type = TypesafeConfigUtils
-                    .getStringOptional(appConfig, "ddth-akka-scheduling.pubsub-backend.type")
+            String type = TypesafeConfigUtils.getStringOptional(appConfig, "ddth-akka-scheduling.pubsub-backend.type")
                     .orElse(null);
             AbstractPubSubHub<?, byte[]> hub;
             if (StringUtils.equalsAnyIgnoreCase("redis", type)) {
-                String redisHostAndPort = TypesafeConfigUtils.getStringOptional(appConfig,
-                        "ddth-akka-scheduling.pubsub-backend.redis-host-and-port")
+                String redisHostAndPort = TypesafeConfigUtils
+                        .getStringOptional(appConfig, "ddth-akka-scheduling.pubsub-backend.redis-host-and-port")
                         .orElse("localhost:6379");
-                String redisPassword = TypesafeConfigUtils.getStringOptional(appConfig,
-                        "ddth-akka-scheduling.pubsub-backend.redis-password").orElse(null);
-                Logger.info("Creating Redis pub/sub hub [" + redisHostAndPort + "]...");
+                String redisPassword = TypesafeConfigUtils
+                        .getStringOptional(appConfig, "ddth-akka-scheduling.pubsub-backend.redis-password")
+                        .orElse(null);
+                LOGGER.info("Creating Redis pub/sub hub [" + redisHostAndPort + "]...");
                 hub = new UniversalRedisPubSubHub().setRedisHostAndPort(redisHostAndPort)
                         .setRedisPassword(redisPassword).init();
             } else {
-                Logger.info("Creating in-memory pub/sub hub...");
+                LOGGER.info("Creating in-memory pub/sub hub...");
                 hub = new UniversalInmemPubSubHub().init();
             }
-            addShutdownHook(() -> hub.destroy());
-            RegistryGlobal.putToGlobalStorage("pubsub-hub", hub);
+            GlobalRegistry.addShutdownHook(() -> hub.destroy());
+            GlobalRegistry.putToGlobalStorage(REG_KEY_PUBSUB_HUB, hub);
             pubSubHub = hub;
         }
         return pubSubHub;
@@ -265,43 +243,44 @@ public class RegistryImpl implements IRegistry {
      */
     private ActorRef initTickFanOutActor() {
         if (!appConfig.hasPath("ddth-akka-scheduling")) {
-            Logger.warn("No configuration [ddth-akka-scheduling] found!");
+            LOGGER.warn("No configuration [ddth-akka-scheduling] found, scheduled jobs are disabled.");
             return null;
         }
         String mode = TypesafeConfigUtils.getStringOptional(appConfig, "ddth-akka-scheduling.mode")
                 .orElse("single-node");
         ActorRef tickFanOut;
         if (StringUtils.equalsAnyIgnoreCase("cluster", mode)) {
+            LOGGER.info("Creating tick fan-out for [cluster] mode.");
             // cluster mode
             tickFanOut = ClusterTickFanOutActor.newInstance(actorSystem);
         } else if (StringUtils.equalsAnyIgnoreCase("multi-node", mode) || StringUtils
-                .equalsAnyIgnoreCase("multi-nodes", mode) || StringUtils
-                .equalsAnyIgnoreCase("multiple-nodes", mode)) {
+                .equalsAnyIgnoreCase("multi-nodes", mode) || StringUtils.equalsAnyIgnoreCase("multiple-nodes", mode)) {
+            LOGGER.info("Creating tick fan-out for [multi-nodes] mode.");
             // multi-node mode
             IDLockFactory dlockFactory = buildDlockFactory();
             String dlockName = TypesafeConfigUtils
                     .getStringOptional(appConfig, "ddth-akka-scheduling.dlock-backend.lock-name")
                     .orElse("akka-scheduled-jobs");
-            Logger.info("Creating dlock instance [" + dlockName + "]...");
+            LOGGER.info("Creating dlock instance [" + dlockName + "]...");
             IDLock dlock = dlockFactory.createLock(dlockName);
 
-            long dlockTimeMs = TypesafeConfigUtils
-                    .getLongOptional(appConfig, "ddth-akka-scheduling.dlock-time-ms")
+            long dlockTimeMs = TypesafeConfigUtils.getLongOptional(appConfig, "ddth-akka-scheduling.dlock-time-ms")
                     .orElse(MultiNodePubSubBasedTickFanOutActor.DEFAULT_DLOCK_TIME_MS).longValue();
 
             IPubSubHub<?, byte[]> pubSubHub = buildPubSubHub();
-            String channelName = TypesafeConfigUtils.getStringOptional(appConfig,
-                    "ddth-akka-scheduling.pubsub-backend.channel-name")
+            String channelName = TypesafeConfigUtils
+                    .getStringOptional(appConfig, "ddth-akka-scheduling.pubsub-backend.channel-name")
                     .orElse("akka-scheduled-jobs");
 
             tickFanOut = MultiNodePubSubBasedTickFanOutActor
                     .newInstance(actorSystem, dlock, dlockTimeMs, pubSubHub, channelName);
         } else {
+            LOGGER.info("Creating tick fan-out for [single node] mode.");
             // single-node mode
             tickFanOut = SingleNodeTickFanOutActor.newInstance(actorSystem);
         }
-        Logger.info("Tick fan-out: " + tickFanOut);
-        addShutdownHook(() -> actorSystem.stop(tickFanOut));
+        LOGGER.info("Tick fan-out: " + tickFanOut);
+        GlobalRegistry.addShutdownHook(() -> actorSystem.stop(tickFanOut));
         return tickFanOut;
     }
 
@@ -312,8 +291,7 @@ public class RegistryImpl implements IRegistry {
      * strings in format {@code fully-qualified-class-name[;actor-name[;dlock-name]]}</p>
      */
     private void initWorkers() {
-        List<String> workerClazzs = TypesafeConfigUtils
-                .getStringListOptional(appConfig, "ddth-akka-scheduling.workers")
+        List<String> workerClazzs = TypesafeConfigUtils.getStringListOptional(appConfig, "ddth-akka-scheduling.workers")
                 .orElse(Collections.emptyList());
         if (workerClazzs != null && workerClazzs.size() != 0) {
             IDLockFactory dlockFactory = buildDlockFactory();
@@ -325,22 +303,20 @@ public class RegistryImpl implements IRegistry {
                     if (Actor.class.isAssignableFrom(_clazz)) {
                         String actorName = tokens.length > 1 ? tokens[1] : _clazz.getSimpleName();
                         String dlockName = tokens.length > 2 ? tokens[2] : _clazz.getSimpleName();
-                        Logger.info("Creating worker [" + className + "] with name [" + actorName
-                                + "] and dlock-name [" + dlockName + "]...");
-                        IDLock dlock = dlockFactory != null && !StringUtils.isBlank(dlockName)
-                                ? dlockFactory.createLock(dlockName)
-                                : null;
+                        LOGGER.info("Creating worker [" + className + "] with name [" + actorName + "] and dlock-name ["
+                                + dlockName + "]...");
+                        IDLock dlock = dlockFactory != null && !StringUtils.isBlank(dlockName) ?
+                                dlockFactory.createLock(dlockName) :
+                                null;
                         Props props;
                         Class<Actor> clazz = (Class<Actor>) _clazz;
-                        Constructor<Actor> constructor = ReflectionUtils
-                                .getConstructor(clazz, IDLock.class);
+                        Constructor<Actor> constructor = ReflectionUtils.getConstructor(clazz, IDLock.class);
                         if (constructor != null) {
                             props = Props.create(clazz, dlock);
                         } else {
                             props = Props.create(clazz, () -> {
                                 Actor actor = clazz.newInstance();
-                                Method m = ReflectionUtils
-                                        .getMethod("setLock", clazz, IDLock.class);
+                                Method m = ReflectionUtils.getMethod("setLock", clazz, IDLock.class);
                                 if (m == null) {
                                     m = ReflectionUtils.getMethod("setDlock", clazz, IDLock.class);
                                 }
@@ -354,20 +330,20 @@ public class RegistryImpl implements IRegistry {
                             });
                         }
                         if (StringUtils.isBlank(actorName)) {
-                            Logger.info("Created worker " + actorSystem.actorOf(props));
+                            LOGGER.info("Created worker " + actorSystem.actorOf(props));
                         } else {
-                            Logger.info("Created worker " + actorSystem.actorOf(props, actorName));
+                            LOGGER.info("Created worker " + actorSystem.actorOf(props, actorName));
                         }
                     } else {
-                        Logger.warn("Worker [" + className + "] must be an actor!");
+                        LOGGER.warn("Worker [" + className + "] must be an actor.");
                     }
                 } catch (ClassNotFoundException cnfe) {
-                    Logger.error("Error: Class [" + className + "] not found!", cnfe);
+                    LOGGER.error("Error: Class [" + className + "] not found.", cnfe);
                 }
             }
         } else {
-            Logger.warn("No schefuled-job worker defined! Defined list of workers at config key "
-                    + "[ddth-akka-scheduling.workers]!");
+            LOGGER.warn("No scheduled-job worker defined! Defined list of workers at config key "
+                    + "[ddth-akka-scheduling.workers].");
         }
     }
 
@@ -385,45 +361,36 @@ public class RegistryImpl implements IRegistry {
 
     private void initApplicationContext() {
         String strConfig = AppConfigUtils.getOrNull(appConfig::getString, "spring.conf");
-        String[] configFiles = !StringUtils.isBlank(strConfig)
-                ? strConfig.trim().split("[,;\\s]+")
-                : null;
+        String[] configFiles = !StringUtils.isBlank(strConfig) ? strConfig.trim().split("[,;\\s]+") : null;
         if (configFiles == null || configFiles.length < 1) {
-            Logger.info("No Spring configuration file defined, skip creating ApplicationContext.");
+            LOGGER.info("No Spring configuration file defined, skip creating ApplicationContext.");
         } else {
             List<String> configLocations = new ArrayList<>();
             for (String configFile : configFiles) {
-                File f = configFile.startsWith("/")
-                        ? new File(configFile)
-                        : new File(playApp.path(), configFile);
+                File f = configFile.startsWith("/") ? new File(configFile) : new File(playApp.path(), configFile);
                 if (f.exists() && f.isFile() && f.canRead()) {
                     configLocations.add("file:" + f.getAbsolutePath());
                 } else {
-                    Logger.warn("Spring config file [" + f + "] not found or not readable!");
+                    LOGGER.warn("Spring config file [" + f + "] not found or not readable.");
                 }
             }
             if (configLocations.size() > 0) {
-                Logger.info("Creating Spring's ApplicationContext with configuration files: "
-                        + configLocations);
+                LOGGER.info("Creating Spring ApplicationContext with configuration files: " + configLocations);
                 AbstractApplicationContext applicationContext = new FileSystemXmlApplicationContext(
                         configLocations.toArray(ArrayUtils.EMPTY_STRING_ARRAY));
                 applicationContext.start();
                 appContext = applicationContext;
+                GlobalRegistry.addShutdownHook(() -> {
+                    try {
+                        applicationContext.close();
+                    } catch (Exception e) {
+                        LOGGER.warn(e.getMessage(), e);
+                    }
+                });
             } else {
-                Logger.warn(
-                        "No valid Spring configuration file(s), skip creating ApplicationContext!");
+                LOGGER.warn("No valid Spring configuration file(s), skip creating ApplicationContext.");
             }
         }
-        addShutdownHook(() -> {
-            if (appContext != null) {
-                try {
-                    appContext.destroy();
-                } catch (Exception e) {
-                    Logger.warn(e.getMessage(), e);
-                }
-                appContext = null;
-            }
-        });
     }
 
     /*----------------------------------------------------------------------*/
@@ -507,14 +474,6 @@ public class RegistryImpl implements IRegistry {
         return getBean(ApiRouter.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ExecutionContextExecutor getDefaultExecutionContextExecutor() {
-        return actorSystem.dispatcher();
-    }
-
     private Map<String, Boolean> exceptionLoggedGetECE = new HashMap<>();
 
     /**
@@ -527,12 +486,10 @@ public class RegistryImpl implements IRegistry {
             return actorSystem.dispatchers().lookup(id);
         } catch (ConfigurationException e) {
             if (exceptionLoggedGetECE.get(id) == null) {
-                Logger.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
                 exceptionLoggedGetECE.put(id, Boolean.TRUE);
             }
             return null;
         }
     }
-    /*----------------------------------------------------------------------*/
-
 }

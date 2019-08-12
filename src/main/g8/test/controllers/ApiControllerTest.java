@@ -13,7 +13,6 @@ import static play.test.Helpers.GET;
 import static play.test.Helpers.route;
 
 public class ApiControllerTest extends WithApplication {
-
     private final static String appId = "test";
     private final static String appAuth = "test";
 
@@ -24,11 +23,9 @@ public class ApiControllerTest extends WithApplication {
 
     @Test
     public void testEchoGet() {
-        Http.RequestBuilder request = new Http.RequestBuilder().method(GET)
-                .uri("/samplesApi/api/echo");
+        Http.RequestBuilder request = new Http.RequestBuilder().method(GET).uri("/samplesApi/api/echo");
         Result result = route(app, request);
         assertEquals(OK, result.status());
     }
-
 }
 
