@@ -4,18 +4,23 @@
         @_macro_displayFormErrors(form)
     </div>
 }
-<form role="form" method="post">
-    <input type="hidden" name="editId" value="@form("editId").getValue.orElse("")">
+@**
+ * CSRF token can be put in form field, or on query string.
+ * In this case we choose query string (just for demo purpose).
+ *@
+<form role="form" method="post" action="@if(form("editId").value.orElse("")==""){@helper.CSRF(samples.controllers.routes.SampleControlPanelController.createUsergroup())
+    }else{@helper.CSRF(samples.controllers.routes.SampleControlPanelController.editUsergroup(form("editId").value.get()))}">
+    <input type="hidden" name="editId" value="@form("editId").value.orElse("")">
     <div class="box-body">
         <div class="form-group">
             <label for="usergroup_id">@messages.at("msg.usergroup.id")</label>
-            <input @if(form("editId").getValue.orElse("")!=""){readonly="readonly"} type="text" class="form-control"
-                id="usergroup_id" name="id" value="@form("id").getValue.orElse("")" placeholder="@messages.at("msg.usergroup.id")">
+            <input @if(form("editId").value.orElse("")!=""){readonly="readonly"} type="text" class="form-control"
+                id="usergroup_id" name="id" value="@form("id").value.orElse("")" placeholder="@messages.at("msg.usergroup.id")">
         </div>
         <div class="form-group">
             <label for="usergroup_desc">@messages.at("msg.usergroup.desc")</label>
             <input type="text" class="form-control" id="usergroup_desc" name="description"
-                value="@form("description").getValue.orElse("")" placeholder="@messages.at("msg.usergroup.desc")">
+                value="@form("description").value.orElse("")" placeholder="@messages.at("msg.usergroup.desc")">
         </div>
     </div>
 

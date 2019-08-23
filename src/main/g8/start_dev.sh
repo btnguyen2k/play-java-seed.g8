@@ -3,7 +3,8 @@
 ## For dev env only!
 ## Start application in dev mode with remote debugging
 
-#unset SBT_OPTS
+unset SBT_OPTS && javac -version && sbt clean compile
+export SBT_OPTS="-server -Xlog:gc -XX:+ExitOnOutOfMemoryError -XX:+CrashOnOutOfMemoryError -XX:+UseG1GC -Xms64m -Xmx1234m -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:-ShrinkHeapInSteps"
 sbt -jvm-debug 9999 -Dhttp.port=9000 -Dhttps.port=9043 \
 	-Dconfig.file=conf/application.conf -Dlogger.file=conf/logback-dev.xml \
 	-Dplay.server.https.keyStore.path=conf/keys/server.keystore \

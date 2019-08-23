@@ -1,34 +1,482 @@
 ## Sample: API routes
+# API document can be written in route file in Swagger yaml format. The document must be enclosed between ### and ###
+# We may want to disable CSRF check on API call by usinng "+ nocsrf"
 
-# Examples of controller that handles web service calls
+### NoDocs ###
 GET         /                           samples.controllers.SampleApiController.index
 
+# Examples of controller that handles web service calls
+
+###
+# summary: Get all available employees.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           type: array
+#           description: List of employee records.
+#           items:
+#             type: object
+#             description: An employee record.
+#   default:
+#     schema:
+#       $ref: '#/responses/ApiResponse'
+###
++ nocsrf
 GET         /api/employees              samples.controllers.SampleApiController.listEmployees(request: Request)
+
+###
+# summary: Create a new employee records.
+# parameters:
+#   - in: body
+#     name: employee
+#     description: The employee to create.
+#     schema:
+#       type: object
+#       required: [email, fullname]
+#       properties:
+#         email:
+#           description: Email address of the employee to be created, must be unique for all employees.
+#           type: string
+#           format: email
+#         fullname:
+#           description: Fullname of the employee to be created.
+#           type: string
+# responses:
+#   successful:
+#     description: New employee record was created successfully.
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: The newly created employee record.
+#           type: object
+#           properties:
+#             id:
+#               description: Unique numeric id of the employee record.
+#               type: integer
+#   invalid_parameters:
+#     description: invalid parameters from client (e.g. empty or missing [email] field), or there is already an employee with the same email address.
+#     schema:
+#       $ref: '#/responses/ErrorClient'
+#   default:
+#     schema:
+#       $ref: '#/responses/ApiResponse'
+###
++ nocsrf
 POST        /api/employee               samples.controllers.SampleApiController.createEmployee(request: Request)
+
+###
+# summary: Get an employee record by id.
+# parameters:
+#   - in: path
+#     description: unique id of the employee record.
+#     name: id
+#     type: integer
+#     required: true
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: The employee record.
+#           type: object
+#   not_found:
+#     schema:
+#       $ref: '#/responses/NotFound'
+#   default:
+#     schema:
+#       $ref: '#/responses/ApiResponse'
+###
++ nocsrf
 GET         /api/employee/:id           samples.controllers.SampleApiController.getEmployee(request: Request, id: String)
+
+###
+# summary: Update an existing employee record by id.
+# parameters:
+#   - in: path
+#     description: unique id of the employee record.
+#     name: id
+#     type: integer
+#     required: true
+#   - in: body
+#     name: employee
+#     description: The new employee data to update.
+#     schema:
+#       type: object
+#       required: [email, fullname]
+#       properties:
+#         email:
+#           description: Email address of the employee, must be unique for all employees.
+#           type: string
+#           format: email
+#         fullname:
+#           description: Fullname of the employee.
+#           type: string
+# responses:
+#   successful:
+#     description: The employee record was updated successfully.
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: The updated employee record.
+#           type: object
+#   invalid_parameters:
+#     description: invalid parameters from client (e.g. empty or missing [email] field), or there is already an employee with the same email address.
+#     schema:
+#       $ref: '#/responses/ErrorClient'
+#   not_found:
+#     schema:
+#       $ref: '#/responses/NotFound'
+#   default:
+#     schema:
+#       $ref: '#/responses/ApiResponse'
+###
++ nocsrf
 PUT         /api/employee/:id           samples.controllers.SampleApiController.updateEmployee(request: Request, id: String)
+
+###
+# summary: Delete an employee record by id.
+# parameters:
+#   - in: path
+#     description: unique id of the employee record.
+#     name: id
+#     type: integer
+#     required: true
+# responses:
+#   successful:
+#     description: The employee record was deleted successfully.
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: The employee record that was deleted.
+#           type: object
+#   not_found:
+#     schema:
+#       $ref: '#/responses/NotFound'
+#   default:
+#     schema:
+#       $ref: '#/responses/ApiResponse'
+###
++ nocsrf
 DELETE      /api/employee/:id           samples.controllers.SampleApiController.deleteEmployee(request: Request, id: String)
 
+###
+# summary: Echo back all parameters from client.
+# parameters:
+#   - in: body
+#     name: request
+#     description: Parameters sent from client.
+#     schema:
+#       type: object
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Parameters sent from client are echoed back.
+#           type: object
+###
++ nocsrf
 DELETE      /api/echo                   samples.controllers.SampleApiController.echoDelete(request: Request)
+
+###
+# summary: Echo back all parameters from client.
+# parameters:
+#   - in: body
+#     name: request
+#     description: Parameters sent from client.
+#     schema:
+#       type: object
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Parameters sent from client are echoed back.
+#           type: object
+###
++ nocsrf
 GET         /api/echo                   samples.controllers.SampleApiController.echoGet(request: Request)
+
+###
+# summary: Echo back all parameters from client.
+# parameters:
+#   - in: body
+#     name: request
+#     description: Parameters sent from client.
+#     schema:
+#       type: object
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Parameters sent from client are echoed back.
+#           type: object
+###
++ nocsrf
 PATCH       /api/echo                   samples.controllers.SampleApiController.echoPatch(request: Request)
+
+###
+# summary: Echo back all parameters from client.
+# parameters:
+#   - in: body
+#     name: request
+#     description: Parameters sent from client.
+#     schema:
+#       type: object
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Parameters sent from client are echoed back.
+#           type: object
+###
++ nocsrf
 POST        /api/echo                   samples.controllers.SampleApiController.echoPost(request: Request)
+
+###
+# summary: Echo back all parameters from client.
+# parameters:
+#   - in: body
+#     name: request
+#     description: Parameters sent from client.
+#     schema:
+#       type: object
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Parameters sent from client are echoed back.
+#           type: object
+###
++ nocsrf
 PUT         /api/echo                   samples.controllers.SampleApiController.echoPut(request: Request)
 
+###
+# summary: Sample API that returns server's info.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Server's information such as name, version, ip, etc.
+#           type: object
+###
++ nocsrf
 DELETE      /api/info                   samples.controllers.SampleApiController.info(request: Request)
+
+###
+# summary: Sample API that returns server's info.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Server's information such as name, version, ip, etc.
+#           type: object
+###
++ nocsrf
 GET         /api/info                   samples.controllers.SampleApiController.info(request: Request)
+
+###
+# summary: Sample API that returns server's info.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Server's information such as name, version, ip, etc.
+#           type: object
+###
++ nocsrf
 PATCH       /api/info                   samples.controllers.SampleApiController.info(request: Request)
+
+###
+# summary: Sample API that returns server's info.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Server's information such as name, version, ip, etc.
+#           type: object
+###
++ nocsrf
 POST        /api/info                   samples.controllers.SampleApiController.info(request: Request)
+
+###
+# summary: Sample API that returns server's info.
+# responses:
+#   successful:
+#     schema:
+#       type: object
+#       properties:
+#         status:
+#           type: integer
+#           enum: [200]
+#         data:
+#           description: Server's information such as name, version, ip, etc.
+#           type: object
+###
++ nocsrf
 PUT         /api/info                   samples.controllers.SampleApiController.info(request: Request)
 
+###
+# summary: Sample API that always returns "access denied" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/AccessDenied'
+###
++ nocsrf
 DELETE      /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+
+###
+# summary: Sample API that always returns "access denied" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/AccessDenied'
+###
++ nocsrf
 GET         /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+
+###
+# summary: Sample API that always returns "access denied" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/AccessDenied'
+###
++ nocsrf
 PATCH       /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+
+###
+# summary: Sample API that always returns "access denied" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/AccessDenied'
+###
++ nocsrf
 POST        /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
+
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
 PUT         /api/deny                   samples.controllers.SampleApiController.deny(request: Request)
 
-DELETE      /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
-GET         /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
-PATCH       /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
-POST        /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
-PUT         /api/noApi                  samples.controllers.SampleApiController.noApi(request: Request)
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
+DELETE      /api/*api                   samples.controllers.SampleApiController.noApi(request: Request, api: String)
+
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
+GET         /api/*api                   samples.controllers.SampleApiController.noApi(request: Request, api: String)
+
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
+PATCH       /api/*api                   samples.controllers.SampleApiController.noApi(request: Request, api: String)
+
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
+POST        /api/*api                   samples.controllers.SampleApiController.noApi(request: Request, api: String)
+
+###
+# summary: Sample API that always returns "not implemented" status.
+# responses:
+#   successful:
+#     schema:
+#       $ref: '#/responses/NotImplemented'
+###
++ nocsrf
+PUT         /api/*api                   samples.controllers.SampleApiController.noApi(request: Request, api: String)

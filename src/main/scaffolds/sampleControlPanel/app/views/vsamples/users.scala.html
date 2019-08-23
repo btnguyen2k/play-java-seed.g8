@@ -1,4 +1,4 @@
-@(users: Array[samples.models.UserModel])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(users: Array[samples.models.UserModel])(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
     active    = "users",
     customCss = Array("lib/AdminLTE/plugins/datatables/dataTables.bootstrap.css"),
@@ -14,7 +14,7 @@
 </section>
 
 <section class="content">
-    @defining(Controller.flash(samples.controllers.SampleControlPanelController.VIEW_USERS)){msg =>
+    @defining(request.flash().apply(samples.controllers.SampleControlPanelController.VIEW_USERS).orElse(null)){msg =>
 	    @if(msg != null){
 	        <div class="row">
 	            <div class="col-xs-12">

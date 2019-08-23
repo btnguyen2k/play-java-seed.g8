@@ -1,9 +1,15 @@
 package controllers;
 
+import akka.actor.ActorRef;
+import com.github.ddth.akka.AkkaUtils;
 import com.typesafe.config.Config;
 import errors.ClientError;
 import org.apache.commons.lang3.StringUtils;
 import play.mvc.Result;
+import utils.InternalUtils;
+
+import java.time.Duration;
+import java.util.Collection;
 
 /**
  * Index controller.
@@ -12,14 +18,6 @@ import play.mvc.Result;
  * @since template-v2.6.r3
  */
 public class IndexController extends BaseController {
-    private static boolean classExists(String className) {
-        try {
-            return Class.forName(className) != null;
-        } catch (ClassNotFoundException e) {
-            return false;
-        }
-    }
-
     public Result index() {
         StringBuffer output = new StringBuffer();
 
@@ -40,13 +38,36 @@ public class IndexController extends BaseController {
                 .append("</li>").append("</ul>");
 
         //samples.controllers.routes.SampleApiController
-        if (classExists("samples.controllers.ReverseSampleApiController")) {
-            output.append("Sample API:").append("<ul>").append("<li>")
-                    .append("<a href=\"/samplesApi\">Sample API list</a>").append("</li>").append("</li>")
+        if (InternalUtils.classExists("samples.controllers.ReverseSampleApiController")) {
+            output.append("Sample API:").append("<ul>")
+                    .append("<li>").append("<a href=\"" + controllers.swagger.routes.SwaggerUiAssets.jsonSwaggerSpecs() + "\">Swagger.json</a>").append("</li>")
+                    .append("<li>").append("<a href=\"" + controllers.swagger.routes.SwaggerUiAssets.at("index.html") + "\">Swagger UI</a>").append("</li>")
+                    //.append("<li>").append("<a href=\"/samplesApi\">Sample API list</a>").append("</li>")
                     .append("</ul>");
         }
 
-        //output.append("See sample Control Panel in action: <a href=\"/samples\">samples</a>");
+        boolean hasWorker = false;
+        Collection<ActorRef> actorRefs = AkkaUtils
+                .selectActors(getRegistry().getActorSystem(), "/user/*", Duration.ofMillis(3456));
+        if (actorRefs != null && actorRefs.size() > 0) {
+            output.append("Actors:").append("<ul>");
+            for (ActorRef actorRef : actorRefs) {
+                output.append("<li><code>").append(actorRef).append("</code></li>");
+                if (actorRef.path().name().endsWith("TickFanOutActor")) {
+                    hasWorker = true;
+                }
+            }
+            output.append("</ul>");
+        }
+        if (hasWorker) {
+            output.append("See workers output in log (console or file).");
+        }
+
+        if (InternalUtils.classExists("samples.controllers.ReverseSampleController")) {
+            output.append("Sample ControlPanel:").append("<ul>")
+                    .append("<li>").append("<a href=\"/samples\">Click here to login</a>").append("</li>")
+                    .append("</ul>");
+        }
 
         return ok(output.toString()).as("text/html; charset=utf-8");
     }

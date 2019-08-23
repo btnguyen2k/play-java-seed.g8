@@ -1,4 +1,4 @@
-@()(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@()(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 <div class="navbar-custom-menu">
     <ul class="nav navbar-nav">
         <!-- Messages: style can be found in dropdown.less-->
@@ -15,7 +15,7 @@
                             <!-- start message -->
                             <a href="#">
                                 <div class="pull-left">
-                                    <img src="@routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="img-circle" alt="User Image">
+                                    <img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="img-circle" alt="User Image">
                                 </div>
                                 <h4>
                                     Support Team <small><i class="fa fa-clock-o"></i> 5 mins</small>
@@ -27,7 +27,7 @@
                         <li>
                             <a href="#">
                                 <div class="pull-left">
-                                    <img src="@routes.Assets.at("lib/AdminLTE/dist/img/user3-128x128.jpg")" class="img-circle" alt="User Image">
+                                    <img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user3-128x128.jpg")" class="img-circle" alt="User Image">
                                 </div>
                                 <h4>
                                     AdminLTE Design Team <small><i class="fa fa-clock-o"></i> 2 hours</small>
@@ -38,7 +38,7 @@
                         <li>
                             <a href="#">
                                 <div class="pull-left">
-                                    <img src="@routes.Assets.at("lib/AdminLTE/dist/img/user4-128x128.jpg")" class="img-circle" alt="User Image">
+                                    <img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user4-128x128.jpg")" class="img-circle" alt="User Image">
                                 </div>
                                 <h4>
                                     Developers <small><i class="fa fa-clock-o"></i> Today</small>
@@ -49,7 +49,7 @@
                         <li>
                             <a href="#">
                                 <div class="pull-left">
-                                    <img src="@routes.Assets.at("lib/AdminLTE/dist/img/user3-128x128.jpg")" class="img-circle" alt="User Image">
+                                    <img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user3-128x128.jpg")" class="img-circle" alt="User Image">
                                 </div>
                                 <h4>
                                     Sales Department <small><i class="fa fa-clock-o"></i> Yesterday</small>
@@ -60,7 +60,7 @@
                         <li>
                             <a href="#">
                                 <div class="pull-left">
-                                    <img src="@routes.Assets.at("lib/AdminLTE/dist/img/user4-128x128.jpg")" class="img-circle" alt="User Image">
+                                    <img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user4-128x128.jpg")" class="img-circle" alt="User Image">
                                 </div>
                                 <h4>
                                     Reviewers <small><i class="fa fa-clock-o"></i> 2 days</small>
@@ -182,13 +182,13 @@
         <!-- User Account: style can be found in dropdown.less -->
         <li class="dropdown user user-menu"><a href="#"
                                                class="dropdown-toggle" data-toggle="dropdown"> <img
-                src="@routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="user-image" alt="User Image">
-            <span class="hidden-xs">@samples.utils.SessionUtils.currentUser().getFullname()</span>
+                src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="user-image" alt="User Image">
+            <span class="hidden-xs">@samples.utils.SessionUtils.currentUser(request).getFullname()</span>
         </a>
             <ul class="dropdown-menu">
                 <!-- User image -->
-                <li class="user-header"><img src="@routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="img-circle" alt="User Image">
-                    @defining(samples.utils.SessionUtils.currentUser()){user =>
+                <li class="user-header"><img src="@controllers.routes.Assets.at("lib/AdminLTE/dist/img/user2-160x160.jpg")" class="img-circle" alt="User Image">
+                    @defining(samples.utils.SessionUtils.currentUser(request)){user =>
                     <p>@user.getFullname() - @user.getGroupId() <small>Member since @user.getTimestampCreatedStr()</small></p>
                     }
                 </li>

@@ -9,7 +9,6 @@ import com.google.inject.AbstractModule;
  * @since template-v2.6.r5
  */
 public class SampleModule extends AbstractModule {
-
 	/**
 	 * {@inheritDoc}
 	 */
@@ -17,5 +16,4 @@ public class SampleModule extends AbstractModule {
 	protected void configure() {
 		bind(SampleBootstrap.class).asEagerSingleton();
 	}
-
 }

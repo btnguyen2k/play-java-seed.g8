@@ -1,4 +1,4 @@
-@(usergroups: Array[samples.models.UserGroupModel])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(usergroups: Array[samples.models.UserGroupModel])(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
     active    = "usergroups",
     customCss = Array("lib/AdminLTE/plugins/datatables/dataTables.bootstrap.css"),
@@ -14,7 +14,7 @@
 </section>
 
 <section class="content">
-    @defining(Controller.flash(samples.controllers.SampleControlPanelController.VIEW_USERGROUPS)){msg =>
+    @defining(request.flash().apply(samples.controllers.SampleControlPanelController.VIEW_USERGROUPS).orElse(null)){msg =>
 	    @if(msg != null){
 	        <div class="row">
 	            <div class="col-xs-12">

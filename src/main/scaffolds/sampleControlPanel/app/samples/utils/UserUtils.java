@@ -2,6 +2,8 @@ package samples.utils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import modules.registry.IRegistry;
+
 import com.github.ddth.commons.utils.HashUtils;
 
 import samples.bo.user.IUserDao;
@@ -49,8 +51,7 @@ public class UserUtils {
      * @return
      */
     public static UserBo[] allUsers() {
-        return RegistryGlobal.registry.getBean(IUserDao.class).getAllUsers()
-                .toArray(UserBo.EMPTY_ARRAY);
+        return IRegistry.INSTANCE.get().getBean(IUserDao.class).getAllUsers().toArray(UserBo.EMPTY_ARRAY);
     }
 
     /**
@@ -59,7 +60,7 @@ public class UserUtils {
      * @return
      */
     public static int countUsers() {
-        return RegistryGlobal.registry.getBean(IUserDao.class).getAllUsers().size();
+        return IRegistry.INSTANCE.get().getBean(IUserDao.class).getAllUsers().size();
     }
 
     /**
@@ -68,8 +69,7 @@ public class UserUtils {
      * @return
      */
     public static UserGroupBo[] allUsergroups() {
-        return RegistryGlobal.registry.getBean(IUserDao.class).getAllUserGroups()
-                .toArray(UserGroupBo.EMPTY_ARRAY);
+        return IRegistry.INSTANCE.get().getBean(IUserDao.class).getAllUserGroups().toArray(UserGroupBo.EMPTY_ARRAY);
     }
 
     /**
@@ -78,6 +78,6 @@ public class UserUtils {
      * @return
      */
     public static int countUsergroups() {
-        return RegistryGlobal.registry.getBean(IUserDao.class).getAllUserGroups().size();
+        return IRegistry.INSTANCE.get().getBean(IUserDao.class).getAllUserGroups().size();
     }
 }

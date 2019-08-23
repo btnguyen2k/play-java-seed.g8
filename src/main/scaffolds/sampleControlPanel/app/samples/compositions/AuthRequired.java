@@ -17,6 +17,10 @@ import play.mvc.With;
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AuthRequired {
+    /**
+     * List of user-groups who have permission to access.
+     * @return
+     */
     String[] usergroups() default {};
 
     /**
@@ -28,7 +32,17 @@ public @interface AuthRequired {
      */
     String loginCall() default "";
 
+    /**
+     * Key of flashing message.
+     * 
+     * @return
+     */
     String flashMsg() default "";
 
+    /**
+     * Content of flashing message.
+     * 
+     * @return
+     */
     String flashKey() default "";
 }

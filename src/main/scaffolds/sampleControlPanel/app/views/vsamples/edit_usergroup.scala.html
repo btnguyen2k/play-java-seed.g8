@@ -1,4 +1,4 @@
-@(form: play.data.Form[samples.forms.FormCreateEditUsergroup])(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(form: play.data.Form[samples.forms.FormCreateEditUsergroup])(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
 active    = "usergroups"
 ){

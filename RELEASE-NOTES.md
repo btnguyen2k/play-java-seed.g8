@@ -1,6 +1,6 @@
 # Release Notes
 
-## 2019-08-11: template-v2.7.r1
+## 2019-08-23: template-v2.7.r1
 
 **Highlighted changes:**
 
@@ -8,6 +8,16 @@
 - Upgrade to `Play! Framework v2.7.3`:
   - [What’s new in Play 2.7](https://www.playframework.com/documentation/2.7.x/Highlights27)
   - [Play 2.7 Migration Guide](https://www.playframework.com/documentation/2.7.x/Migration27)
+- Add Swagger support.
+- Use `G1GC` as default GC (can be changed via start script).
+- Aggressive small memory footprint (`-XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:-ShrinkHeapInSteps`)
+
+
+**Breaking changes**
+- Template file now needs an `implicit request: Http.Request` parameter.
+It will be passed to template via `BasePageController.render(...)`.
+See [Play Documentation - Java Http.Context changes](https://www.playframework.com/documentation/2.7.x/JavaHttpContextMigration27#Some-template-tags-need-an-implicit-Request,-Messages-or-Lang-instance) for more information.
+- Methods of `BaseController` that read/write cookies or session now require either `Request`, `Result` or `Cookies` as a parameter.
 
 **Upgrade to Play! Framework v2.7.3:**
 
@@ -31,7 +41,7 @@ RPC:
 - netty-tcnative-boringssl-static: v2.0.25.Final
 
 DDTH:
-- ddth-akka         : v1.0.0
+- ddth-akka         : v1.1.0.1
 - ddth-cache-adapter: v1.0.0
 - ddth-commons      : v1.1.0
 - ddth-dao          : v1.0.0
@@ -39,10 +49,19 @@ DDTH:
 - ddth-queue        : v1.0.0
 - ddth-recipes      : v1.0.0
 
+Swagger:
+- com.iheart:play-swagger: v0.8.0-PLAY2.7
+- Webjars swagger-ui     : v3.23.5
+
 Others:
 - Google's Guava        : v28.0-jre
 - Apache's commons-pool2: v2.7.0
 - Webjars AdminLTE      : v2.4.15
+  - Webjars Bootstrap        : v3.4.1
+  - Webjars Font-Awesome     : v4.7.0
+  - Webjars jQuery           : v3.4.1
+  - Webjars jQuery-slimScroll: v1.3.8
+  - Webjars Ionicons         : v2.0.1
 
 Plugins:
 - com.typesafe.sbteclipse:sbteclipse-plugin:5.2.4

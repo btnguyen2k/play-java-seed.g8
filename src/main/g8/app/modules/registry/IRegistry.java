@@ -9,6 +9,8 @@ import play.i18n.MessagesApi;
 import play.libs.ws.WSClient;
 import scala.concurrent.ExecutionContextExecutor;
 
+import java.util.concurrent.atomic.AtomicReference;
+
 /**
  * Application's central registry interface.
  *
@@ -16,6 +18,12 @@ import scala.concurrent.ExecutionContextExecutor;
  * @since template-v0.1.0
  */
 public interface IRegistry {
+    /**
+     * A static {@link IRegistry} that can be accessed anywhere, useful where
+     * {@link com.github.ddth.recipes.global.GlobalRegistry} or DI can not be used (e.g. in scala templates).
+     */
+    AtomicReference<IRegistry> INSTANCE = new AtomicReference<>();
+
     String REG_KEY_REGISTRY = "registry";
     String REG_KEY_DLOCK_FACTORY = "dlock-factory";
     String REG_KEY_PUBSUB_HUB = "pubsub-hub";
@@ -38,8 +46,20 @@ public interface IRegistry {
      * Get application's available languages, defined in {@code application.conf}.
      *
      * @return
+     * @deprecated use {@link #getAvailableLanguages()}
      */
-    Lang[] getAvailableLanguage();
+    @Deprecated
+    default Lang[] getAvailableLanguage() {
+        return getAvailableLanguages();
+    }
+
+    /**
+     * Get application's available languages, defined in {@code application.conf}.
+     *
+     * @return
+     * @since template-v2.7.r1
+     */
+    Lang[] getAvailableLanguages();
 
     /**
      * Get the {@link ActorSystem} instance.

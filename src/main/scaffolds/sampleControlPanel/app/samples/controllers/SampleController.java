@@ -3,6 +3,7 @@ package samples.controllers;
 import controllers.BasePageController;
 import play.data.Form;
 import play.i18n.Lang;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.twirl.api.Html;
 import samples.forms.FormLogin;
@@ -15,7 +16,6 @@ import samples.utils.SessionUtils;
  * @since template-2.6.r5
  */
 public class SampleController extends BasePageController {
-
     /**
      * Handle GET /<context>
      */
@@ -27,8 +27,7 @@ public class SampleController extends BasePageController {
      * Handle GET /<context>/logout
      */
     public Result logout() throws Exception {
-        SessionUtils.logout();
-        return redirect(samples.controllers.routes.SampleController.index());
+        return SessionUtils.logout(redirect(samples.controllers.routes.SampleController.index()).withNewSession());
     }
 
     public final static String VIEW_LOGIN = "vsamples.login";
@@ -36,29 +35,28 @@ public class SampleController extends BasePageController {
     /**
      * Handle GET /<context>/login?urlReturn=xxx
      */
-    public Result login(String returnUrl) throws Exception {
+    public Result login(Http.Request request, String returnUrl) throws Exception {
         Form<FormLogin> form = formFactory.form(FormLogin.class);
-        Html html = render(VIEW_LOGIN, form);
+        Html html = render(request, VIEW_LOGIN, form);
         return ok(html);
     }
 
     /**
      * Handle POST /<context>/login?urlReturn=xxx
      */
-    public Result loginSubmit(String returnUrl) throws Exception {
-        Form<FormLogin> form = formFactory.form(FormLogin.class).bindFromRequest(request());
+    public Result loginSubmit(Http.Request request, String returnUrl) throws Exception {
+        Form<FormLogin> form = formFactory.form(FormLogin.class).bindFromRequest(request);
         if (form.hasErrors()) {
-            Html html = render(VIEW_LOGIN, form);
+            Html html = render(request, VIEW_LOGIN, form);
             return ok(html);
         }
-        SessionUtils.login(session(), form.get().getUser());
-
+        Http.Session session = request.session();
+        session = SessionUtils.login(session, form.get().getUser());
         //set preferred language
         String langCode = form.get().getLanguage();
         Lang lang = Lang.forCode(langCode);
-        setLanguage(lang != null ? lang : lang());
+        session = setLanguage(session, lang != null ? lang : lang());
 
-        return redirect(samples.controllers.routes.SampleController.index());
+        return redirect(samples.controllers.routes.SampleController.index()).withSession(session);
     }
-
 }

@@ -2,19 +2,40 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET		/									controllers.IndexController.index
+GET     /                               controllers.IndexController.index
 
-GET     /400                                controllers.IndexController.error400(msg: String?="")
-GET     /403                                controllers.IndexController.error403(msg: String?="")
-GET     /404                                controllers.IndexController.error404(msg: String?="")
-GET     /error                              controllers.IndexController.errorServer(msg: String?="")
+GET     /api-swagger.json               controllers.swagger.SwaggerUiAssets.jsonSwaggerSpecs
+#GET     /_api-swagger.json              controllers.ApiHelpController.getResources
+# com.iheart.playSwagger, Java conntroller
+GET     /japi-swagger.json              controllers.swagger.JavaApiSpecs.specsJson(request: Request)
+# com.iheart.playSwagger, Scala controller
+GET     /sapi-swagger.json              controllers.swagger.ScalaApiSpecs.specsJson
 
-# Map static resources from the /public folder to the /assets URL path
-# prefix must match `play.assets.urlPrefix`
-GET     /assets/*file                       controllers.Assets.at(file)
-GET     /versionedAssets/*file              controllers.Assets.versioned(file)
-#GET     /assets/*file                       controllers.Assets.versioned(path="/public", file: Asset)
-#GET     /assets/*file                       controllers.Assets.at(path="/public", file: Asset)
+GET     /api-docs/                      controllers.swagger.SwaggerUiAssets.at(file="index.html")
+GET     /api-docs/*file                 controllers.swagger.SwaggerUiAssets.at(file)
+
+GET     /400                            controllers.IndexController.error400(msg: String?="")
+GET     /403                            controllers.IndexController.error403(msg: String?="")
+GET     /404                            controllers.IndexController.error404(msg: String?="")
+GET     /error                          controllers.IndexController.errorServer(msg: String?="")
+
+## Map static resources from the /public folder to the /assets URL path
+#  prefix must match `play.assets.urlPrefix`
+#GET     /favicon.ico                    controllers.Default.redirect(to="/assets/favicon.io/favicon.ico")
+GET     /favicon.ico                    controllers.Assets.at(file="favicon.io/favicon.ico")
+GET     /assets/*file                   controllers.Assets.at(file)
+#GET     /versionedAssets/*file          controllers.Assets.versioned(file)
+
+## if static resources are stored in multiple directory, use full path location syntax
+#GET     /assets/*file                   controllers.Assets.at(path="/public", file)
+#GET     /versionedAssets/*file          controllers.Assets.versioned(path="/public", file)
+
+## Some sample pages
+GET     /demo/cookie                    controllers.CookieDemoController.cookieDemo(request: Request, key: String?="", value: String?="")
+GET     /demo/session                   controllers.SessionDemoController.sessionDemo(request: Request, key: String?="", value: String?="")
+GET     /demo/csrf                      controllers.CSRFDemoController.csrfDemo(request: Request)
+POST    /demo/csrf                      controllers.CSRFDemoController.csrfDemoSubmit(request: Request)
+GET     /demo/memInfo                   controllers.MemoryDemoController.memInfo(request: Request, mem: Integer?=0)
 
 ## Include routes for samples
 -> /samples         samples.Routes

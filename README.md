@@ -30,6 +30,10 @@ Latest release: [template-v2.7.r1](RELEASE-NOTES.md).
   - HTTP
   - [Apache Thrift](https://thrift.apache.org).
   - [gRPC](https://grpc.io).
+- Swagger support for REST APIs (since [template-v2.7.r1](RELEASE-NOTES.md)):
+  - Swagger Json file & API annotations.
+  - Swagger UI.
+  - See examples at [sampleApis/conf/samplesApi.routes](src/main/scaffolds/sampleApis/conf/samplesApi.routes).
 - Docker support (since [template-v2.6.r6](RELEASE-NOTES.md)).
 - HTTPS & HTTP/2 support (since [template-v2.6.r1](RELEASE-NOTES.md)).
 - GitLab CI Runner sample (since [template-v0.1.3](RELEASE-NOTES.md)).
@@ -49,6 +53,24 @@ Latest release: [template-v2.7.r1](RELEASE-NOTES.md).
   - I18N
 - JVM tuning & GC logging
 - Custom error pages (since [template-v2.6.r9](RELEASE-NOTES.md)).
+
+### Swagger Specs Generator for REST APIs
+
+Since [template-v2.7.r1](RELEASE-NOTES.md), this template use [com.iheart:play-swagger](https://github.com/iheartradio/play-swagger) to generate Swagger specs file in Json format.
+The specs file can be accessed via `http(s)://host:port/api-swagger.json`. The URI is configured in `routes` file and can be changed.
+
+[Swagger UI](https://swagger.io/tools/swagger-ui/) is also included and can be accessed via `http(s)://host:port/api-docs/`.
+
+To write API documentation in Swagger spec:
+- Write the document in `routes` file. Currently this template support [Swagger v2.0 syntax](https://swagger.io/docs/specification/2-0/basic-structure/).
+- Examples at [sampleApis/conf/samplesApi.routes](src/main/scaffolds/sampleApis/conf/samplesApi.routes).
+- See [com.iheart:play-swagger GitHub page](https://github.com/iheartradio/play-swagger) for more information.
+
+Remember to set the `routes` file to be parsed for API specs in `application.conf`:
+
+```
+swagger.routes.file = samplesApi.routes
+```
 
 ### Start/Stop Scripts
 

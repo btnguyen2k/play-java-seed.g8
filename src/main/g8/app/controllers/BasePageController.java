@@ -44,49 +44,57 @@ public class BasePageController extends BaseController {
     /**
      * Render a HTML view.
      *
-     * <p>This method add 2 more parameters to the HTML page:</p>
+     * <p>This method add 3 more parameters to the HTML page:</p>
      * <ul>
-     *     <li>{@link Messages} {@code messages}: for i18n.</li>
-     *     <li>{@link Config} {@code config}: to access application's config from inside template.</li>
+     *     <li>{@link Http.Request} {@code request}: as per <a href="https://www.playframework.com/documentation/2.7.x/JavaHttpContextMigration27#Some-template-tags-need-an-implicit-Request,-Messages-or-Lang-instance">Play! 2.7 changes</a>.</li>
+     *     <li>{@link Messages} {@code messages}: for i18n within the template.</li>
+     *     <li>{@link Config} {@code config}: to access application's config within the template.</li>
      * </ul>
      *
+     * <p>{@code Messages} will be calculated from request via {@link #calcMessages(Http.Request)}.</p>
+     *
+     * @param request
      * @param view
      * @param params
      * @return
      * @throws Exception
      * @since template-v2.7.r1
      */
-    protected Html render(Http.Session session, String view, Object... params) throws Exception {
-        return render(calcMessages(session), view, params);
+    protected Html render(Http.Request request, String view, Object... params) throws Exception {
+        return render(request, calcMessages(request), view, params);
     }
 
     /**
      * Render a HTML view.
      *
-     * <p>This method add 2 more parameters to the HTML page:</p>
+     * <p>This method add 3 more parameters to the HTML page:</p>
      * <ul>
-     *     <li>{@link Messages} {@code messages}: for i18n.</li>
-     *     <li>{@link Config} {@code config}: to access application's config from inside template.</li>
+     *     <li>{@link Http.Request} {@code request}: as per <a href="https://www.playframework.com/documentation/2.7.x/JavaHttpContextMigration27#Some-template-tags-need-an-implicit-Request,-Messages-or-Lang-instance">Play! 2.7 changes</a>.</li>
+     *     <li>{@link Messages} {@code messages}: for i18n within the template.</li>
+     *     <li>{@link Config} {@code config}: to access application's config within the template.</li>
      * </ul>
      *
+     * @param request
+     * @param messages
      * @param view
      * @param params
      * @return
      * @throws Exception
      * @since template-v2.7.r1
      */
-    protected Html render(Messages messages, String view, Object... params) throws Exception {
+    protected Html render(Http.Request request, Messages messages, String view, Object... params) throws Exception {
         String clazzName = "views.html." + view;
         Class<?> clazz = Class.forName(clazzName);
         Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             if (method.getName().equals("render")) {
-                Object[] combinedParams = Arrays.copyOf(params, params.length + 2);
-                combinedParams[params.length] = messages;
-                combinedParams[params.length + 1] = getRegistry().getAppConfig();
+                Object[] combinedParams = Arrays.copyOf(params, params.length + 3);
+                combinedParams[params.length] = request;
+                combinedParams[params.length + 1] = messages != null ? messages : calcMessages(request);
+                combinedParams[params.length + 2] = getRegistry().getAppConfig();
                 return (Html) method.invoke(null, combinedParams);
             }
         }
-        return null;
+        throw new RuntimeException("Method render() cannot be found in view [" + clazzName + "].");
     }
 }

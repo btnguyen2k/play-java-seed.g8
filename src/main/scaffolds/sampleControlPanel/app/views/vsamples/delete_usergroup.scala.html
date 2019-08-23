@@ -1,4 +1,4 @@
-@(usergroup: samples.models.UserGroupModel)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(usergroup: samples.models.UserGroupModel)(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
     active    = "usergroups"
 ){
@@ -15,7 +15,12 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-warning">
+	 			@**
+	 			 * CSRF token can be put in form field, or on query string.
+	 			 * In this case we choose form field (just for demo purpose).
+	 			 *@
 				<form role="form" method="post">
+					@helper.CSRF.formField
 				    <div class="box-body">
 				        <div class="form-group">
 				            <label for="usergroup_id">@messages.at("msg.usergroup.id")</label>

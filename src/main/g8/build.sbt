@@ -11,8 +11,8 @@ scalaVersion := "$scala_version$"
 // Custom Maven repository
 resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases/"
 
-// See https://playframework.com/documentation/latest/AkkaHttpServer
-lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttpServer, PlayAkkaHttp2Support, SbtWeb).disablePlugins(ScriptedPlugin).settings(
+// AkkaHttpServer in Play, see https://playframework.com/documentation/latest/AkkaHttpServer
+lazy val root = (project in file(".")).enablePlugins(PlayJava, PlayScala, PlayAkkaHttpServer, PlayAkkaHttp2Support, SbtWeb).settings(
     name         := appName,
     version      := appVersion,
     organization := "$organization$",
@@ -37,7 +37,7 @@ EclipseKeys.projectFlavor            := EclipseProjectFlavor.Java               
 dockerCommands := Seq()
 import com.typesafe.sbt.packager.docker._
 dockerCommands := Seq(
-    Cmd("FROM"          , "openjdk:11-jre-alpine"),
+    Cmd("FROM"          , "openjdk:11-jre-slim"),
     Cmd("LABEL"         , "maintainer=\"$author$\""),
     Cmd("ADD"           , "opt /opt"),
     Cmd("RUN"           , "apk add --no-cache -U bash ca-certificates tzdata && ln -s /opt/docker /opt/" + appName + " && chown -R daemon:daemon /opt && chmod 755 /opt/docker/conf/*.sh && chmod 755 /opt/docker/bin/*"),
@@ -62,7 +62,7 @@ val _akkaVersion             = "2.5.23"
 val _playWsStandaloneVersion = "2.0.7"
 val _grpcVersion             = "1.22.1"
 val _springVersion           = "5.1.9.RELEASE"
-val _ddthAkkaVersion         = "1.0.0"
+val _ddthAkkaVersion         = "1.1.0.1"
 val _ddthCacheAdapterVersion = "1.0.0"
 val _ddthCommonsVersion      = "1.1.0"
 val _ddthDaoVersion          = "1.0.0"
@@ -142,5 +142,19 @@ libraryDependencies ++= Seq(
     ,javaWs
     ,guice
 
+    // Add Swagger Json & UI,
+    // see http://ainsightful.com/index.php/2017/12/09/how-to-add-swagger-ui-to-a-play-application/
+    // see https://github.com/swagger-api/swagger-play
+    // see https://github.com/iheartradio/play-swagger/blob/master/docs/AlternativeSetup.md
+    //,"io.swagger"               %% "swagger-play2"                % "1.7.1"
+    ,"org.webjars"               % "swagger-ui"                   % "3.23.5"
+    //,"javax"                     % "javaee-api"                   % "8.0.1"
+    ,"com.iheart"               %% "play-swagger"                 % "0.8.0-PLAY2.7"
+
     ,"org.webjars"               % "AdminLTE"                     % "2.4.15"
+    ,"org.webjars"               % "bootstrap"                    % "3.4.1"
+    ,"org.webjars"               % "font-awesome"                 % "4.7.0"
+    ,"org.webjars"               % "jquery"                       % "3.4.1"
+    ,"org.webjars"               % "jQuery-slimScroll"            % "1.3.8"
+    ,"org.webjars"               % "ionicons"                     % "2.0.1"
 )

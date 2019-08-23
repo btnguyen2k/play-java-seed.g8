@@ -83,6 +83,7 @@ public class RegistryImpl implements IRegistry {
 
     /*----------------------------------------------------------------------*/
     private void init() {
+        IRegistry.INSTANCE.set(this);
         GlobalRegistry.putToGlobalStorage(REG_KEY_REGISTRY, this);
         initAvailableLanguages();
         initApplicationContext();
@@ -446,7 +447,7 @@ public class RegistryImpl implements IRegistry {
     /**
      * {@inheritDoc}
      */
-    public Lang[] getAvailableLanguage() {
+    public Lang[] getAvailableLanguages() {
         return availableLanguages;
     }
 

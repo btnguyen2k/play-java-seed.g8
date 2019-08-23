@@ -3,8 +3,9 @@ package samples.controllers;
 import com.github.ddth.commons.utils.MapUtils;
 import com.github.ddth.recipes.apiservice.ApiRouter;
 import com.google.inject.Provider;
-import controllers.BaseJsonWsController;
+import controllers.routes;
 import modules.registry.IRegistry;
+import controllers.BaseJsonWsController;
 import play.mvc.Http;
 import play.mvc.Result;
 import samples.api.ApiFuncSample;
@@ -46,15 +47,13 @@ public class SampleApiController extends BaseJsonWsController {
     public Result index() {
         StringBuffer output = new StringBuffer();
         output.append("Sample API list:").append("<ul>");
+        output.append("<li><a href=\"").append(controllers.swagger.routes.SwaggerUiAssets.jsonSwaggerSpecs()).append("\">Swagger.json</a>").append("</li>");
         output.append("</ul>");
         return ok(output.toString()).as("text/html; charset=utf-8");
     }
 
     /*----------------------------------------------------------------------*/
 
-    /*
-     * Handle request GET:/api/employees
-     */
     public Result listEmployees(Http.Request request) {
         return doApiCall(request, "listEmployees");
     }
@@ -143,7 +142,7 @@ public class SampleApiController extends BaseJsonWsController {
     /*
      * Handle request *:/api/noApi
      */
-    public Result noApi(Http.Request request) {
+    public Result noApi(Http.Request request, String apiName) {
         return doApiCall(request, "noApi");
     }
 }

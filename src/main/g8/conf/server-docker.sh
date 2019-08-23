@@ -33,7 +33,7 @@ popd > /dev/null
 # Override environment variables if needed after the next line
 . \$_basedir/server-env.sh
 
-DEFAULT_APP_MEM=64
+DEFAULT_APP_MEM=256
 DEFAULT_APP_CONF=application-prod.conf
 DEFAULT_APP_LOGBACK=logback-docker.xml
 
@@ -99,10 +99,11 @@ doStart() {
     if [ "\$MEMORY_LIMIT" != "" -a "\$MEMORY_LIMIT" != "0" ]; then
     	APP_MEM="\$MEMORY_LIMIT"
     fi
-    RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
+    RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MIN_MEM}m -J-Xmx\${APP_MEM}m)
     RUN_CMD+=(-J-XX:+UseThreadPriorities -J-XX:ThreadPriorityPolicy=42 -J-XX:+HeapDumpOnOutOfMemoryError -J-Xss256k)
     RUN_CMD+=(-J-XX:+UseTLAB -J-XX:+ResizeTLAB -J-XX:+UseNUMA -J-XX:+PerfDisableSharedMem)
-    RUN_CMD+=(-J-XX:+UseG1GC -J-XX:G1RSetUpdatingPauseTimePercent=5 -J-XX:MaxGCPauseMillis=500)
+    RUN_CMD+=(-J-XX:+ExitOnOutOfMemoryError -J-XX:+CrashOnOutOfMemoryError)
+    RUN_CMD+=(-J-XX:+UseG1GC -J-XX:MinHeapFreeRatio=5 -J-XX:MaxHeapFreeRatio=10 -J-XX:-ShrinkHeapInSteps -J-XX:MaxGCPauseMillis=100)
     #RUN_CMD+=(-J-XX:+PrintGCDetails -J-XX:+PrintGCDateStamps -J-XX:+PrintHeapAtGC -J-XX:+PrintTenuringDistribution)
     #RUN_CMD+=(-J-XX:+PrintGCApplicationStoppedTime -J-XX:+PrintPromotionFailure -J-XX:PrintFLSStatistics=1)
     #RUN_CMD+=(-J-Xloggc:\${APP_LOGDIR}/gc.log -J-XX:+UseGCLogFileRotation -J-XX:NumberOfGCLogFiles=10 -J-XX:GCLogFileSize=10M)

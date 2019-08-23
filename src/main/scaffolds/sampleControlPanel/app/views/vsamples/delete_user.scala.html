@@ -1,4 +1,4 @@
-@(user: samples.models.UserModel)(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@(user: samples.models.UserModel)(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
     active    = "users"
 ){
@@ -15,7 +15,11 @@
     <div class="row">
         <div class="col-xs-12">
             <div class="box box-warning">
-				<form role="form" method="post">
+                @**
+                 * CSRF token can be put in form field, or on query string.
+                 * In this case we choose query string (just for demo purpose).
+                 *@
+				<form role="form" method="post" action="@helper.CSRF(samples.controllers.routes.SampleControlPanelController.deleteUser(user.getUsername()))">
 				    <div class="box-body">
 				        <div class="form-group">
 				            <label for="user_username">@messages.at("msg.user.username")</label>

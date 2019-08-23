@@ -1,4 +1,4 @@
-@()(implicit messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
+@()(implicit request: Http.Request, messages: play.i18n.Messages, appConf: com.typesafe.config.Config)
 @_layout(
     active    = "dashboard",
     customCss = Array(),

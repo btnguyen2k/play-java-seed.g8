@@ -82,7 +82,10 @@ doStart() {
     if [ "\$FINAL_APP_SSL_KEYSTORE" != "" ]; then
         RUN_CMD+=(-Djavax.net.ssl.keyStore=\$FINAL_APP_SSL_KEYSTORE -Djavax.net.ssl.keyStorePassword=\$APP_SSL_KEYSTORE_PASSWORD)
     fi
-    RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MEM}m -J-Xmx\${APP_MEM}m)
+
+    RUN_CMD+=(-Djava.awt.headless=true -Djava.net.preferIPv4Stack=true -J-server -J-Xms\${APP_MIN_MEM}m -J-Xmx\${APP_MEM}m)
+    RUN_CMD+=(-J-XX:+ExitOnOutOfMemoryError -J-XX:+CrashOnOutOfMemoryError)
+    RUN_CMD+=(-J-Xlog:gc -J-XX:+UseG1GC -J-XX:MinHeapFreeRatio=5 -J-XX:MaxHeapFreeRatio=10 -J-XX:-ShrinkHeapInSteps)
     RUN_CMD+=(-Dspring.profiles.active=development -Dconfig.file=\$FINAL_APP_CONF -Dlogger.file=\$FINAL_APP_LOGBACK)
     RUN_CMD+=(\$JVM_EXTRA_OPS)
        

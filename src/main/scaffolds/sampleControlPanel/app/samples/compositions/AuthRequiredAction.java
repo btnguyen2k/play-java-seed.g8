@@ -12,27 +12,27 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import play.Logger;
 import play.mvc.Action;
 import play.mvc.Call;
-import play.mvc.Http.Context;
-import play.mvc.Http.Session;
+import play.mvc.Http;
 import play.mvc.Result;
 import samples.bo.user.UserBo;
 import samples.utils.SessionUtils;
 
 public class AuthRequiredAction extends Action<AuthRequired> {
+    private final Logger.ALogger LOGGER = Logger.of(AuthRequiredAction.class);
 
-    private CompletionStage<Result> goLogin(Context ctx, String _loginCall, String flashKey,
-            String flashMsg) {
+    private CompletionStage<Result> goLogin(Http.Request request, String _loginCall, String flashKey, String flashMsg) {
         return CompletableFuture.supplyAsync(() -> {
             String loginCall = _loginCall.trim();
+            Http.Flash flash = request.flash();
             if (!StringUtils.isBlank(flashMsg) && !StringUtils.isBlank(flashKey)) {
-                ctx.flash().put(flashKey, flashMsg);
+                flash = flash.adding(flashKey, flashMsg);
             }
 
-            String urlReturn = ctx.request().uri();
+            String urlReturn = request.uri();
             if (StringUtils.isBlank(loginCall)) {
-                return redirect(samples.controllers.routes.SampleController.login(urlReturn));
+                return redirect(samples.controllers.routes.SampleController.login(urlReturn)).withFlash(flash);
             } else if (loginCall.startsWith("/")) {
-                return redirect(loginCall);
+                return redirect(loginCall).withFlash(flash);
             } else {
                 try {
                     String[] tokens = loginCall.split(":");
@@ -43,13 +43,13 @@ public class AuthRequiredAction extends Action<AuthRequired> {
                         Method[] methods = revertClass.getMethods();
                         for (Method method : methods) {
                             if (StringUtils.equals(method.getName(), tokens[2])) {
-                                return redirect((Call) method.invoke(field.get(null), urlReturn));
+                                return redirect((Call) method.invoke(field.get(null), urlReturn)).withFlash(flash);
                             }
                         }
                     }
-                    Logger.warn("Cannot find loginCall: " + _loginCall);
+                    LOGGER.warn("Cannot find loginCall: " + _loginCall);
                 } catch (Exception e) {
-                    Logger.warn(e.getMessage(), e);
+                    LOGGER.warn(e.getMessage(), e);
                 }
             }
             return redirect("/");
@@ -57,20 +57,20 @@ public class AuthRequiredAction extends Action<AuthRequired> {
     }
 
     @Override
-    public CompletionStage<Result> call(Context ctx) {
-        Session session = ctx.session();
-        UserBo currentUser = SessionUtils.currentUser(session);
+    public CompletionStage<Result> call(Http.Request request) {
+        UserBo currentUser = SessionUtils.currentUser(request);
         if (currentUser == null
                 || (configuration.usergroups() != null && configuration.usergroups().length > 0
-                && ArrayUtils.indexOf(configuration.usergroups(),
-                currentUser.getGroupId()) == ArrayUtils.INDEX_NOT_FOUND)) {
+                && ArrayUtils.indexOf(configuration.usergroups(), currentUser.getGroupId()) == ArrayUtils.INDEX_NOT_FOUND)) {
+            if (currentUser != null) {
+                LOGGER.warn("User [" + currentUser.getUsername() + "] logged in, but not in allowed groups to access " + request.uri());
+            }
             // user not logged in, or not in allowed groups
-            return goLogin(ctx, configuration.loginCall(), configuration.flashKey(),
-                    configuration.flashMsg());
+            return goLogin(request, configuration.loginCall(), configuration.flashKey(), configuration.flashMsg());
         }
 
         try {
-            return delegate.call(ctx);
+            return delegate.call(request);
         } catch (Exception e) {
             return CompletableFuture.supplyAsync(() -> {
                 StringBuilder sb = new StringBuilder(

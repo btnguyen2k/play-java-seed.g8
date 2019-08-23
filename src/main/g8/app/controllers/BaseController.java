@@ -59,10 +59,12 @@ public class BaseController extends Controller {
     /**
      * Switch to the specified language: store language code in session at key {@link #SESSION_LANG}.
      *
+     * @param result
      * @param lang
+     * @return
      */
-    protected void setLanguage(Result result, Lang lang) {
-        setLanguage(result.session(), lang);
+    protected Result setLanguage(Result result, Lang lang) {
+        return result.withSession(setLanguage(result.session(), lang));
     }
 
     /**
@@ -70,10 +72,11 @@ public class BaseController extends Controller {
      *
      * @param session
      * @param lang
+     * @return
      * @since template-v2.7.r1
      */
-    protected void setLanguage(Http.Session session, Lang lang) {
-        session.adding(SESSION_LANG, lang.code());
+    protected Http.Session setLanguage(Http.Session session, Lang lang) {
+        return session.adding(SESSION_LANG, lang.code());
     }
 
     /**
@@ -143,7 +146,7 @@ public class BaseController extends Controller {
     protected Result responseRedirect(String url, String flashKey, String flashMsg) {
         Result result = redirect(url);
         if (!StringUtils.isBlank(flashKey) && !StringUtils.isBlank(flashMsg)) {
-            result.flashing(flashKey, flashMsg);
+            result = result.flashing(flashKey, flashMsg);
         }
         return result;
     }
@@ -159,7 +162,7 @@ public class BaseController extends Controller {
     protected Result responseRedirect(Call call, String flashKey, String flashMsg) {
         Result result = redirect(call);
         if (!StringUtils.isBlank(flashKey) && !StringUtils.isBlank(flashMsg)) {
-            result.flashing(flashKey, flashMsg);
+            result = result.flashing(flashKey, flashMsg);
         }
         return result;
     }
